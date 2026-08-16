@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { addToCart, getCart, type CartItem } from "@/lib/cart";
 
 type Store = {
   id: string;
@@ -24,19 +25,32 @@ type Product = {
   is_active: boolean;
   is_featured: boolean;
   image_url: string | null;
+  sku: string | null;
 };
 
-type Settings = {
-  currency: string;
-};
+type Settings = { currency: string };
 
 export default function StorefrontPage() {
   const params = useParams<{ slug: string }>();
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<Settings>({ currency: "DZD" });
+  const [cartCount, setCartCount] = useState(0);
+  const [addedId, setAddedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  function refreshCartCount() {
+    setCartCount(
+      getCart().reduce((total: number, item: CartItem) => total + item.quantity, 0)
+    );
+  }
+
+  useEffect(() => {
+    refreshCartCount();
+    window.addEventListener("nexora-cart-updated", refreshCartCount);
+    return () => window.removeEventListener("nexora-cart-updated", refreshCartCount);
+  }, []);
 
   useEffect(() => {
     async function loadStore() {
@@ -62,7 +76,9 @@ export default function StorefrontPage() {
         await Promise.all([
           supabase
             .from("products")
-            .select("id,name,slug,description,price,compare_at_price,stock_quantity,is_active,is_featured,image_url")
+            .select(
+              "id,name,slug,description,price,compare_at_price,stock_quantity,is_active,is_featured,image_url,sku"
+            )
             .eq("store_id", storeData.id)
             .eq("is_active", true)
             .order("is_featured", { ascending: false })
@@ -74,15 +90,10 @@ export default function StorefrontPage() {
             .maybeSingle(),
         ]);
 
-      if (productError) {
-        setError(productError.message);
-      } else {
-        setProducts(productData ?? []);
-      }
+      if (productError) setError(productError.message);
+      else setProducts(productData ?? []);
 
-      if (settingsData?.currency) {
-        setSettings({ currency: settingsData.currency });
-      }
+      if (settingsData?.currency) setSettings({ currency: settingsData.currency });
 
       setLoading(false);
     }
@@ -90,13 +101,36 @@ export default function StorefrontPage() {
     loadStore();
   }, [params.slug]);
 
+  function handleAdd(product: Product) {
+    if (!store || product.stock_quantity <= 0) return;
+
+    addToCart({
+      productId: product.id,
+      storeId: store.id,
+      storeSlug: store.slug,
+      name: product.name,
+      slug: product.slug,
+      price: Number(product.price),
+      quantity: 1,
+      stockQuantity: product.stock_quantity,
+      imageUrl: product.image_url,
+      sku: product.sku,
+    });
+
+    setAddedId(product.id);
+    refreshCartCount();
+    setTimeout(() => setAddedId(null), 1800);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#fafafa] p-6" dir="rtl">
         <div className="mx-auto max-w-6xl animate-pulse">
           <div className="h-48 rounded-[2rem] bg-zinc-200" />
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((item) => <div key={item} className="h-80 rounded-3xl bg-zinc-200" />)}
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="h-80 rounded-3xl bg-zinc-200" />
+            ))}
           </div>
         </div>
       </main>
@@ -108,7 +142,9 @@ export default function StorefrontPage() {
       <main className="flex min-h-screen items-center justify-center bg-[#fafafa] p-6" dir="rtl">
         <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center">
           <p className="text-sm font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p>
-          <h1 className="mt-4 text-2xl font-bold text-zinc-900">{error || "المتجر غير موجود"}</h1>
+          <h1 className="mt-4 text-2xl font-bold text-zinc-900">
+            {error || "المتجر غير موجود"}
+          </h1>
         </div>
       </main>
     );
@@ -116,8 +152,8 @@ export default function StorefrontPage() {
 
   return (
     <main className="min-h-screen bg-[#fafafa] text-zinc-900" dir="rtl">
-      <header className="border-b border-zinc-200/80 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+      <header className="sticky top-0 z-20 border-b border-zinc-200/80 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <div className="flex items-center gap-3">
             {store.logo_url ? (
               <img src={store.logo_url} alt={store.name} className="h-11 w-11 rounded-2xl object-cover" />
@@ -132,8 +168,16 @@ export default function StorefrontPage() {
             </div>
           </div>
 
-          <Link href="/dashboard" className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50">
-            لوحة التحكم
+          <Link
+            href="/cart"
+            className="relative rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white"
+          >
+            السلة 🛒
+            {cartCount > 0 && (
+              <span className="mr-2 inline-flex min-w-6 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-zinc-900">
+                {cartCount}
+              </span>
+            )}
           </Link>
         </div>
       </header>
@@ -141,9 +185,13 @@ export default function StorefrontPage() {
       <section className="mx-auto max-w-6xl px-5 pb-8 pt-10">
         <div className="overflow-hidden rounded-[2rem] bg-zinc-900 px-7 py-12 text-white sm:px-12">
           <p className="text-sm font-medium text-zinc-400">متجر إلكتروني</p>
-          <h2 className="mt-3 max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">{store.name}</h2>
+          <h2 className="mt-3 max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
+            {store.name}
+          </h2>
           {store.description && (
-            <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300">{store.description}</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300">
+              {store.description}
+            </p>
           )}
         </div>
       </section>
@@ -165,53 +213,66 @@ export default function StorefrontPage() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
-              <article key={product.id} className="group overflow-hidden rounded-[1.75rem] border border-zinc-200 bg-white transition hover:-translate-y-1 hover:shadow-xl">
-                <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
-                  {product.image_url ? (
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-zinc-400">لا توجد صورة</div>
-                  )}
-                  {product.is_featured && (
-                    <span className="absolute right-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold shadow-sm">
-                      مميز
-                    </span>
-                  )}
-                </div>
+              <article
+                key={product.id}
+                className="group overflow-hidden rounded-[1.75rem] border border-zinc-200 bg-white transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                <Link href={`/shop/${store.slug}/product/${product.slug}`} className="block">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+                        لا توجد صورة
+                      </div>
+                    )}
 
-                <div className="p-5">
-                  <h3 className="text-lg font-bold">{product.name}</h3>
-                  {product.description && (
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-500">{product.description}</p>
-                  )}
-
-                  <div className="mt-5 flex items-end justify-between gap-3">
-                    <div>
-                      <p className="text-xl font-bold">
-                        {Number(product.price).toLocaleString("fr-DZ")} {settings.currency}
-                      </p>
-                      {product.compare_at_price && product.compare_at_price > product.price && (
-                        <p className="mt-1 text-sm text-zinc-400 line-through">
-                          {Number(product.compare_at_price).toLocaleString("fr-DZ")} {settings.currency}
-                        </p>
-                      )}
-                    </div>
-
-                    <span className={product.stock_quantity > 0 ? "text-sm text-emerald-600" : "text-sm text-red-500"}>
-                      {product.stock_quantity > 0 ? "متوفر" : "نفد المخزون"}
-                    </span>
+                    {product.is_featured && (
+                      <span className="absolute right-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold shadow-sm">
+                        مميز
+                      </span>
+                    )}
                   </div>
 
+                  <div className="p-5 pb-2">
+                    <h3 className="text-lg font-bold">{product.name}</h3>
+                    {product.description && (
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-500">
+                        {product.description}
+                      </p>
+                    )}
+
+                    <div className="mt-5 flex items-end justify-between gap-3">
+                      <div>
+                        <p className="text-xl font-bold">
+                          {Number(product.price).toLocaleString("fr-DZ")} {settings.currency}
+                        </p>
+                        {product.compare_at_price && product.compare_at_price > product.price && (
+                          <p className="mt-1 text-sm text-zinc-400 line-through">
+                            {Number(product.compare_at_price).toLocaleString("fr-DZ")} {settings.currency}
+                          </p>
+                        )}
+                      </div>
+
+                      <span className={product.stock_quantity > 0 ? "text-sm text-emerald-600" : "text-sm text-red-500"}>
+                        {product.stock_quantity > 0 ? "متوفر" : "نفد المخزون"}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+
+                <div className="px-5 pb-5">
                   <button
                     type="button"
                     disabled={product.stock_quantity <= 0}
-                    className="mt-5 w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
+                    onClick={() => handleAdd(product)}
+                    className="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
                   >
-                    {product.stock_quantity > 0 ? "أضف إلى السلة" : "غير متوفر"}
+                    {addedId === product.id ? "تمت الإضافة ✓" : "أضف إلى السلة"}
                   </button>
                 </div>
               </article>
