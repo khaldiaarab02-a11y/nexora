@@ -1,73 +1,128 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-type Body = {
-  storeId: string;
-  storeSlug: string;
-  customer: {
-    name: string;
-    phone: string;
-    email?: string;
-    wilaya: string;
-    commune?: string;
-    address: string;
-    notes?: string;
-  };
-  items: { productId: string; quantity: number }[];
+type OrderItemInput = {
+  productId: string;
+  quantity: number;
 };
+
+type OrderInput = {
+  storeId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  wilaya: string;
+  commune?: string;
+  address: string;
+  notes?: string;
+  items: OrderItemInput[];
+};
+
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url) {
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
+  }
+
+  if (!key) {
+    throw new Error(
+      "Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables"
+    );
+  }
+
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Body;
+    const body = (await request.json()) as OrderInput;
 
-    if (!body.storeId || !body.items?.length) {
-      return NextResponse.json({ error: "الطلب غير مكتمل." }, { status: 400 });
+    if (
+      !body.storeId ||
+      !body.customerName?.trim() ||
+      !body.customerPhone?.trim() ||
+      !body.wilaya?.trim() ||
+      !body.address?.trim() ||
+      !Array.isArray(body.items) ||
+      body.items.length === 0
+    ) {
+      return NextResponse.json(
+        { error: "بيانات الطلب غير مكتملة." },
+        { status: 400 }
+      );
     }
 
-    if (!body.customer?.name || !body.customer?.phone || !body.customer?.wilaya || !body.customer?.address) {
-      return NextResponse.json({ error: "يرجى إكمال معلومات التوصيل." }, { status: 400 });
-    }
+    const supabase = getAdminClient();
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SECRET_KEY!
-    );
+    const productIds = body.items.map((item) => item.productId);
 
-    const { data: store } = await supabase
-      .from("stores")
-      .select("id,slug,is_active")
-      .eq("id", body.storeId)
-      .maybeSingle();
-
-    if (!store?.is_active) {
-      return NextResponse.json({ error: "المتجر غير متاح." }, { status: 400 });
-    }
-
-    const ids = body.items.map((x) => x.productId);
     const { data: products, error: productsError } = await supabase
       .from("products")
-      .select("id,store_id,name,sku,price,stock_quantity,is_active")
-      .in("id", ids)
+      .select(
+        "id,store_id,name,sku,price,stock_quantity,is_active"
+      )
       .eq("store_id", body.storeId)
-      .eq("is_active", true);
+      .in("id", productIds);
 
-    if (productsError || !products || products.length !== ids.length) {
-      return NextResponse.json({ error: "أحد المنتجات لم يعد متاحًا." }, { status: 400 });
+    if (productsError) {
+      throw new Error(`تعذر قراءة المنتجات: ${productsError.message}`);
     }
 
-    const normalized = body.items.map((requested) => {
-      const product = products.find((p) => p.id === requested.productId)!;
-      const quantity = Math.max(1, Math.floor(Number(requested.quantity)));
-      return { product, quantity };
-    });
+    if (!products || products.length !== body.items.length) {
+      return NextResponse.json(
+        { error: "أحد المنتجات في السلة لم يعد متاحًا." },
+        { status: 409 }
+      );
+    }
 
-    for (const item of normalized) {
-      if (item.quantity > item.product.stock_quantity) {
-        return NextResponse.json({ error: `الكمية المتاحة من "${item.product.name}" هي ${item.product.stock_quantity}.` }, { status: 400 });
+    const productMap = new Map(products.map((product) => [product.id, product]));
+
+    let subtotal = 0;
+
+    const orderItems = body.items.map((item) => {
+      const product = productMap.get(item.productId);
+
+      if (!product) {
+        throw new Error("المنتج غير موجود.");
       }
-    }
 
-    const subtotal = normalized.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
+      const quantity = Number(item.quantity);
+
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        throw new Error(`الكمية غير صالحة للمنتج: ${product.name}`);
+      }
+
+      if (!product.is_active) {
+        throw new Error(`المنتج غير متاح: ${product.name}`);
+      }
+
+      if (product.stock_quantity < quantity) {
+        throw new Error(
+          `المخزون غير كافٍ للمنتج "${product.name}". المتوفر: ${product.stock_quantity}`
+        );
+      }
+
+      const unitPrice = Number(product.price);
+      subtotal += unitPrice * quantity;
+
+      return {
+        product_id: product.id,
+        product_name: product.name,
+        product_sku: product.sku,
+        unit_price: unitPrice,
+        quantity,
+        options: {},
+      };
+    });
 
     const { data: settings } = await supabase
       .from("store_settings")
@@ -75,68 +130,97 @@ export async function POST(request: Request) {
       .eq("store_id", body.storeId)
       .maybeSingle();
 
-    const shippingFee = Number(settings?.default_shipping_fee || 0);
+    const shippingFee = Number(settings?.default_shipping_fee ?? 0);
     const total = subtotal + shippingFee;
 
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
         store_id: body.storeId,
-        customer_name: body.customer.name.trim(),
-        customer_phone: body.customer.phone.trim(),
-        customer_email: body.customer.email?.trim() || null,
-        wilaya: body.customer.wilaya.trim(),
-        commune: body.customer.commune?.trim() || null,
-        address: body.customer.address.trim(),
-        notes: body.customer.notes?.trim() || null,
+        customer_name: body.customerName.trim(),
+        customer_phone: body.customerPhone.trim(),
+        customer_email: body.customerEmail?.trim() || null,
+        wilaya: body.wilaya.trim(),
+        commune: body.commune?.trim() || null,
+        address: body.address.trim(),
+        notes: body.notes?.trim() || null,
         subtotal,
         shipping_fee: shippingFee,
         total,
         status: "pending",
       })
-      .select("id,order_number")
+      .select("id")
       .single();
 
     if (orderError || !order) {
-      return NextResponse.json({ error: orderError?.message || "تعذر إنشاء الطلب." }, { status: 500 });
+      throw new Error(
+        `تعذر إنشاء الطلب: ${orderError?.message || "لم يتم إنشاء الطلب"}`
+      );
     }
 
-    const { error: itemsError } = await supabase.from("order_items").insert(
-      normalized.map(({ product, quantity }) => ({
-        order_id: order.id,
-        product_id: product.id,
-        product_name: product.name,
-        product_sku: product.sku,
-        unit_price: product.price,
-        quantity,
-        options: {},
-      }))
-    );
+    const itemsWithOrderId = orderItems.map((item) => ({
+      ...item,
+      order_id: order.id,
+    }));
+
+    const { error: itemsError } = await supabase
+      .from("order_items")
+      .insert(itemsWithOrderId);
 
     if (itemsError) {
       await supabase.from("orders").delete().eq("id", order.id);
-      return NextResponse.json({ error: "تعذر حفظ تفاصيل الطلب." }, { status: 500 });
+      throw new Error(`تعذر حفظ تفاصيل الطلب: ${itemsError.message}`);
     }
 
-    for (const { product, quantity } of normalized) {
-      const { data: updated, error: stockError } = await supabase
+    for (const item of body.items) {
+      const product = productMap.get(item.productId)!;
+      const quantity = Number(item.quantity);
+
+      const { data: updatedProduct, error: stockError } = await supabase
         .from("products")
-        .update({ stock_quantity: product.stock_quantity - quantity })
+        .update({
+          stock_quantity: product.stock_quantity - quantity,
+        })
         .eq("id", product.id)
         .eq("store_id", body.storeId)
         .gte("stock_quantity", quantity)
         .select("id")
         .maybeSingle();
 
-      if (stockError || !updated) {
+      if (stockError || !updatedProduct) {
         await supabase.from("order_items").delete().eq("order_id", order.id);
         await supabase.from("orders").delete().eq("id", order.id);
-        return NextResponse.json({ error: `تعذر تحديث مخزون "${product.name}". حاولي مرة أخرى.` }, { status: 409 });
+
+        throw new Error(
+          stockError
+            ? `تعذر تحديث المخزون: ${stockError.message}`
+            : `المخزون تغير أثناء إنشاء الطلب للمنتج: ${product.name}`
+        );
       }
     }
 
-    return NextResponse.json({ ok: true, orderNumber: order.order_number, storeSlug: store.slug });
-  } catch {
-    return NextResponse.json({ error: "حدث خطأ غير متوقع." }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: true,
+        orderId: order.id,
+        subtotal,
+        shippingFee,
+        total,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "حدث خطأ غير معروف.";
+
+    console.error("NEXORA ORDER ERROR:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: message,
+      },
+      { status: 500 }
+    );
   }
 }
