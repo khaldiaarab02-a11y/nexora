@@ -71,10 +71,7 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <main
-        className="min-h-screen bg-zinc-50 p-8 text-center text-zinc-500"
-        dir="rtl"
-      >
+      <main className="min-h-screen bg-zinc-50 p-8 text-center text-zinc-500" dir="rtl">
         جاري تحميل المنتج...
       </main>
     );
@@ -82,55 +79,45 @@ export default function ProductPage() {
 
   if (error || !product || !store) {
     return (
-      <main
-        className="min-h-screen bg-zinc-50 p-8 text-center text-red-600"
-        dir="rtl"
-      >
+      <main className="min-h-screen bg-zinc-50 p-8 text-center text-red-600" dir="rtl">
         {error || "المنتج غير موجود."}
       </main>
     );
   }
 
-  const unavailable = product.stock_quantity <= 0;
+  // Capture narrowed values so TypeScript keeps them non-null inside callbacks.
+  const currentProduct = product;
+  const currentStore = store;
+  const unavailable = currentProduct.stock_quantity <= 0;
 
   function handleAdd() {
-    if (product.stock_quantity <= 0) return;
+    if (currentProduct.stock_quantity <= 0) return;
 
     addToCart({
-      productId: product.id,
-      storeId: product.store_id,
-      storeSlug: store.slug,
-      name: product.name,
-      slug: product.slug,
-      price: Number(product.price),
+      productId: currentProduct.id,
+      storeId: currentProduct.store_id,
+      storeSlug: currentStore.slug,
+      name: currentProduct.name,
+      slug: currentProduct.slug,
+      price: Number(currentProduct.price),
       quantity,
-      stockQuantity: product.stock_quantity,
-      imageUrl: product.image_url,
-      sku: product.sku,
+      stockQuantity: currentProduct.stock_quantity,
+      imageUrl: currentProduct.image_url,
+      sku: currentProduct.sku,
     });
 
     setAdded(true);
-
-    setTimeout(() => {
-      setAdded(false);
-    }, 2500);
+    setTimeout(() => setAdded(false), 2500);
   }
 
   return (
     <main className="min-h-screen bg-[#fafafa]" dir="rtl">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
-          <Link
-            href={`/shop/${store.slug}`}
-            className="text-sm font-medium text-zinc-600"
-          >
+          <Link href={`/shop/${currentStore.slug}`} className="text-sm font-medium text-zinc-600">
             ← العودة للمتجر
           </Link>
-
-          <Link
-            href="/cart"
-            className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white"
-          >
+          <Link href="/cart" className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white">
             السلة 🛒
           </Link>
         </div>
@@ -139,10 +126,10 @@ export default function ProductPage() {
       <section className="mx-auto max-w-5xl px-5 py-8">
         <div className="grid overflow-hidden rounded-[2rem] border border-zinc-200 bg-white md:grid-cols-2">
           <div className="aspect-square bg-zinc-100">
-            {product.image_url ? (
+            {currentProduct.image_url ? (
               <img
-                src={product.image_url}
-                alt={product.name}
+                src={currentProduct.image_url}
+                alt={currentProduct.name}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -153,68 +140,49 @@ export default function ProductPage() {
           </div>
 
           <div className="p-7 sm:p-10">
-            <p className="text-sm text-zinc-400">{store.name}</p>
+            <p className="text-sm text-zinc-400">{currentStore.name}</p>
+            <h1 className="mt-3 text-3xl font-bold">{currentProduct.name}</h1>
 
-            <h1 className="mt-3 text-3xl font-bold">{product.name}</h1>
-
-            {product.description && (
+            {currentProduct.description && (
               <p className="mt-5 leading-7 text-zinc-600">
-                {product.description}
+                {currentProduct.description}
               </p>
             )}
 
             <div className="mt-7">
               <span className="text-3xl font-bold">
-                {Number(product.price).toLocaleString("fr-DZ")} DZD
+                {Number(currentProduct.price).toLocaleString("fr-DZ")} DZD
               </span>
 
-              {product.compare_at_price &&
-                product.compare_at_price > product.price && (
+              {currentProduct.compare_at_price &&
+                currentProduct.compare_at_price > currentProduct.price && (
                   <span className="mr-3 text-zinc-400 line-through">
-                    {Number(product.compare_at_price).toLocaleString("fr-DZ")} DZD
+                    {Number(currentProduct.compare_at_price).toLocaleString("fr-DZ")} DZD
                   </span>
                 )}
             </div>
 
-            <p
-              className={`mt-3 text-sm ${
-                unavailable ? "text-red-500" : "text-emerald-600"
-              }`}
-            >
-              {unavailable
-                ? "نفد المخزون"
-                : `متوفر — ${product.stock_quantity} قطعة`}
+            <p className={`mt-3 text-sm ${unavailable ? "text-red-500" : "text-emerald-600"}`}>
+              {unavailable ? "نفد المخزون" : `متوفر — ${currentProduct.stock_quantity} قطعة`}
             </p>
 
             {!unavailable && (
               <div className="mt-7">
-                <label className="mb-2 block text-sm font-medium">
-                  الكمية
-                </label>
-
+                <label className="mb-2 block text-sm font-medium">الكمية</label>
                 <div className="flex w-fit items-center overflow-hidden rounded-xl border border-zinc-300">
                   <button
                     type="button"
                     className="px-5 py-3"
-                    onClick={() =>
-                      setQuantity(Math.max(1, quantity - 1))
-                    }
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   >
                     −
                   </button>
-
                   <span className="min-w-12 text-center">{quantity}</span>
-
                   <button
                     type="button"
                     className="px-5 py-3"
                     onClick={() =>
-                      setQuantity(
-                        Math.min(
-                          product.stock_quantity,
-                          quantity + 1
-                        )
-                      )
+                      setQuantity(Math.min(currentProduct.stock_quantity, quantity + 1))
                     }
                   >
                     +
