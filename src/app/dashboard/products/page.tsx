@@ -86,28 +86,31 @@ export default function ProductsPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <article key={product.id} className="overflow-hidden rounded-3xl border border-zinc-200 bg-white">
-                <div className="aspect-[4/3] bg-zinc-100">
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-zinc-400">لا توجد صورة</div>
-                  )}
-                </div>
-                <div className="p-5" dir="rtl">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="font-bold text-zinc-900">{product.name}</h2>
-                      <p className="mt-1 text-xs text-zinc-400">{product.slug}</p>
+                <Link href={`/dashboard/products/${product.id}/edit`} className="block">
+                  <div className="aspect-[4/3] bg-zinc-100">
+                    {product.image_url ? (
+                      <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-zinc-400">لا توجد صورة</div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h2 className="font-bold text-zinc-900">{product.name}</h2>
+                        <p className="mt-1 text-xs text-zinc-400">{product.slug}</p>
+                      </div>
+                      <span className={product.is_active ? "text-sm text-emerald-600" : "text-sm text-zinc-400"}>
+                        {product.is_active ? "نشط" : "متوقف"}
+                      </span>
                     </div>
-                    <span className={product.is_active ? "text-emerald-600 text-sm" : "text-zinc-400 text-sm"}>
-                      {product.is_active ? "نشط" : "متوقف"}
-                    </span>
+                    <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
+                      <span className="font-bold text-zinc-900">{Number(product.price).toLocaleString("fr-DZ")} DZD</span>
+                      <span className="text-sm text-zinc-500">المخزون: {product.stock_quantity}</span>
+                    </div>
+                    <div className="mt-4 text-center text-sm font-medium text-zinc-500">اضغطي للتعديل</div>
                   </div>
-                  <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
-                    <span className="font-bold text-zinc-900">{Number(product.price).toLocaleString("fr-DZ")} DZD</span>
-                    <span className="text-sm text-zinc-500">المخزون: {product.stock_quantity}</span>
-                  </div>
-                </div>
+                </Link>
               </article>
             ))}
           </div>
