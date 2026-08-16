@@ -25,3 +25,14 @@ export const statusStyles: Record<OrderStatus, string> = {
   delivered: "bg-emerald-50 text-emerald-700",
   cancelled: "bg-red-50 text-red-700",
 };
+
+// Solid bar color per status (e.g. for the status-distribution bars on the
+// dashboard). Kept as literal Tailwind class names (not derived at runtime)
+// so the Tailwind JIT scanner can find and include them in the build.
+export const statusBarColor: Record<OrderStatus, string> = {
+  pending: "bg-amber-400",
+  confirmed: "bg-blue-400",
+  shipped: "bg-violet-400",
+  delivered: "bg-emerald-400",
+  cancelled: "bg-red-400",
+};
