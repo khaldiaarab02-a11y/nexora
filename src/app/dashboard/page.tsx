@@ -1,6 +1,65 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
+
+type StoreSummary = {
+  name: string;
+  slug: string;
+  productsCount: number;
+  ordersCount: number;
+  revenue: number;
+};
 
 export default function DashboardPage() {
+  const [summary, setSummary] = useState<StoreSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    async function loadSummary() {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        setMessage("يجب تسجيل الدخول أولًا.");
+        setLoading(false);
+        return;
+      }
+
+      const { data: membership } = await supabase
+        .from("store_members")
+        .select("store_id")
+        .eq("user_id", userData.user.id)
+        .eq("role", "owner")
+        .limit(1)
+        .maybeSingle();
+
+      if (!membership) {
+        setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+        setLoading(false);
+        return;
+      }
+
+      const [{ data: store }, { count: productsCount }, { data: orders, count: ordersCount }] = await Promise.all([
+        supabase.from("stores").select("name,slug").eq("id", membership.store_id).maybeSingle(),
+        supabase.from("products").select("id", { count: "exact", head: true }).eq("store_id", membership.store_id),
+        supabase.from("orders").select("total", { count: "exact" }).eq("store_id", membership.store_id),
+      ]);
+
+      const revenue = (orders ?? []).reduce((sum, order) => sum + Number(order.total || 0), 0);
+
+      setSummary({
+        name: store?.name || "",
+        slug: store?.slug || "",
+        productsCount: productsCount ?? 0,
+        ordersCount: ordersCount ?? 0,
+        revenue,
+      });
+      setLoading(false);
+    }
+    loadSummary();
+  }, []);
+
   return (
     <main className="min-h-screen bg-zinc-50" dir="rtl">
       <header className="border-b border-zinc-200 bg-white">
@@ -18,14 +77,22 @@ export default function DashboardPage() {
       <div className="mx-auto max-w-6xl px-6 py-8">
         <section className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm">
           <p className="text-sm font-medium text-zinc-400">المتجر الحالي</p>
-          <h2 className="mt-2 text-3xl font-bold text-zinc-900">Nexora Test</h2>
-          <p className="mt-1 text-sm text-zinc-500">nexora-test</p>
+          {loading ? (
+            <p className="mt-2 text-sm text-zinc-400">جاري التحميل...</p>
+          ) : message ? (
+            <p className="mt-2 text-sm text-red-600">{message}</p>
+          ) : (
+            <>
+              <h2 className="mt-2 text-3xl font-bold text-zinc-900">{summary?.name}</h2>
+              <p className="mt-1 text-sm text-zinc-500">{summary?.slug}</p>
+            </>
+          )}
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <DashboardCard title="المنتجات" value="0" href="/dashboard/products" />
-            <DashboardCard title="الطلبات" value="0" href="#" />
+            <DashboardCard title="المنتجات" value={String(summary?.productsCount ?? 0)} href="/dashboard/products" />
+            <DashboardCard title="الطلبات" value={String(summary?.ordersCount ?? 0)} href="/dashboard/orders" />
             <DashboardCard title="العملاء" value="0" href="#" />
-            <DashboardCard title="الإيرادات" value="0 DZD" href="#" />
+            <DashboardCard title="الإيرادات" value={`${(summary?.revenue ?? 0).toLocaleString("fr-DZ")} DZD`} href="#" />
           </div>
         </section>
 
