@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { statusLabel } from "@/lib/orderStatus";
 
 type Order = {
   id: string;
@@ -16,15 +18,8 @@ type Order = {
   created_at: string;
 };
 
-const statusLabel: Record<string, string> = {
-  pending: "قيد الانتظار",
-  confirmed: "مؤكد",
-  shipped: "تم الشحن",
-  delivered: "تم التسليم",
-  cancelled: "ملغى",
-};
-
 export default function OrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -105,7 +100,16 @@ export default function OrdersPage() {
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id} className="border-b border-zinc-50 last:border-0">
+                  <tr
+                    key={order.id}
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") router.push(`/dashboard/orders/${order.id}`);
+                    }}
+                    className="cursor-pointer border-b border-zinc-50 transition hover:bg-zinc-50 last:border-0"
+                  >
                     <td className="px-5 py-4 font-semibold text-zinc-900">#{order.id.slice(0, 8)}</td>
                     <td className="px-5 py-4">{order.customer_name}</td>
                     <td className="px-5 py-4 text-zinc-500">{order.customer_phone}</td>
