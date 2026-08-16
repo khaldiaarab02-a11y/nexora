@@ -45,8 +45,13 @@ export default function CheckoutPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         storeId,
-        storeSlug,
-        customer: form,
+        customerName: form.name,
+        customerPhone: form.phone,
+        customerEmail: form.email,
+        wilaya: form.wilaya,
+        commune: form.commune,
+        address: form.address,
+        notes: form.notes,
         items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
       }),
     });
@@ -60,7 +65,7 @@ export default function CheckoutPage() {
     }
 
     clearCart();
-    window.location.href = `/order-success?order=${encodeURIComponent(data.orderNumber)}&store=${encodeURIComponent(storeSlug)}`;
+    window.location.href = `/order-success?order=${encodeURIComponent(data.orderId)}&store=${encodeURIComponent(storeSlug)}`;
   }
 
   if (!items.length) {
