@@ -70,18 +70,27 @@ export default function ProductPage() {
   const unavailable = product.stock_quantity <= 0;
 
   function handleAdd() {
-    addToCart({
-      productId: product.id,
-      storeId: product.store_id,
-      storeSlug: store.slug,
-      name: product.name,
-      slug: product.slug,
-      price: Number(product.price),
-      quantity,
-      stockQuantity: product.stock_quantity,
-      imageUrl: product.image_url,
-      sku: product.sku,
-    });
+  if (!product || !store || product.stock_quantity <= 0) return;
+
+  addToCart({
+    productId: product.id,
+    storeId: product.store_id,
+    storeSlug: store.slug,
+    name: product.name,
+    slug: product.slug,
+    price: Number(product.price),
+    quantity,
+    stockQuantity: product.stock_quantity,
+    imageUrl: product.image_url,
+    sku: product.sku,
+  });
+
+  setAdded(true);
+
+  setTimeout(() => {
+    setAdded(false);
+  }, 2500);
+}
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   }
