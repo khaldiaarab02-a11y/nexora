@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import ProductImagesManager, { type ProductImageRecord } from "@/components/dashboard/ProductImagesManager";
 
 type Product = {
   id: string;
@@ -18,17 +19,22 @@ type Product = {
   image_url: string | null;
 };
 
+function extractStoragePath(url: string) {
+  const marker = "/storage/v1/object/public/product-images/";
+  const index = url.indexOf(marker);
+  return index === -1 ? null : decodeURIComponent(url.slice(index + marker.length));
+}
+
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [images, setImages] = useState<ProductImageRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
-  const [newImage, setNewImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -39,17 +45,27 @@ export default function EditProductPage() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("products")
-        .select("id,name,slug,description,sku,price,compare_at_price,stock_quantity,is_active,is_featured,image_url")
-        .eq("id", params.id)
-        .maybeSingle();
+      const [{ data: productData, error: productError }, { data: imagesData, error: imagesError }] = await Promise.all([
+        supabase
+          .from("products")
+          .select("id,name,slug,description,sku,price,compare_at_price,stock_quantity,is_active,is_featured,image_url")
+          .eq("id", params.id)
+          .maybeSingle(),
+        supabase
+          .from("product_images")
+          .select("id,image_url,sort_order,is_primary")
+          .eq("product_id", params.id)
+          .order("sort_order", { ascending: true }),
+      ]);
 
-      if (error || !data) {
-        setMessage(error?.message || "لم يتم العثور على المنتج.");
-      } else {
-        setProduct(data);
+      if (productError || !productData) {
+        setMessage(productError?.message || "لم يتم العثور على المنتج.");
+        setLoading(false);
+        return;
       }
+
+      setProduct(productData);
+      if (!imagesError) setImages(imagesData ?? []);
       setLoading(false);
     }
 
@@ -60,47 +76,6 @@ export default function EditProductPage() {
     if (!product) return;
     setSaving(true);
     setMessage("");
-
-    let imageUrl = product.image_url;
-
-    if (newImage) {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-
-      if (!user) {
-        setMessage("يجب تسجيل الدخول أولًا.");
-        setSaving(false);
-        return;
-      }
-
-      const extension = newImage.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(path, newImage, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: newImage.type,
-        });
-
-      if (uploadError) {
-        setMessage(`تعذر رفع الصورة: ${uploadError.message}`);
-        setSaving(false);
-        return;
-      }
-
-      imageUrl = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
-
-      if (product.image_url) {
-        const marker = "/storage/v1/object/public/product-images/";
-        const index = product.image_url.indexOf(marker);
-        if (index !== -1) {
-          const oldPath = decodeURIComponent(product.image_url.slice(index + marker.length));
-          await supabase.storage.from("product-images").remove([oldPath]);
-        }
-      }
-    }
 
     const { error } = await supabase
       .from("products")
@@ -114,7 +89,7 @@ export default function EditProductPage() {
         stock_quantity: Number(product.stock_quantity),
         is_active: product.is_active,
         is_featured: product.is_featured,
-        image_url: imageUrl,
+        image_url: product.image_url,
       })
       .eq("id", product.id);
 
@@ -138,12 +113,19 @@ export default function EditProductPage() {
     setDeleting(true);
     setMessage("");
 
+    // Clean up every gallery image file from Storage (the DB rows cascade
+    // automatically when the product row is deleted below).
+    const galleryPaths = images.map((img) => extractStoragePath(img.image_url)).filter((p): p is string => Boolean(p));
+    if (galleryPaths.length > 0) {
+      await supabase.storage.from("product-images").remove(galleryPaths);
+    }
+
+    // Legacy safety net: older products may have an image_url that was
+    // never mirrored into product_images.
     if (product.image_url) {
-      const marker = "/storage/v1/object/public/product-images/";
-      const index = product.image_url.indexOf(marker);
-      if (index !== -1) {
-        const path = decodeURIComponent(product.image_url.slice(index + marker.length));
-        await supabase.storage.from("product-images").remove([path]);
+      const legacyPath = extractStoragePath(product.image_url);
+      if (legacyPath && !galleryPaths.includes(legacyPath)) {
+        await supabase.storage.from("product-images").remove([legacyPath]);
       }
     }
 
@@ -175,32 +157,11 @@ export default function EditProductPage() {
           <h1 className="mt-2 text-3xl font-bold text-zinc-900">تعديل المنتج</h1>
 
           <div className="mt-7 space-y-5">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">صورة المنتج</label>
-              <label className="block cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-zinc-300">
-                {preview || product.image_url ? (
-                  <img src={preview || product.image_url || ""} alt={product.name} className="h-56 w-full object-cover" />
-                ) : (
-                  <div className="py-12 text-center text-sm text-zinc-400">لا توجد صورة — اضغطي لاختيار صورة</div>
-                )}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
-                      setMessage("اختاري JPG أو PNG أو WEBP بحجم أقل من 5MB.");
-                      return;
-                    }
-                    setNewImage(file);
-                    setPreview(URL.createObjectURL(file));
-                    setMessage("");
-                  }}
-                />
-              </label>
-            </div>
+            <ProductImagesManager
+              productId={product.id}
+              initialImages={images}
+              onPrimaryUrlChange={(url) => setProduct((prev) => (prev ? { ...prev, image_url: url } : prev))}
+            />
 
             <Field label="اسم المنتج">
               <input className={inputClass} value={product.name}
