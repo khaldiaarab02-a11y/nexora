@@ -1,11 +1,14 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import ProductImagesManager, { type ProductImagesManagerHandle } from "./ProductImagesManager";
 
 export default function ProductForm() {
   const router = useRouter();
+  const imagesRef = useRef<ProductImagesManagerHandle>(null);
+
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
@@ -15,8 +18,6 @@ export default function ProductForm() {
   const [stock, setStock] = useState("0");
   const [active, setActive] = useState(true);
   const [featured, setFeatured] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -27,21 +28,6 @@ export default function ProductForm() {
         .replace(/[^a-z0-9-]/g, "")
         .replace(/-+/g, "-")
     );
-  }
-
-  function handleImageChange(file: File | null) {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setMessage("اختاري ملف صورة فقط.");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage("حجم الصورة يجب أن يكون أقل من 5MB.");
-      return;
-    }
-    setImageFile(file);
-    setPreview(URL.createObjectURL(file));
-    setMessage("");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -72,51 +58,35 @@ export default function ProductForm() {
       return;
     }
 
-    let imageUrl: string | null = null;
+    const { data: newProduct, error } = await supabase
+      .from("products")
+      .insert({
+        store_id: membership.store_id,
+        name: name.trim(),
+        slug,
+        description: description.trim() || null,
+        sku: sku.trim() || null,
+        price: Number(price),
+        compare_at_price: compareAtPrice ? Number(compareAtPrice) : null,
+        stock_quantity: Number(stock),
+        is_active: active,
+        is_featured: featured,
+        image_url: null,
+      })
+      .select("id")
+      .single();
 
-    if (imageFile) {
-      const extension = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
-      const filePath = `${user.id}/${crypto.randomUUID()}.${extension}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(filePath, imageFile, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: imageFile.type,
-        });
-
-      if (uploadError) {
-        setMessage(`تعذر رفع الصورة: ${uploadError.message}`);
-        setLoading(false);
-        return;
-      }
-
-      const { data: publicUrl } = supabase.storage
-        .from("product-images")
-        .getPublicUrl(filePath);
-
-      imageUrl = publicUrl.publicUrl;
-    }
-
-    const { error } = await supabase.from("products").insert({
-      store_id: membership.store_id,
-      name: name.trim(),
-      slug,
-      description: description.trim() || null,
-      sku: sku.trim() || null,
-      price: Number(price),
-      compare_at_price: compareAtPrice ? Number(compareAtPrice) : null,
-      stock_quantity: Number(stock),
-      is_active: active,
-      is_featured: featured,
-      image_url: imageUrl,
-    });
-
-    if (error) {
-      setMessage(error.message);
+    if (error || !newProduct) {
+      setMessage(error?.message || "تعذر حفظ المنتج.");
       setLoading(false);
       return;
+    }
+
+    if (imagesRef.current?.hasStaged()) {
+      const primaryUrl = await imagesRef.current.commitStagedImages(newProduct.id, user.id);
+      if (primaryUrl) {
+        await supabase.from("products").update({ image_url: primaryUrl }).eq("id", newProduct.id);
+      }
     }
 
     router.push("/dashboard/products");
@@ -129,30 +99,12 @@ export default function ProductForm() {
         <p className="text-sm font-medium text-zinc-400">Nexora</p>
         <h1 className="mt-2 text-3xl font-bold text-zinc-900">إضافة منتج</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-500">
-          أضف بيانات المنتج وصورته إلى متجرك.
+          أضف بيانات المنتج وصوره إلى متجرك.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-700">صورة المنتج</label>
-          <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-zinc-300 p-4 text-center">
-            {preview ? (
-              <img src={preview} alt="معاينة المنتج" className="mx-auto h-56 w-full rounded-xl object-cover" />
-            ) : (
-              <div className="py-10">
-                <p className="font-medium text-zinc-700">اضغطي لاختيار صورة</p>
-                <p className="mt-1 text-xs text-zinc-400">JPG, PNG, WEBP — حتى 5MB</p>
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
-            />
-          </label>
-        </div>
+        <ProductImagesManager ref={imagesRef} productId={null} />
 
         <Field label="اسم المنتج">
           <input required value={name} onChange={(e) => { setName(e.target.value); makeSlug(e.target.value); }}
@@ -204,7 +156,7 @@ export default function ProductForm() {
 
         <button type="submit" disabled={loading}
           className="w-full rounded-xl bg-zinc-900 px-4 py-3 font-medium text-white disabled:opacity-50">
-          {loading ? "جاري حفظ المنتج والصورة..." : "حفظ المنتج"}
+          {loading ? "جاري حفظ المنتج والصور..." : "حفظ المنتج"}
         </button>
       </form>
 
