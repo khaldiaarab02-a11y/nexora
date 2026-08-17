@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { addToCart } from "@/lib/cart";
@@ -22,18 +22,29 @@ type Product = {
 
 type Store = { name: string; slug: string };
 
-type GalleryImage = { id: string; image_url: string };
+type RelatedProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  image_url: string | null;
+};
+
+const SWIPE_THRESHOLD = 40;
 
 export default function ProductPage() {
   const params = useParams<{ slug: string; productSlug: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [store, setStore] = useState<Store | null>(null);
-  const [gallery, setGallery] = useState<GalleryImage[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [related, setRelated] = useState<RelatedProduct[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -68,16 +79,27 @@ export default function ProductPage() {
 
       setStore(storeData);
       setProduct(data);
+      setSelectedIndex(0);
 
-      const { data: imagesData } = await supabase
-        .from("product_images")
-        .select("id,image_url")
-        .eq("product_id", data.id)
-        .order("sort_order", { ascending: true });
+      const [{ data: imagesData }, { data: relatedData }] = await Promise.all([
+        supabase
+          .from("product_images")
+          .select("image_url")
+          .eq("product_id", data.id)
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("products")
+          .select("id,name,slug,price,image_url")
+          .eq("store_id", storeData.id)
+          .eq("is_active", true)
+          .neq("id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(4),
+      ]);
 
-      const galleryImages = imagesData ?? [];
-      setGallery(galleryImages);
-      setSelectedImage(galleryImages[0]?.image_url || data.image_url || null);
+      const urls = (imagesData ?? []).map((img) => img.image_url);
+      setGallery(urls.length > 0 ? urls : data.image_url ? [data.image_url] : []);
+      setRelated(relatedData ?? []);
 
       setLoading(false);
     }
@@ -85,18 +107,54 @@ export default function ProductPage() {
     load();
   }, [params.slug, params.productSlug]);
 
+  function goToImage(index: number) {
+    if (gallery.length === 0) return;
+    const next = ((index % gallery.length) + gallery.length) % gallery.length;
+    setSelectedIndex(next);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(delta) > SWIPE_THRESHOLD) {
+      // Swipe left -> next image, swipe right -> previous image.
+      goToImage(delta < 0 ? selectedIndex + 1 : selectedIndex - 1);
+    }
+    touchStartX.current = null;
+  }
+
   if (loading) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-8 text-center text-zinc-500" dir="rtl">
-        جاري تحميل المنتج...
+      <main className="min-h-screen bg-zinc-50 p-6" dir="rtl">
+        <div className="mx-auto max-w-5xl animate-pulse">
+          <div className="h-14 rounded-2xl bg-zinc-200" />
+          <div className="mt-6 grid gap-0 overflow-hidden rounded-[2rem] bg-white md:grid-cols-2">
+            <div className="aspect-square bg-zinc-200" />
+            <div className="space-y-4 p-8">
+              <div className="h-6 w-2/3 rounded bg-zinc-200" />
+              <div className="h-4 w-full rounded bg-zinc-200" />
+              <div className="h-4 w-3/4 rounded bg-zinc-200" />
+              <div className="h-10 w-1/3 rounded bg-zinc-200" />
+            </div>
+          </div>
+        </div>
       </main>
     );
   }
 
   if (error || !product || !store) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-8 text-center text-red-600" dir="rtl">
-        {error || "المنتج غير موجود."}
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8" dir="rtl">
+        <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center">
+          <h1 className="text-2xl font-bold text-red-600">{error || "المنتج غير موجود."}</h1>
+          <Link href="/" className="mt-4 inline-block text-sm font-medium text-zinc-500">
+            الرئيسية
+          </Link>
+        </div>
       </main>
     );
   }
@@ -105,6 +163,7 @@ export default function ProductPage() {
   const currentProduct = product;
   const currentStore = store;
   const unavailable = currentProduct.stock_quantity <= 0;
+  const selectedImage = gallery[selectedIndex] || null;
 
   function handleAdd() {
     if (currentProduct.stock_quantity <= 0) return;
@@ -142,32 +201,61 @@ export default function ProductPage() {
       <section className="mx-auto max-w-5xl px-5 py-8">
         <div className="grid overflow-hidden rounded-[2rem] border border-zinc-200 bg-white md:grid-cols-2">
           <div className="min-w-0">
-            <div className="aspect-square bg-zinc-100">
+            <div
+              className="relative aspect-square touch-pan-y select-none bg-zinc-100"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
               {selectedImage ? (
                 <img
                   src={selectedImage}
                   alt={currentProduct.name}
                   className="h-full w-full object-cover"
+                  draggable={false}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-zinc-400">
                   لا توجد صورة
                 </div>
               )}
+
+              {gallery.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => goToImage(selectedIndex - 1)}
+                    aria-label="الصورة السابقة"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow"
+                  >
+                    ›
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goToImage(selectedIndex + 1)}
+                    aria-label="الصورة التالية"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow"
+                  >
+                    ‹
+                  </button>
+                  <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white">
+                    {selectedIndex + 1} / {gallery.length}
+                  </span>
+                </>
+              )}
             </div>
 
             {gallery.length > 1 && (
               <div className="flex gap-2.5 overflow-x-auto p-4">
-                {gallery.map((img) => (
+                {gallery.map((url, index) => (
                   <button
-                    key={img.id}
+                    key={url + index}
                     type="button"
-                    onClick={() => setSelectedImage(img.image_url)}
+                    onClick={() => goToImage(index)}
                     className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 ${
-                      selectedImage === img.image_url ? "border-zinc-900" : "border-transparent"
+                      selectedIndex === index ? "border-zinc-900" : "border-transparent"
                     }`}
                   >
-                    <img src={img.image_url} alt="" className="h-full w-full object-cover" />
+                    <img src={url} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -245,6 +333,35 @@ export default function ProductPage() {
             )}
           </div>
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-xl font-bold text-zinc-900">منتجات أخرى قد تعجبك</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {related.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/shop/${currentStore.slug}/product/${item.slug}`}
+                  className="overflow-hidden rounded-2xl border border-zinc-200 bg-white transition hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div className="aspect-square bg-zinc-100">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs text-zinc-400">لا توجد صورة</div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="truncate text-sm font-semibold text-zinc-900">{item.name}</p>
+                    <p className="mt-1 text-sm font-bold text-zinc-900">
+                      {Number(item.price).toLocaleString("fr-DZ")} DZD
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
     </main>
   );
