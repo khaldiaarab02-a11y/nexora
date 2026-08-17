@@ -22,10 +22,14 @@ type Product = {
 
 type Store = { name: string; slug: string };
 
+type GalleryImage = { id: string; image_url: string };
+
 export default function ProductPage() {
   const params = useParams<{ slug: string; productSlug: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [store, setStore] = useState<Store | null>(null);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
@@ -58,10 +62,22 @@ export default function ProductPage() {
 
       if (productError || !data) {
         setError("المنتج غير موجود.");
-      } else {
-        setStore(storeData);
-        setProduct(data);
+        setLoading(false);
+        return;
       }
+
+      setStore(storeData);
+      setProduct(data);
+
+      const { data: imagesData } = await supabase
+        .from("product_images")
+        .select("id,image_url")
+        .eq("product_id", data.id)
+        .order("sort_order", { ascending: true });
+
+      const galleryImages = imagesData ?? [];
+      setGallery(galleryImages);
+      setSelectedImage(galleryImages[0]?.image_url || data.image_url || null);
 
       setLoading(false);
     }
@@ -125,16 +141,35 @@ export default function ProductPage() {
 
       <section className="mx-auto max-w-5xl px-5 py-8">
         <div className="grid overflow-hidden rounded-[2rem] border border-zinc-200 bg-white md:grid-cols-2">
-          <div className="aspect-square bg-zinc-100">
-            {currentProduct.image_url ? (
-              <img
-                src={currentProduct.image_url}
-                alt={currentProduct.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-zinc-400">
-                لا توجد صورة
+          <div className="min-w-0">
+            <div className="aspect-square bg-zinc-100">
+              {selectedImage ? (
+                <img
+                  src={selectedImage}
+                  alt={currentProduct.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-zinc-400">
+                  لا توجد صورة
+                </div>
+              )}
+            </div>
+
+            {gallery.length > 1 && (
+              <div className="flex gap-2.5 overflow-x-auto p-4">
+                {gallery.map((img) => (
+                  <button
+                    key={img.id}
+                    type="button"
+                    onClick={() => setSelectedImage(img.image_url)}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 ${
+                      selectedImage === img.image_url ? "border-zinc-900" : "border-transparent"
+                    }`}
+                  >
+                    <img src={img.image_url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
               </div>
             )}
           </div>
