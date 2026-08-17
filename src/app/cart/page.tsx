@@ -15,6 +15,7 @@ export default function CartPage() {
   }, []);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const continueShoppingHref = items[0]?.storeSlug ? `/shop/${items[0].storeSlug}` : "/";
 
   return (
     <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
@@ -35,6 +36,9 @@ export default function CartPage() {
         ) : (
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="space-y-4">
+              <Link href={continueShoppingHref} className="inline-block text-sm font-medium text-zinc-500">
+                ← متابعة التسوق
+              </Link>
               {items.map((item) => (
                 <article key={item.productId} className="flex gap-4 rounded-3xl border border-zinc-200 bg-white p-4">
                   <div className="h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
