@@ -1,47 +1,181 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_LOGO_SIZE = 5 * 1024 * 1024;
+
 export default function CreateStoreForm() {
   const router = useRouter();
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+  const [currency, setCurrency] = useState("DZD");
+  const [shippingFee, setShippingFee] = useState("0");
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error">("error");
 
   function handleSlugChange(value: string) {
-    setSlug(value.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-"));
+    setSlug(
+      value.toLowerCase().trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+    );
+  }
+
+  function handleLogoSelected(fileList: FileList | null) {
+    const file = fileList?.[0];
+    if (!file) return;
+
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setMessage("يُسمح فقط بصور بصيغة JPG أو PNG أو WEBP.");
+      setMessageType("error");
+      return;
+    }
+    if (file.size > MAX_LOGO_SIZE) {
+      setMessage("حجم الشعار يجب ألا يتجاوز 5MB.");
+      setMessageType("error");
+      return;
+    }
+
+    if (logoPreview) URL.revokeObjectURL(logoPreview);
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+    setMessage("");
+  }
+
+  function removeStagedLogo() {
+    if (logoPreview) URL.revokeObjectURL(logoPreview);
+    setLogoFile(null);
+    setLogoPreview(null);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
+
+    const trimmedName = name.trim();
+    const fee = Number(shippingFee);
+
+    if (!trimmedName) {
+      setMessage("اسم المتجر لا يمكن أن يكون فارغًا.");
+      setMessageType("error");
+      return;
+    }
+    if (!slug || slug.length < 3) {
+      setMessage("رابط المتجر يجب أن يتكوّن من 3 أحرف على الأقل.");
+      setMessageType("error");
+      return;
+    }
+    if (Number.isNaN(fee) || fee < 0) {
+      setMessage("قيمة تكلفة التوصيل غير صالحة.");
+      setMessageType("error");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
       setMessage("يجب تسجيل الدخول أولًا.");
+      setMessageType("error");
       setLoading(false);
       return;
     }
 
-    const { data, error } = await supabase.rpc("create_store", {
-      p_name: name.trim(),
+    // Core store creation stays exactly on the existing RPC - it is what
+    // atomically creates the stores row AND makes the caller its owner
+    // in store_members, using auth.uid() server-side (nothing here is
+    // trusted from the client).
+    const { error } = await supabase.rpc("create_store", {
+      p_name: trimmedName,
       p_slug: slug,
     });
 
     if (error) {
-      setMessage(error.message);
+      if (error.message.toLowerCase().includes("duplicate") || error.message.toLowerCase().includes("unique")) {
+        setMessage("هذا الرابط مستخدم بالفعل من متجر آخر. اختاري رابطًا مختلفًا.");
+      } else {
+        setMessage(error.message);
+      }
+      setMessageType("error");
       setLoading(false);
       return;
     }
 
-    if (!data) {
-      setMessage("تعذر إنشاء المتجر.");
-      setLoading(false);
+    // The RPC's return shape isn't something this form assumes - instead,
+    // look the new store up by its (guaranteed-unique) slug to get its real
+    // id for the optional follow-up writes below.
+    const { data: createdStore, error: lookupError } = await supabase
+      .from("stores")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    const newStoreId = createdStore?.id;
+
+    if (lookupError || !newStoreId) {
+      // The store itself was created successfully by the RPC (no error
+      // above) - only the optional extras below can't be applied right
+      // now. The user can still set them from Settings afterward.
+      router.push("/dashboard");
+      router.refresh();
       return;
+    }
+
+    // Everything below is optional polish on top of the now-real store.
+    // A failure here does not leave an incomplete store - name, slug, and
+    // ownership are already committed - so we surface a soft warning and
+    // still continue to the dashboard.
+    const extras: string[] = [];
+
+    const trimmedDescription = description.trim();
+    if (trimmedDescription) {
+      const { error: descError } = await supabase
+        .from("stores")
+        .update({ description: trimmedDescription })
+        .eq("id", newStoreId);
+      if (descError) extras.push("الوصف");
+    }
+
+    if (logoFile) {
+      const extension = logoFile.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${userData.user.id}/logo-${crypto.randomUUID()}.${extension}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(path, logoFile, { cacheControl: "3600", upsert: false, contentType: logoFile.type });
+
+      if (uploadError) {
+        extras.push("الشعار");
+      } else {
+        const publicUrl = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+        const { error: logoUpdateError } = await supabase
+          .from("stores")
+          .update({ logo_url: publicUrl })
+          .eq("id", newStoreId);
+        if (logoUpdateError) extras.push("الشعار");
+      }
+    }
+
+    const { error: settingsError } = await supabase
+      .from("store_settings")
+      .upsert({ store_id: newStoreId, currency: currency.trim() || "DZD", default_shipping_fee: fee }, { onConflict: "store_id" });
+    if (settingsError) extras.push("إعدادات الشحن والعملة");
+
+    if (extras.length > 0) {
+      setMessage(`تم إنشاء متجرك بنجاح، لكن تعذر حفظ: ${extras.join("، ")}. يمكنك إضافتها لاحقًا من إعدادات المتجر.`);
+      setMessageType("success");
     }
 
     router.push("/dashboard");
@@ -49,17 +183,19 @@ export default function CreateStoreForm() {
   }
 
   return (
-    <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm" dir="rtl">
-      <div className="mb-8">
+    <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8" dir="rtl">
+      <div className="mb-7 text-center">
         <p className="text-sm font-medium text-zinc-500">Nexora</p>
-        <h1 className="mt-2 text-3xl font-bold text-zinc-900">إنشاء متجرك</h1>
-        <p className="mt-2 text-sm text-zinc-500">أدخل المعلومات الأساسية لبدء متجرك الإلكتروني.</p>
+        <h1 className="mt-2 text-3xl font-bold text-zinc-900">أنشئي متجرك الأول</h1>
+        <p className="mt-2 text-sm text-zinc-500">
+          خطوة واحدة تفصلك عن بدء البيع أونلاين — يمكنك تعديل كل هذه البيانات لاحقًا من إعدادات المتجر.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="store-name" className="mb-2 block text-sm font-medium text-zinc-700">اسم المتجر</label>
-          <input id="store-name" required value={name} onChange={(e)=>setName(e.target.value)}
+          <input id="store-name" required value={name} onChange={(e) => setName(e.target.value)}
             className="w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
             placeholder="مثال: متجر الأناقة" />
         </div>
@@ -67,11 +203,69 @@ export default function CreateStoreForm() {
         <div>
           <label htmlFor="store-slug" className="mb-2 block text-sm font-medium text-zinc-700">رابط المتجر</label>
           <div className="flex items-center rounded-xl border border-zinc-300 focus-within:border-zinc-900">
-            <span className="border-l px-3 text-sm text-zinc-400">/</span>
-            <input id="store-slug" required minLength={3} value={slug} onChange={(e)=>handleSlugChange(e.target.value)}
+            <span className="border-l px-3 text-sm text-zinc-400">/shop/</span>
+            <input id="store-slug" required minLength={3} value={slug} onChange={(e) => handleSlugChange(e.target.value)}
               className="w-full rounded-xl px-3 py-3 outline-none" placeholder="my-store" />
           </div>
           <p className="mt-2 text-xs text-zinc-400">استخدمي الحروف الإنجليزية والأرقام والشرطة فقط.</p>
+        </div>
+
+        <div>
+          <label htmlFor="store-description" className="mb-2 block text-sm font-medium text-zinc-700">
+            وصف المتجر <span className="text-zinc-400">(اختياري)</span>
+          </label>
+          <textarea id="store-description" value={description} maxLength={500}
+            onChange={(e) => setDescription(e.target.value)}
+            className="min-h-24 w-full resize-y rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
+            placeholder="بضع كلمات عن متجرك ومنتجاتك..." />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-700">
+            شعار المتجر <span className="text-zinc-400">(اختياري)</span>
+          </label>
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
+              {logoPreview ? (
+                <img src={logoPreview} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-[10px] text-zinc-400">لا يوجد</div>
+              )}
+            </div>
+            <div className="flex flex-1 gap-2">
+              <label className="flex-1 cursor-pointer rounded-xl border border-zinc-300 px-4 py-2.5 text-center text-sm font-medium text-zinc-700">
+                {logoFile ? "تغيير الصورة" : "رفع شعار"}
+                <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                  onChange={(e) => {
+                    handleLogoSelected(e.target.files);
+                    if (logoInputRef.current) logoInputRef.current.value = "";
+                  }} />
+              </label>
+              {logoFile && (
+                <button type="button" onClick={removeStagedLogo}
+                  className="rounded-xl border border-red-100 px-4 py-2.5 text-sm font-medium text-red-600">
+                  إزالة
+                </button>
+              )}
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-zinc-400">JPG, PNG, WEBP — حتى 5MB.</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="store-currency" className="mb-2 block text-sm font-medium text-zinc-700">العملة</label>
+            <input id="store-currency" value={currency} maxLength={6}
+              onChange={(e) => setCurrency(e.target.value.toUpperCase())}
+              className="w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
+              placeholder="DZD" />
+          </div>
+          <div>
+            <label htmlFor="store-shipping" className="mb-2 block text-sm font-medium text-zinc-700">تكلفة التوصيل الافتراضية</label>
+            <input id="store-shipping" type="number" min="0" step="0.01" value={shippingFee}
+              onChange={(e) => setShippingFee(e.target.value)}
+              className="w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900" />
+          </div>
         </div>
 
         <button type="submit" disabled={loading}
@@ -80,7 +274,13 @@ export default function CreateStoreForm() {
         </button>
       </form>
 
-      {message && <p className="mt-5 rounded-xl bg-red-50 p-3 text-center text-sm text-red-700">{message}</p>}
+      {message && (
+        <p className={`mt-5 rounded-xl p-3 text-center text-sm ${
+          messageType === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+        }`}>
+          {message}
+        </p>
+      )}
     </div>
   );
 }
