@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
 const navLinks = [
@@ -13,26 +13,60 @@ const navLinks = [
   { href: "/dashboard/account", label: "الحساب" },
 ];
 
+const ONBOARDING_PATH = "/dashboard/store/new";
+
+type GuardStatus = "checking" | "unauthenticated" | "no-store" | "ready";
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [status, setStatus] = useState<GuardStatus>("checking");
   const [storeSlug, setStoreSlug] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Avoids acting on a stale check if the effect re-runs (auth state
+  // change) while an earlier check is still in flight.
+  const checkId = useRef(0);
+
   useEffect(() => {
-    async function loadStoreSlug() {
+    async function check() {
+      const currentCheckId = ++checkId.current;
+
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return;
+      const user = userData.user;
+
+      if (!user) {
+        if (checkId.current !== currentCheckId) return;
+        setStatus("unauthenticated");
+        setStoreSlug(null);
+        if (pathname !== "/auth") router.replace("/auth");
+        return;
+      }
 
       const { data: membership } = await supabase
         .from("store_members")
         .select("store_id")
-        .eq("user_id", userData.user.id)
+        .eq("user_id", user.id)
         .eq("role", "owner")
         .limit(1)
         .maybeSingle();
 
-      if (!membership) return;
+      if (checkId.current !== currentCheckId) return;
+
+      if (!membership) {
+        setStatus("no-store");
+        setStoreSlug(null);
+        if (pathname !== ONBOARDING_PATH) router.replace(ONBOARDING_PATH);
+        return;
+      }
+
+      // Already has a store - the onboarding page has nothing left to do
+      // for this user (this project is single-store-per-owner, matching
+      // every store_id lookup already used throughout the app).
+      if (pathname === ONBOARDING_PATH) {
+        router.replace("/dashboard");
+        return;
+      }
 
       const { data: store } = await supabase
         .from("stores")
@@ -40,11 +74,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .eq("id", membership.store_id)
         .maybeSingle();
 
-      if (store?.slug) setStoreSlug(store.slug);
+      if (checkId.current !== currentCheckId) return;
+
+      setStoreSlug(store?.slug ?? null);
+      setStatus("ready");
     }
 
-    loadStoreSlug();
-  }, []);
+    check();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
+    return () => subscription.unsubscribe();
+  }, [pathname, router]);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -54,6 +94,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   function isActive(href: string) {
     return href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
+  }
+
+  // While the guard is still deciding, or actively redirecting, don't flash
+  // protected content or the onboarding form to the wrong audience.
+  if (status === "checking" || status === "unauthenticated") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400" dir="rtl">
+        جاري التحقق من الجلسة...
+      </div>
+    );
+  }
+
+  // A user with no store yet only ever sees the onboarding page itself -
+  // no dashboard nav/shell around it, since none of those links are usable
+  // without a store yet.
+  if (status === "no-store") {
+    return <>{children}</>;
   }
 
   return (
