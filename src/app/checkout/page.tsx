@@ -8,6 +8,7 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [form, setForm] = useState({ name: "", phone: "", email: "", wilaya: "", commune: "", address: "", notes: "" });
   const [shipping, setShipping] = useState(0);
+  const [currency, setCurrency] = useState("DZD");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -17,17 +18,21 @@ export default function CheckoutPage() {
     if (cart.length) {
       fetch(`/api/store-settings?storeId=${cart[0].storeId}`)
         .then((r) => r.json())
-        .then((data) => setShipping(Number(data.defaultShippingFee || 0)))
+        .then((data) => {
+          setShipping(Number(data.defaultShippingFee || 0));
+          if (data.currency) setCurrency(data.currency);
+        })
         .catch(() => {});
     }
   }, []);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = subtotal + shipping;
+  const freeShipping = shipping === 0;
 
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
-    if (!items.length) return;
+    if (submitting || !items.length) return;
     setSubmitting(true);
     setError("");
 
@@ -59,9 +64,30 @@ export default function CheckoutPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error || "تعذر إنشاء الطلب.");
+      setError(data.error || "تعذر إنشاء الطلب. حاولي مرة أخرى.");
       setSubmitting(false);
       return;
+    }
+
+    // Everything below is sourced only from the API's own JSON response for
+    // this request - nothing client-computed - so order-success can show a
+    // real, server-confirmed summary without needing any further Supabase
+    // read access to the orders table from the browser.
+    try {
+      sessionStorage.setItem(
+        "nexora-last-order",
+        JSON.stringify({
+          orderId: data.orderId,
+          subtotal: data.subtotal,
+          shippingFee: data.shippingFee,
+          total: data.total,
+          currency,
+          items: items.map((item) => ({ name: item.name, quantity: item.quantity, price: item.price })),
+        })
+      );
+    } catch {
+      // sessionStorage can fail in rare private-browsing edge cases - the
+      // success page still works with just the order id in that case.
     }
 
     clearCart();
@@ -69,7 +95,13 @@ export default function CheckoutPage() {
   }
 
   if (!items.length) {
-    return <main className="min-h-screen bg-zinc-50 p-8 text-center" dir="rtl"><h1 className="text-2xl font-bold">السلة فارغة</h1><Link href="/" className="mt-4 inline-block text-zinc-500">العودة</Link></main>;
+    return (
+      <main className="min-h-screen bg-zinc-50 p-8 text-center" dir="rtl">
+        <h1 className="text-2xl font-bold">السلة فارغة</h1>
+        <p className="mt-2 text-sm text-zinc-500">أضيفي منتجًا من المتجر أولًا لإتمام الطلب.</p>
+        <Link href="/" className="mt-4 inline-block text-zinc-500">العودة</Link>
+      </main>
+    );
   }
 
   return (
@@ -96,14 +128,26 @@ export default function CheckoutPage() {
           <aside className="h-fit rounded-3xl border border-zinc-200 bg-white p-6">
             <h2 className="text-xl font-bold">ملخص الطلب</h2>
             <div className="mt-5 space-y-3 text-sm">
-              {items.map((item) => <div key={item.productId} className="flex justify-between gap-3"><span>{item.name} × {item.quantity}</span><span>{(item.price * item.quantity).toLocaleString("fr-DZ")} DZD</span></div>)}
+              {items.map((item) => (
+                <div key={item.productId} className="flex justify-between gap-3">
+                  <span>{item.name} × {item.quantity}</span>
+                  <span>{(item.price * item.quantity).toLocaleString("fr-DZ")} {currency}</span>
+                </div>
+              ))}
             </div>
             <div className="mt-5 space-y-3 border-t border-zinc-100 pt-5">
-              <div className="flex justify-between"><span>المجموع الفرعي</span><strong>{subtotal.toLocaleString("fr-DZ")} DZD</strong></div>
-              <div className="flex justify-between"><span>التوصيل</span><strong>{shipping.toLocaleString("fr-DZ")} DZD</strong></div>
-              <div className="flex justify-between text-lg"><span>الإجمالي</span><strong>{total.toLocaleString("fr-DZ")} DZD</strong></div>
+              <div className="flex justify-between"><span>المجموع الفرعي</span><strong>{subtotal.toLocaleString("fr-DZ")} {currency}</strong></div>
+              <div className="flex justify-between">
+                <span>التوصيل</span>
+                <strong className={freeShipping ? "text-emerald-600" : ""}>
+                  {freeShipping ? "مجاني" : `${shipping.toLocaleString("fr-DZ")} ${currency}`}
+                </strong>
+              </div>
+              <div className="flex justify-between text-lg"><span>الإجمالي</span><strong>{total.toLocaleString("fr-DZ")} {currency}</strong></div>
             </div>
-            <button disabled={submitting} className="mt-6 w-full rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white disabled:opacity-50">{submitting ? "جاري إرسال الطلب..." : "تأكيد الطلب"}</button>
+            <button disabled={submitting} className="mt-6 w-full rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white disabled:opacity-50">
+              {submitting ? "جاري إرسال الطلب..." : "تأكيد الطلب"}
+            </button>
           </aside>
         </form>
       </div>
