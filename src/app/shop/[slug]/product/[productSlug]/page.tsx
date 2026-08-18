@@ -21,6 +21,7 @@ type Product = {
 };
 
 type Store = { name: string; slug: string };
+type Settings = { currency: string };
 
 type RelatedProduct = {
   id: string;
@@ -39,6 +40,7 @@ export default function ProductPage() {
   const [gallery, setGallery] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [related, setRelated] = useState<RelatedProduct[]>([]);
+  const [settings, setSettings] = useState<Settings>({ currency: "DZD" });
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
@@ -81,25 +83,32 @@ export default function ProductPage() {
       setProduct(data);
       setSelectedIndex(0);
 
-      const [{ data: imagesData }, { data: relatedData }] = await Promise.all([
-        supabase
-          .from("product_images")
-          .select("image_url")
-          .eq("product_id", data.id)
-          .order("sort_order", { ascending: true }),
-        supabase
-          .from("products")
-          .select("id,name,slug,price,image_url")
-          .eq("store_id", storeData.id)
-          .eq("is_active", true)
-          .neq("id", data.id)
-          .order("created_at", { ascending: false })
-          .limit(4),
-      ]);
+      const [{ data: imagesData }, { data: relatedData }, { data: settingsData }] =
+        await Promise.all([
+          supabase
+            .from("product_images")
+            .select("image_url")
+            .eq("product_id", data.id)
+            .order("sort_order", { ascending: true }),
+          supabase
+            .from("products")
+            .select("id,name,slug,price,image_url")
+            .eq("store_id", storeData.id)
+            .eq("is_active", true)
+            .neq("id", data.id)
+            .order("created_at", { ascending: false })
+            .limit(4),
+          supabase
+            .from("store_settings")
+            .select("currency")
+            .eq("store_id", storeData.id)
+            .maybeSingle(),
+        ]);
 
       const urls = (imagesData ?? []).map((img) => img.image_url);
       setGallery(urls.length > 0 ? urls : data.image_url ? [data.image_url] : []);
       setRelated(relatedData ?? []);
+      if (settingsData?.currency) setSettings({ currency: settingsData.currency });
 
       setLoading(false);
     }
@@ -265,6 +274,9 @@ export default function ProductPage() {
           <div className="p-7 sm:p-10">
             <p className="text-sm text-zinc-400">{currentStore.name}</p>
             <h1 className="mt-3 text-3xl font-bold">{currentProduct.name}</h1>
+            {currentProduct.sku && (
+              <p className="mt-1 text-xs text-zinc-400">SKU: {currentProduct.sku}</p>
+            )}
 
             {currentProduct.description && (
               <p className="mt-5 leading-7 text-zinc-600">
@@ -274,13 +286,13 @@ export default function ProductPage() {
 
             <div className="mt-7">
               <span className="text-3xl font-bold">
-                {Number(currentProduct.price).toLocaleString("fr-DZ")} DZD
+                {Number(currentProduct.price).toLocaleString("fr-DZ")} {settings.currency}
               </span>
 
               {currentProduct.compare_at_price &&
                 currentProduct.compare_at_price > currentProduct.price && (
                   <span className="mr-3 text-zinc-400 line-through">
-                    {Number(currentProduct.compare_at_price).toLocaleString("fr-DZ")} DZD
+                    {Number(currentProduct.compare_at_price).toLocaleString("fr-DZ")} {settings.currency}
                   </span>
                 )}
             </div>
@@ -354,7 +366,7 @@ export default function ProductPage() {
                   <div className="p-3">
                     <p className="truncate text-sm font-semibold text-zinc-900">{item.name}</p>
                     <p className="mt-1 text-sm font-bold text-zinc-900">
-                      {Number(item.price).toLocaleString("fr-DZ")} DZD
+                      {Number(item.price).toLocaleString("fr-DZ")} {settings.currency}
                     </p>
                   </div>
                 </Link>
