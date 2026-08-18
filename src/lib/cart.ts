@@ -53,6 +53,28 @@ export function removeFromCart(productId: string) {
   saveCart(getCart().filter((x) => x.productId !== productId));
 }
 
+// Used by the cart page to reconcile a locally-stored item with the
+// authoritative product row fetched from Supabase (price/stock may have
+// drifted since the item was added). Never used to trust client-supplied
+// price/stock for the actual order - the API re-validates everything again
+// server-side regardless of what's synced here.
+export function syncCartItem(
+  productId: string,
+  updates: Partial<Pick<CartItem, "price" | "stockQuantity">>
+) {
+  const cart = getCart();
+  const item = cart.find((x) => x.productId === productId);
+  if (!item) return;
+
+  if (typeof updates.price === "number") item.price = updates.price;
+  if (typeof updates.stockQuantity === "number") {
+    item.stockQuantity = updates.stockQuantity;
+    item.quantity = Math.min(item.quantity, Math.max(updates.stockQuantity, 0));
+  }
+
+  saveCart(cart);
+}
+
 export function clearCart() {
   saveCart([]);
 }
