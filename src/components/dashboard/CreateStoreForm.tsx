@@ -128,7 +128,7 @@ export default function CreateStoreForm() {
       // The store itself was created successfully by the RPC (no error
       // above) - only the optional extras below can't be applied right
       // now. The user can still set them from Settings afterward.
-      router.push("/dashboard");
+      router.push("/dashboard/subscription");
       router.refresh();
       return;
     }
@@ -189,7 +189,7 @@ export default function CreateStoreForm() {
       setMessageType("success");
     }
 
-    router.push("/dashboard");
+    router.push("/dashboard/subscription");
     router.refresh();
   }
 
