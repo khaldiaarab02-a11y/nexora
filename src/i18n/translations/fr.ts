@@ -1,1 +1,7 @@
-
+export const fr = {
+  nav: { home: "Accueil", about: "À propos", features: "Fonctionnalités", plans: "Plans", login: "Connexion", createStore: "Créer une boutique", dashboard: "Tableau de bord", support: "Support", subscription: "Abonnement", appearance: "Apparence", logout: "Se déconnecter" },
+  auth: { login: "Connexion", signup: "Créer un compte", email: "Adresse e-mail", password: "Mot de passe", confirm: "Confirmer le mot de passe", forgot: "Mot de passe oublié ?", resend: "Renvoyer l'e-mail de vérification", verifyTitle: "Vérifiez votre e-mail", verifyText: "Consultez votre boîte de réception pour confirmer votre compte Nexora.", continue: "Continuer", reset: "Réinitialiser le mot de passe", newPassword: "Nouveau mot de passe", success: "Terminé" },
+  common: { loading: "Chargement...", error: "Une erreur est survenue.", save: "Enregistrer", back: "Retour", submit: "Envoyer", pending: "En attente", active: "Actif", rejected: "Refusé", resolved: "Résolu", open: "Ouvert" },
+  plans: { title: "Choisissez votre plan", starter: "Starter", business: "Business", choose: "Choisir", current: "Plan actuel" },
+  support: { title: "Support", new: "Nouvelle demande", subject: "Sujet", message: "Message", category: "Catégorie", reply: "Répondre", send: "Envoyer", technical: "Problème technique", store: "Problème boutique", subscription: "Abonnement", payment: "Paiement", general: "Question générale" },
+} as const;
