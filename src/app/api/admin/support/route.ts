@@ -1,1 +1,2 @@
-
+import {NextResponse} from "next/server";import {requireAdmin,serviceClient} from "@/lib/server/auth";
+export async function GET(request:Request){try{const g=await requireAdmin(request);if(!g.user)return NextResponse.json({error:"Unauthorized"},{status:401});if(!g.admin)return NextResponse.json({error:"Forbidden"},{status:403});const db=serviceClient();const {data,error}=await db.from("support_conversations").select("id,store_id,category,subject,status,created_at,updated_at").order("updated_at",{ascending:false});if(error)throw new Error(error.message);return NextResponse.json({conversations:data||[]});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Failed"},{status:500});}}
