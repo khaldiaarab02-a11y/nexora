@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
 function friendlyAuthError(rawMessage: string): string {
@@ -31,6 +32,7 @@ function friendlyAuthError(rawMessage: string): string {
 
 export default function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,14 +46,16 @@ export default function AuthForm() {
   // dashboard, which decides (via its own guard) whether that means the
   // real dashboard or the store-onboarding step.
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        router.replace("/dashboard");
-      } else {
-        setCheckingSession(false);
-      }
+    const requestedMode = searchParams.get("mode");
+    if (requestedMode === "signup") setMode("signup");
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { setCheckingSession(false); return; }
+      const { data: admin } = await supabase.from("admin_users").select("user_id").eq("user_id", data.user.id).maybeSingle();
+      if (admin) { router.replace("/admin"); return; }
+      const { data: membership } = await supabase.from("store_members").select("store_id").eq("user_id", data.user.id).eq("role", "owner").limit(1).maybeSingle();
+      router.replace(membership ? "/dashboard" : "/dashboard/store/new");
     });
-  }, [router]);
+  }, [router, searchParams]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,16 +86,17 @@ export default function AuthForm() {
       if (result.data.session) {
         // Email confirmation is off in this project's Supabase settings -
         // the user is already logged in.
-        router.push("/dashboard");
+        router.push("/dashboard/store/new");
         return;
       }
-      setMessage("تم إنشاء الحساب. تحققي من بريدك الإلكتروني لتأكيد الحساب قبل تسجيل الدخول.");
-      setMessageType("success");
-      setLoading(false);
+      router.replace("/auth/verify-email");
       return;
     }
 
-    router.push("/dashboard");
+    const { data: admin } = await supabase.from("admin_users").select("user_id").eq("user_id", result.data.user.id).maybeSingle();
+    if (admin) { router.push("/admin"); return; }
+    const { data: membership } = await supabase.from("store_members").select("store_id").eq("user_id", result.data.user.id).eq("role", "owner").limit(1).maybeSingle();
+    router.push(membership ? "/dashboard" : "/dashboard/store/new");
   }
 
   if (checkingSession) {
@@ -153,6 +158,8 @@ export default function AuthForm() {
           {message}
         </p>
       )}
+
+      <div className="mt-5 text-center"><Link href="/auth/forgot-password" className="text-sm font-medium text-zinc-500 underline">{mode === "login" ? "نسيت كلمة المرور؟" : ""}</Link></div>
 
       <div className="mt-6 text-center text-sm text-zinc-500">
         {mode === "login" ? "ليس لديك حساب؟" : "لديك حساب بالفعل؟"}
