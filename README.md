@@ -33,3 +33,8 @@ npm run dev
 ```bash
 npm run build
 ```
+
+
+## Phase 2 — Themes + Store Customization
+
+Run `theme_system_schema.sql` manually in Supabase before testing theme persistence. The application falls back to Minimal when no theme row exists.
