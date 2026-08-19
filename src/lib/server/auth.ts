@@ -1,1 +1,6 @@
+import { createClient } from "@supabase/supabase-js";
 
+export function serviceClient(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw new Error("Supabase server credentials are missing.");return createClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}});}
+export async function getBearerUser(request:Request){const token=(request.headers.get("authorization")||"").replace(/^Bearer\s+/i,"").trim();if(!token)return null;const anon=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,{auth:{autoRefreshToken:false,persistSession:false}});const {data,error}=await anon.auth.getUser(token);return error?null:data.user??null;}
+export async function getOwnedStore(userId:string){const admin=serviceClient();const {data,error}=await admin.from("store_members").select("store_id").eq("user_id",userId).eq("role","owner").limit(1).maybeSingle();if(error)throw new Error(error.message);return data?.store_id??null;}
+export async function requireAdmin(request:Request){const user=await getBearerUser(request);if(!user)return {user:null,admin:null};const admin=serviceClient();const {data}=await admin.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();return {user,admin:data};}
