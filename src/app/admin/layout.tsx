@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (status === "checking" || status === "unauthenticated") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400" dir="rtl">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400">
         جاري التحقق من الجلسة...
       </div>
     );
@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (status === "forbidden") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-6" dir="rtl">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-6">
         <div className="w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-8 text-center">
           <h1 className="text-2xl font-bold text-zinc-900">غير مصرح لك بالوصول</h1>
           <p className="mt-3 text-sm text-zinc-500">هذه اللوحة مخصصة لفريق Nexora فقط.</p>
@@ -73,6 +73,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const links = [
     { href: "/admin", label: "الرئيسية" },
     { href: "/admin/stores", label: "المتاجر" },
+    { href: "/admin/subscriptions", label: "الاشتراكات" },
+    { href: "/admin/support", label: "الدعم" },
   ];
 
   function isActive(href: string) {
@@ -80,7 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div dir="rtl">
+    <div>
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-zinc-900">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-6">
