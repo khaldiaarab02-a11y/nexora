@@ -4,8 +4,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { orderStatuses, statusLabel, statusStyles, statusBarColor, type OrderStatus } from "@/lib/orderStatus";
+import { PLAN_LABELS, type PlanId } from "@/config/plans";
 
 type StoreInfo = { name: string; slug: string };
+
+type SubscriptionInfo = { plan_id: string; status: string; end_date: string | null };
 
 type OrderRow = {
   id: string;
@@ -32,6 +35,7 @@ const LOW_STOCK_THRESHOLD = 5;
 
 export default function DashboardPage() {
   const [store, setStore] = useState<StoreInfo | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [productsCount, setProductsCount] = useState(0);
   const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([]);
   const [orders, setOrders] = useState<OrderRow[]>([]);
@@ -101,6 +105,21 @@ export default function DashboardPage() {
     setProductsCount(productsTotal ?? 0);
     setLowStockProducts(lowStock ?? []);
     setOrders(ordersData ?? []);
+
+    // Business Core: subscription status. Fetched separately and treated
+    // as non-critical - if the Business Core SQL hasn't been run yet in
+    // this project, this table won't exist, and the rest of the dashboard
+    // must keep working exactly as before regardless.
+    try {
+      const { data: subscriptionData } = await supabase
+        .from("subscriptions")
+        .select("plan_id,status,end_date")
+        .eq("store_id", storeId)
+        .maybeSingle();
+      setSubscription(subscriptionData ?? null);
+    } catch {
+      setSubscription(null);
+    }
 
     const nonCancelledOrderIds = (ordersData ?? [])
       .filter((order) => order.status !== "cancelled")
@@ -203,6 +222,26 @@ export default function DashboardPage() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {!loading && subscription && (
+          <div
+            className={`mb-6 flex flex-col gap-2 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
+              subscription.status === "active" ? "border-emerald-100 bg-emerald-50" : "border-amber-100 bg-amber-50"
+            }`}
+          >
+            {subscription.status === "active" ? (
+              <p className="text-sm text-emerald-800">
+                الخطة: <strong>{PLAN_LABELS[subscription.plan_id as PlanId] || subscription.plan_id}</strong> — الاشتراك فعال
+                {subscription.end_date && ` حتى ${new Date(subscription.end_date).toLocaleDateString("fr-DZ")}`}
+              </p>
+            ) : (
+              <p className="text-sm text-amber-800">
+                اشتراكك غير فعال حاليًا ({subscription.status === "pending" ? "قيد الانتظار" : subscription.status === "expired" ? "منتهي" : "ملغى"}).
+                تواصلي مع فريق Nexora لتفعيل متجرك.
+              </p>
+            )}
+          </div>
+        )}
+
         {message && (
           <div className="mb-6 rounded-3xl border border-red-100 bg-red-50 p-6 text-center text-red-700">{message}</div>
         )}
