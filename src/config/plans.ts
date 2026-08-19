@@ -1,10 +1,4 @@
-// Nexora Business Core — plan & feature foundation (Phase 1).
-//
-// This is architecture only. Nothing in the app currently calls
-// canUseFeature() to block anything, and product_limit is not enforced
-// anywhere yet - Phase 1 asks explicitly for the foundation, not the
-// enforcement. Wire this up in Phase 2 once limits/features are finalized.
-
+// Nexora Business Core — centralized plan and feature access (Phase 2).
 export type PlanId = "starter" | "business";
 
 export type FeatureKey =
@@ -12,17 +6,14 @@ export type FeatureKey =
   | "custom_domain"
   | "advanced_customization";
 
-// TODO: confirm official product limits before enforcing anywhere.
-// null = not decided / unlimited for now.
 export const PLAN_LIMITS: Record<PlanId, { productLimit: number | null }> = {
   starter: { productLimit: null },
   business: { productLimit: null },
 };
 
-// TODO: Phase 2 fills these in per plan as real features ship.
 export const PLAN_FEATURES: Record<PlanId, FeatureKey[]> = {
   starter: [],
-  business: [],
+  business: ["advanced_themes", "advanced_customization"],
 };
 
 export function canUseFeature(planId: PlanId, feature: FeatureKey): boolean {
