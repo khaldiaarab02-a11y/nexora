@@ -46,7 +46,7 @@ export default function ThemeProductDetail({
   const selectedImage = gallery[selectedIndex] || null;
 
   return (
-    <main className="min-h-screen" style={{ background: theme.preview.background, color: theme.preview.foreground, fontFamily: fontStack, "--nexora-primary": primaryColor, "--nexora-accent": accentColor } as React.CSSProperties} dir="rtl">
+    <main className="min-h-screen" style={{ background: theme.preview.background, color: theme.preview.foreground, fontFamily: fontStack, "--nexora-primary": primaryColor, "--nexora-accent": accentColor } as React.CSSProperties}>
       <header className={`${theme.layout.header} border-b`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
           <Link href={`/shop/${store.slug}`} className="text-sm font-medium opacity-60">← العودة للمتجر</Link>

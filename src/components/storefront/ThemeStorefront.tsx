@@ -60,7 +60,7 @@ export default function ThemeStorefront({
       "--nexora-text": theme.preview.foreground,
       "--nexora-font": fontStack,
       fontFamily: "var(--nexora-font)",
-    } as React.CSSProperties} dir="rtl">
+    } as React.CSSProperties}>
       <header className={`${theme.layout.header} sticky top-0 z-20`} style={{ "--nexora-primary": "var(--nexora-primary)" } as React.CSSProperties}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <div className="flex min-w-0 items-center gap-3">
