@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/dashboard/orders", label: "الطلبات" },
   { href: "/dashboard/products", label: "المنتجات" },
   { href: "/dashboard/settings/store", label: "إعدادات المتجر" },
+  { href: "/dashboard/appearance", label: "المظهر" },
   { href: "/dashboard/account", label: "الحساب" },
 ];
 
