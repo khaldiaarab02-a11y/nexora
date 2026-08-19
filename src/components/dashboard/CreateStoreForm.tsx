@@ -173,6 +173,17 @@ export default function CreateStoreForm() {
       .upsert({ store_id: newStoreId, currency: currency.trim() || "DZD", default_shipping_fee: fee }, { onConflict: "store_id" });
     if (settingsError) extras.push("إعدادات الشحن والعملة");
 
+    // Business Core: every new store needs a subscription row. This RPC
+    // always creates a 'pending' Starter subscription regardless of what
+    // is passed to it - it cannot be used to self-activate or pick a
+    // different plan. A failure here does not block the store itself;
+    // Nexora admin can still create the subscription manually from
+    // /admin/stores.
+    const { error: subscriptionError } = await supabase.rpc("create_pending_subscription_for_new_store", {
+      p_store_id: newStoreId,
+    });
+    if (subscriptionError) extras.push("تفعيل الاشتراك (سيتواصل معك فريق Nexora)");
+
     if (extras.length > 0) {
       setMessage(`تم إنشاء متجرك بنجاح، لكن تعذر حفظ: ${extras.join("، ")}. يمكنك إضافتها لاحقًا من إعدادات المتجر.`);
       setMessageType("success");
