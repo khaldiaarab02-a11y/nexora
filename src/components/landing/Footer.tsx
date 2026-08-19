@@ -1,1 +1,1 @@
-
+import Link from "next/link";export default function Footer(){return <footer className="border-t border-zinc-100"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-zinc-500 sm:px-6 md:flex-row md:items-center md:justify-between"><span>© Nexora</span><div className="flex gap-5"><a href="#about">عن Nexora</a><a href="#features">المزايا</a><a href="#plans">الخطط</a><Link href="/auth">تسجيل الدخول</Link></div></div></footer>}
