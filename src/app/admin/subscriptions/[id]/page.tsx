@@ -1,18 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { PLAN_LABELS, type PlanId } from "@/config/plans";
 
-type StoreDetail = {
-  store: { id: string; name: string; slug: string; description: string | null; logo_url: string | null; is_active: boolean; created_at: string };
-  ownerEmail: string | null;
-  subscription: { plan_id: string; status: string; start_date: string | null; end_date: string | null } | null;
+type SubscriptionDetail = {
+  store: { id: string; name: string; slug: string } | null;
+  subscription: {
+    plan_id: string;
+    status: string;
+    start_date: string | null;
+    end_date: string | null;
+  } | null;
 };
-
-const statusLabel: Record<string, string> = { pending: "قيد الانتظار", active: "فعال", expired: "منتهي", cancelled: "ملغى" };
 
 async function authedFetch(path: string, init?: RequestInit) {
   const { data } = await supabase.auth.getSession();
@@ -23,59 +25,30 @@ async function authedFetch(path: string, init?: RequestInit) {
   });
 }
 
-export default function AdminStoreDetailPage() {
+export default function AdminSubscriptionDetailPage() {
   const params = useParams<{ id: string }>();
-  const [detail, setDetail] = useState<StoreDetail | null>(null);
-  const [endDateInput, setEndDateInput] = useState("");
+  const [detail, setDetail] = useState<SubscriptionDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("error");
-
-  async function load() {
-    setLoading(true);
-    const response = await authedFetch(`/api/admin/stores/${params.id}`);
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.error || "تعذر تحميل بيانات المتجر.");
-      setMessageType("error");
-      setLoading(false);
-      return;
-    }
-    setDetail(data);
-    setEndDateInput(data.subscription?.end_date ? data.subscription.end_date.slice(0, 10) : "");
-    setLoading(false);
-  }
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id]);
-
-  async function updateSubscription(patch: { status?: string; planId?: string; endDate?: string | null }) {
-    if (saving) return;
-    setSaving(true);
-    setMessage("");
-
-    const response = await authedFetch("/api/admin/subscriptions", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ storeId: params.id, ...patch }),
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      setMessage(data.error || "تعذر تنفيذ الإجراء.");
-      setMessageType("error");
-      setSaving(false);
-      return;
+    async function load() {
+      setLoading(true);
+      const response = await authedFetch(`/api/admin/stores/${params.id}`);
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.error || "تعذر تحميل بيانات الاشتراك.");
+        setLoading(false);
+        return;
+      }
+      setDetail({
+        store: data.store ?? null,
+        subscription: data.subscription ?? null,
+      });
+      setLoading(false);
     }
-
-    setMessage("تم تحديث الاشتراك بنجاح.");
-    setMessageType("success");
-    await load();
-    setSaving(false);
-  }
+    load();
+  }, [params.id]);
 
   if (loading) {
     return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500" dir="rtl">جاري التحميل...</main>;
@@ -89,59 +62,49 @@ export default function AdminStoreDetailPage() {
     );
   }
 
-  const sub = detail.subscription;
+  const subscription = detail.subscription;
 
   return (
     <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         <Link href="/admin/stores" className="text-sm text-zinc-500">→ كل المتاجر</Link>
-        <h1 className="mt-2 text-2xl font-bold text-zinc-900">{detail.store.name}</h1>
-        <p className="text-sm text-zinc-400">/shop/{detail.store.slug}</p>
+        <h1 className="mt-2 text-2xl font-bold text-zinc-900">تفاصيل الاشتراك</h1>
 
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">معلومات المتجر</h2>
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div><dt className="text-xs text-zinc-400">المالك</dt><dd className="mt-1 text-sm">{detail.ownerEmail || "غير معروف"}</dd></div>
-            <div><dt className="text-xs text-zinc-400">تاريخ الإنشاء</dt><dd className="mt-1 text-sm">{new Date(detail.store.created_at).toLocaleDateString("fr-DZ")}</dd></div>
-            <div><dt className="text-xs text-zinc-400">مرئي في المتجر</dt><dd className="mt-1 text-sm">{detail.store.is_active ? "نعم" : "لا"}</dd></div>
-          </dl>
+          <h2 className="text-lg font-bold text-zinc-900">المتجر</h2>
+          {detail.store ? (
+            <>
+              <p className="mt-2 text-sm font-medium text-zinc-800">{detail.store.name}</p>
+              <p className="mt-1 text-sm text-zinc-400">/shop/{detail.store.slug}</p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-zinc-500">المتجر غير موجود.</p>
+          )}
         </section>
 
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
           <h2 className="text-lg font-bold text-zinc-900">الاشتراك</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div><dt className="text-xs text-zinc-400">الخطة الحالية</dt><dd className="mt-1 text-sm font-semibold">{sub ? PLAN_LABELS[sub.plan_id as PlanId] || sub.plan_id : "لا يوجد اشتراك"}</dd></div>
-            <div><dt className="text-xs text-zinc-400">الحالة</dt><dd className="mt-1 text-sm font-semibold">{sub ? statusLabel[sub.status] || sub.status : "—"}</dd></div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <button disabled={saving} onClick={() => updateSubscription({ status: "active" })}
-              className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">تفعيل</button>
-            <button disabled={saving} onClick={() => updateSubscription({ status: "cancelled" })}
-              className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">تعطيل / إلغاء</button>
-            <button disabled={saving} onClick={() => updateSubscription({ planId: sub?.plan_id === "starter" ? "business" : "starter" })}
-              className="rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 disabled:opacity-50">
-              تغيير الخطة إلى {sub?.plan_id === "starter" ? "Business" : "Starter"}
-            </button>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-end gap-3">
-            <div>
-              <label className="mb-2 block text-xs text-zinc-500">تمديد الاشتراك حتى</label>
-              <input type="date" value={endDateInput} onChange={(e) => setEndDateInput(e.target.value)}
-                className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm" />
-            </div>
-            <button disabled={saving || !endDateInput}
-              onClick={() => updateSubscription({ endDate: new Date(endDateInput).toISOString() })}
-              className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
-              حفظ التاريخ
-            </button>
-          </div>
-
-          {message && (
-            <p className={`mt-5 rounded-xl p-3 text-sm ${messageType === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
-              {message}
-            </p>
+          {subscription ? (
+            <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs text-zinc-400">الخطة</dt>
+                <dd className="mt-1 text-sm font-semibold">{PLAN_LABELS[subscription.plan_id as PlanId] || subscription.plan_id}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-zinc-400">الحالة</dt>
+                <dd className="mt-1 text-sm font-semibold">{subscription.status}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-zinc-400">تاريخ البداية</dt>
+                <dd className="mt-1 text-sm">{subscription.start_date ? new Date(subscription.start_date).toLocaleDateString("fr-DZ") : "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-zinc-400">تاريخ الانتهاء</dt>
+                <dd className="mt-1 text-sm">{subscription.end_date ? new Date(subscription.end_date).toLocaleDateString("fr-DZ") : "—"}</dd>
+              </div>
+            </dl>
+          ) : (
+            <p className="mt-4 text-sm text-zinc-500">لا يوجد اشتراك لهذا المتجر.</p>
           )}
         </section>
       </div>
