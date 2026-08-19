@@ -11,6 +11,8 @@ const navLinks = [
   { href: "/dashboard/products", label: "المنتجات" },
   { href: "/dashboard/settings/store", label: "إعدادات المتجر" },
   { href: "/dashboard/appearance", label: "المظهر" },
+  { href: "/dashboard/subscription", label: "الاشتراك" },
+  { href: "/dashboard/support", label: "الدعم" },
   { href: "/dashboard/account", label: "الحساب" },
 ];
 
@@ -101,7 +103,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // protected content or the onboarding form to the wrong audience.
   if (status === "checking" || status === "unauthenticated") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400" dir="rtl">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400">
         جاري التحقق من الجلسة...
       </div>
     );
@@ -115,7 +117,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div dir="rtl">
+    <div>
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/dashboard" className="text-sm font-bold tracking-wide text-zinc-900">
