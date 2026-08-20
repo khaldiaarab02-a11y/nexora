@@ -1,33 +1,11 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getBearerUser, serviceClient } from "@/lib/server/auth";
 import { canUseFeature, type PlanId } from "@/config/plans";
 import { FONT_OPTIONS, getTheme, THEMES } from "@/themes/registry";
 import { isValidHex } from "@/themes/utils";
 
-function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!
-  );
-}
-
-function getAuthClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-  );
-}
-
-async function authenticate(request: Request) {
-  const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (!token) return null;
-  const authClient = getAuthClient();
-  const { data } = await authClient.auth.getUser(token);
-  return data.user ?? null;
-}
-
 async function getOwnerStore(userId: string) {
-  const admin = getAdminClient();
+  const admin = serviceClient();
   const { data: membership, error: membershipError } = await admin
     .from("store_members")
     .select("store_id")
@@ -49,7 +27,7 @@ async function getOwnerStore(userId: string) {
 }
 
 async function getSubscription(storeId: string) {
-  const admin = getAdminClient();
+  const admin = serviceClient();
   const { data } = await admin
     .from("subscriptions")
     .select("plan_id,status,end_date")
@@ -77,13 +55,13 @@ function safeThemePayload(themeId: string, primaryColor: string, accentColor: st
 }
 
 export async function GET(request: Request) {
-  const user = await authenticate(request);
+  const user = await getBearerUser(request);
   if (!user) return NextResponse.json({ error: "يجب تسجيل الدخول أولًا." }, { status: 401 });
 
   const ownerStore = await getOwnerStore(user.id);
   if (!ownerStore) return NextResponse.json({ error: "لم يتم العثور على متجر مرتبط بهذا الحساب." }, { status: 403 });
 
-  const admin = getAdminClient();
+  const admin = serviceClient();
   const [{ data: settings }, subscription] = await Promise.all([
     admin
       .from("store_theme_settings")
@@ -110,7 +88,7 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const user = await authenticate(request);
+  const user = await getBearerUser(request);
   if (!user) return NextResponse.json({ error: "يجب تسجيل الدخول أولًا." }, { status: 401 });
 
   const ownerStore = await getOwnerStore(user.id);
@@ -133,7 +111,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "تخصيص الخطوط متاح ضمن خطة Business." }, { status: 403 });
   }
 
-  const admin = getAdminClient();
+  const admin = serviceClient();
   const { error } = await admin
     .from("store_theme_settings")
     .upsert(
@@ -154,13 +132,13 @@ export async function PUT(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const user = await authenticate(request);
+  const user = await getBearerUser(request);
   if (!user) return NextResponse.json({ error: "يجب تسجيل الدخول أولًا." }, { status: 401 });
 
   const ownerStore = await getOwnerStore(user.id);
   if (!ownerStore) return NextResponse.json({ error: "ليس لديك صلاحية على هذا المتجر." }, { status: 403 });
 
-  const admin = getAdminClient();
+  const admin = serviceClient();
   const { error } = await admin
     .from("store_theme_settings")
     .upsert(
