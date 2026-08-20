@@ -1,53 +1,12 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function getAnonClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  if (!key) throw new Error("Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
-  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
-}
-
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  if (!key) {
-    throw new Error("Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables");
-  }
-  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
-}
-
-async function requireAdmin(request: Request) {
-  const authHeader = request.headers.get("authorization") || "";
-  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-  if (!token) return { error: NextResponse.json({ error: "يجب تسجيل الدخول أولًا." }, { status: 401 }) };
-
-  const anonClient = getAnonClient();
-  const { data: userData, error: userError } = await anonClient.auth.getUser(token);
-  if (userError || !userData.user) {
-    return { error: NextResponse.json({ error: "الجلسة غير صالحة أو منتهية." }, { status: 401 }) };
-  }
-
-  const adminClient = getAdminClient();
-  const { data: adminRow, error: adminError } = await adminClient
-    .from("admin_users")
-    .select("user_id")
-    .eq("user_id", userData.user.id)
-    .maybeSingle();
-
-  if (adminError) return { error: NextResponse.json({ error: adminError.message }, { status: 500 }) };
-  if (!adminRow) return { error: NextResponse.json({ error: "غير مصرح لك بهذا الإجراء." }, { status: 403 }) };
-
-  return { adminClient };
-}
+import { requireAdmin, serviceClient } from "@/lib/server/auth";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const guard = await requireAdmin(request);
-    if ("error" in guard) return guard.error;
-    const { adminClient } = guard;
+    if (!guard.user) return NextResponse.json({ error: "يجب تسجيل الدخول أولًا." }, { status: 401 });
+    if (!guard.admin) return NextResponse.json({ error: "غير مصرح لك بهذا الإجراء." }, { status: 403 });
+    const adminClient = serviceClient();
 
     const { id: storeId } = await params;
 
