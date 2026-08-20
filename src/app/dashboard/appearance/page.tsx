@@ -37,11 +37,13 @@ export default function AppearancePage() {
   const canAdvancedThemes = subscription?.effectivePlan === "business" && subscription.status === "active";
   const canAdvancedCustomization = canAdvancedThemes;
 
-  async function authHeaders() {
+  async function authHeaders(): Promise<Record<string, string>> {
     const { data } = await supabase.auth.getSession();
-    return data.session?.access_token
-      ? { Authorization: `Bearer ${data.session.access_token}`, "Content-Type": "application/json" }
-      : { "Content-Type": "application/json" };
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (data.session?.access_token) {
+      headers.Authorization = `Bearer ${data.session.access_token}`;
+    }
+    return headers;
   }
 
   async function load() {
