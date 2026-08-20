@@ -1,8 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { DEFAULT_LANGUAGE, languageDirection, LANGUAGES, translations, type Language } from "./config";
+import { DEFAULT_LANGUAGE, languageDirection, LANGUAGES, translations, type Language, type Translations } from "./config";
 
-type I18nContext = { language: Language; setLanguage: (language: Language) => void; dir: "rtl" | "ltr"; t: typeof translations["ar"] };
+type I18nContext = { language: Language; setLanguage: (language: Language) => void; dir: "rtl" | "ltr"; t: Translations };
 const Context = createContext<I18nContext | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
