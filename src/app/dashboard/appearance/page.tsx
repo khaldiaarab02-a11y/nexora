@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { PlanId } from "@/config/plans";
 import ThemePreviewCard from "@/components/storefront/ThemePreviewCard";
@@ -37,16 +37,16 @@ export default function AppearancePage() {
   const canAdvancedThemes = subscription?.effectivePlan === "business" && subscription.status === "active";
   const canAdvancedCustomization = canAdvancedThemes;
 
-  async function authHeaders(): Promise<Record<string, string>> {
+  const authHeaders = useCallback(async (): Promise<Record<string, string>> => {
     const { data } = await supabase.auth.getSession();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (data.session?.access_token) {
       headers.Authorization = `Bearer ${data.session.access_token}`;
     }
     return headers;
-  }
+  }, []);
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     setMessage("");
     const headers = await authHeaders();
@@ -69,11 +69,11 @@ export default function AppearancePage() {
       font: data.settings.font,
     });
     setLoading(false);
-  }
+  }, [authHeaders]);
 
   useEffect(() => {
-    load();
-  }, []);
+    void load();
+  }, [load]);
 
   async function save() {
     setSaving(true);
