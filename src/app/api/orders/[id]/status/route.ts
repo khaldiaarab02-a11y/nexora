@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getBearerUser, serviceClient } from "@/lib/server/auth";
 
 const ALLOWED_STATUSES = [
   "pending",
@@ -15,34 +15,6 @@ function isAllowedStatus(value: unknown): value is AllowedStatus {
   return typeof value === "string" && (ALLOWED_STATUSES as readonly string[]).includes(value);
 }
 
-function getAnonClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!url) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  if (!key) throw new Error("Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
-
-  return createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  if (!key) {
-    throw new Error(
-      "Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables"
-    );
-  }
-
-  return createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -52,13 +24,6 @@ export async function PATCH(
 
     if (!orderId) {
       return NextResponse.json({ error: "رقم الطلب غير صالح." }, { status: 400 });
-    }
-
-    const authHeader = request.headers.get("authorization") || "";
-    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-
-    if (!token) {
-      return NextResponse.json({ error: "يجب تسجيل الدخول أولًا." }, { status: 401 });
     }
 
     let body: unknown;
@@ -81,17 +46,16 @@ export async function PATCH(
     }
 
     // Verify the caller's session token against Supabase Auth (not just decoded client-side).
-    const anonClient = getAnonClient();
-    const { data: userData, error: userError } = await anonClient.auth.getUser(token);
+    const user = await getBearerUser(request);
 
-    if (userError || !userData.user) {
+    if (!user) {
       return NextResponse.json(
         { error: "الجلسة غير صالحة أو منتهية. سجّلي الدخول من جديد." },
         { status: 401 }
       );
     }
 
-    const adminClient = getAdminClient();
+    const adminClient = serviceClient();
 
     // Look up the order's store_id first (server-side, trusted).
     const { data: order, error: orderError } = await adminClient
@@ -112,7 +76,7 @@ export async function PATCH(
     const { data: membership, error: membershipError } = await adminClient
       .from("store_members")
       .select("store_id")
-      .eq("user_id", userData.user.id)
+      .eq("user_id", user.id)
       .eq("store_id", order.store_id)
       .eq("role", "owner")
       .maybeSingle();
