@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
   getCart,
@@ -28,7 +28,7 @@ export default function CartPage() {
   const [issues, setIssues] = useState<ItemIssue[]>([]);
   const [outOfStockIds, setOutOfStockIds] = useState<string[]>([]);
 
-  async function validateCart() {
+  const validateCart = useCallback(async () => {
     const localItems = getCart();
 
     if (localItems.length === 0) {
@@ -93,25 +93,26 @@ export default function CartPage() {
     setOutOfStockIds(outOfStock);
     setItems(getCart());
     setChecking(false);
-  }
-
-  useEffect(() => {
-    validateCart();
-    const refresh = () => setItems(getCart());
-    window.addEventListener("nexora-cart-updated", refresh);
-    return () => window.removeEventListener("nexora-cart-updated", refresh);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (!items.length) return;
-    fetch(`/api/store-settings?storeId=${items[0].storeId}`)
+    void validateCart();
+    const refresh = () => setItems(getCart());
+    window.addEventListener("nexora-cart-updated", refresh);
+    return () => window.removeEventListener("nexora-cart-updated", refresh);
+  }, [validateCart]);
+
+  const firstStoreId = items[0]?.storeId ?? null;
+
+  useEffect(() => {
+    if (!firstStoreId) return;
+    fetch(`/api/store-settings?storeId=${firstStoreId}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.currency) setCurrency(data.currency);
       })
       .catch(() => {});
-  }, [items.length ? items[0].storeId : null]);
+  }, [firstStoreId]);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const continueShoppingHref = items[0]?.storeSlug ? `/shop/${items[0].storeSlug}` : "/";
