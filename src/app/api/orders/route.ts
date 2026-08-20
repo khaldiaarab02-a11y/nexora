@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { serviceClient } from "@/lib/server/auth";
 
 type OrderItemInput = {
   productId: string;
@@ -21,30 +21,6 @@ type OrderInput = {
   notes?: string;
   items: OrderItemInput[];
 };
-
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SECRET_KEY ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url) {
-    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
-  }
-
-  if (!key) {
-    throw new Error(
-      "Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables"
-    );
-  }
-
-  return createClient(url, key, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
 
 function validateBody(body: OrderInput) {
   if (
@@ -77,7 +53,7 @@ function isMissingFunctionError(error: { code?: string; message?: string } | nul
 }
 
 async function createOrderViaRpc(
-  supabase: ReturnType<typeof getAdminClient>,
+  supabase: ReturnType<typeof serviceClient>,
   body: OrderInput
 ) {
   const { data, error } = await supabase.rpc("create_order_with_items", {
@@ -117,7 +93,7 @@ async function createOrderViaRpc(
 }
 
 async function createOrderFallback(
-  supabase: ReturnType<typeof getAdminClient>,
+  supabase: ReturnType<typeof serviceClient>,
   body: OrderInput
 ) {
   const productIds = body.items.map((item) => item.productId);
@@ -262,7 +238,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    const supabase = getAdminClient();
+    const supabase = serviceClient();
 
     const rpcResult = await createOrderViaRpc(supabase, body);
 
