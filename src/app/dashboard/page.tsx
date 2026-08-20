@@ -200,6 +200,12 @@ export default function DashboardPage() {
             <h1 className="mt-1 truncate text-2xl font-bold text-zinc-900">{loading ? "..." : store?.name || "لوحة التحكم"}</h1>
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <Link href="/dashboard/analytics" className="hidden rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 sm:inline-flex">
+              التحليلات
+            </Link>
+            <Link href="/dashboard/customers" className="hidden rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 sm:inline-flex">
+              العملاء
+            </Link>
             {store?.slug && (
               <Link
                 href={`/shop/${store.slug}`}
