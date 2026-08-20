@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { getBearerUser, getOwnedStore, serviceClient } from "@/lib/server/auth";
-import type { AnalyticsStatus, DashboardAnalytics } from "@/types/phase3";
+import type {
+  AnalyticsDay,
+  AnalyticsStatus,
+  DashboardAnalytics,
+} from "@/types/phase3";
 
 const STATUSES: AnalyticsStatus[] = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
 const RANGE_DAYS = 30;
