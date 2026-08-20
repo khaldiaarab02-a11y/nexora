@@ -1,5 +1,4 @@
 "use client";
-import { LANGUAGES } from "@/i18n/config";
 import { useI18n } from "@/i18n/LanguageProvider";
 export default function LanguageSwitcher() {
   const { language, setLanguage } = useI18n();
