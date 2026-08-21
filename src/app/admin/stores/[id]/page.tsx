@@ -78,12 +78,12 @@ export default function AdminStoreDetailPage() {
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500" dir="rtl">جاري التحميل...</main>;
+    return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500">جاري التحميل...</main>;
   }
 
   if (!detail) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-6 text-center" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-6 text-center">
         <p className="rounded-2xl bg-red-50 p-4 text-red-700">{message}</p>
       </main>
     );
@@ -92,7 +92,7 @@ export default function AdminStoreDetailPage() {
   const sub = detail.subscription;
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         <Link href="/admin/stores" className="text-sm text-zinc-500">→ كل المتاجر</Link>
         <h1 className="mt-2 text-2xl font-bold text-zinc-900">{detail.store.name}</h1>
