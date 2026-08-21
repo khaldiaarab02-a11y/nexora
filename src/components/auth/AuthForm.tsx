@@ -145,7 +145,7 @@ export default function AuthForm() {
       <div className="mt-8 text-center">
         <h1 className="text-3xl font-bold">{mode === "login" ? t.auth.login : t.auth.signup}</h1>
         <p className="mt-2 text-sm text-zinc-500">
-          {mode === "login" ? "ادخلي إلى لوحة متجرك." : "أنشئ حسابك وابدأ رحلة متجرك."}
+          {mode === "login" ? "الوصول إلى لوحة المتجر." : "إنشاء الحساب وبدء رحلة المتجر."}
         </p>
       </div>
 
