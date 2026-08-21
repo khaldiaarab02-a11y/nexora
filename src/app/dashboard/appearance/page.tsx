@@ -142,7 +142,7 @@ export default function AppearancePage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora</p>
             <h1 className="mt-2 text-3xl font-bold text-zinc-900">المظهر والتخصيص</h1>
-            <p className="mt-2 text-sm text-zinc-500">اختاري مظهرًا جاهزًا ثم خصصي ألوان متجرك وهويته البصرية.</p>
+            <p className="mt-2 text-sm text-zinc-500">اختر مظهرًا جاهزًا ثم خصصي ألوان متجرك وهويته البصرية.</p>
           </div>
           <Link href="/dashboard/settings/store" className="text-sm font-medium text-zinc-500 hover:text-zinc-900">إدارة بيانات المتجر ←</Link>
         </div>
