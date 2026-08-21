@@ -40,7 +40,7 @@ export default function CheckoutPage() {
     const storeSlug = items[0].storeSlug;
 
     if (items.some((item) => item.storeId !== storeId)) {
-      setError("السلة تحتوي منتجات من متاجر مختلفة. أفرغي السلة وابدأ من متجر واحد.");
+      setError("السلة تحتوي منتجات من متاجر مختلفة. يُرجى إفراغ السلة والبدء من متجر واحد.");
       setSubmitting(false);
       return;
     }
