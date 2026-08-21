@@ -35,7 +35,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-4 sm:p-6" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-4 sm:p-6">
         <div className="mx-auto max-w-lg animate-pulse space-y-4 py-6">
           <div className="h-8 w-32 rounded bg-zinc-200" />
           <div className="h-48 rounded-3xl bg-zinc-200" />
@@ -45,7 +45,7 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-lg px-4 sm:px-6">
         <h1 className="text-2xl font-bold text-zinc-900">الحساب</h1>
 
