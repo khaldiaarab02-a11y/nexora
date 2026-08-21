@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
   const maxRevenue = useMemo(() => Math.max(...(data?.daily.map((day) => day.revenue) ?? [1]), 1), [data]);
 
   return (
-    <main className="min-h-screen bg-zinc-50" dir="rtl">
+    <main className="min-h-screen bg-zinc-50">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6">
           <div><p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora · Phase 3</p><h1 className="mt-1 text-2xl font-bold text-zinc-900">تحليلات المتجر</h1></div>
