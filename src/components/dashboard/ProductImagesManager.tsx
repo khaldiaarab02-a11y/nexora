@@ -247,7 +247,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     const target = images.find((img) => img.id === imageId);
     if (!target) return;
 
-    const confirmed = window.confirm("هل تريدين حذف هذه الصورة؟ لا يمكن التراجع عن هذا الإجراء.");
+    const confirmed = window.confirm("هل تريد حذف هذه الصورة؟ لا يمكن التراجع عن هذا الإجراء.");
     if (!confirmed) return;
 
     setMessage("");
