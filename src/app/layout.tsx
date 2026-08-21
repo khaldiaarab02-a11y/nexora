@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
 import "./globals.css";
+import "./page.css";
 
 export const metadata: Metadata = { title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` }, description: siteConfig.description };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
