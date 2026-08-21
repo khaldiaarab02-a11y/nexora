@@ -96,9 +96,9 @@ export default function ProductPage() {
     setTimeout(() => setAdded(false), 2500);
   }
 
-  if (loading) return <main className="min-h-screen bg-zinc-50 p-6" dir="rtl"><div className="mx-auto max-w-5xl animate-pulse"><div className="h-14 rounded-2xl bg-zinc-200" /><div className="mt-6 grid gap-0 overflow-hidden rounded-[2rem] bg-white md:grid-cols-2"><div className="aspect-square bg-zinc-200" /><div className="space-y-4 p-8"><div className="h-6 w-2/3 rounded bg-zinc-200" /><div className="h-4 w-full rounded bg-zinc-200" /><div className="h-10 w-1/3 rounded bg-zinc-200" /></div></div></div></main>;
+  if (loading) return <main className="min-h-screen bg-zinc-50 p-6"><div className="mx-auto max-w-5xl animate-pulse"><div className="h-14 rounded-2xl bg-zinc-200" /><div className="mt-6 grid gap-0 overflow-hidden rounded-[2rem] bg-white md:grid-cols-2"><div className="aspect-square bg-zinc-200" /><div className="space-y-4 p-8"><div className="h-6 w-2/3 rounded bg-zinc-200" /><div className="h-4 w-full rounded bg-zinc-200" /><div className="h-10 w-1/3 rounded bg-zinc-200" /></div></div></div></main>;
 
-  if (error || !product || !store) return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8" dir="rtl"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><h1 className="text-2xl font-bold text-red-600">{error || "المنتج غير موجود."}</h1><Link href="/" className="mt-4 inline-block text-sm font-medium text-zinc-500">الرئيسية</Link></div></main>;
+  if (error || !product || !store) return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><h1 className="text-2xl font-bold text-red-600">{error || "المنتج غير موجود."}</h1><Link href="/" className="mt-4 inline-block text-sm font-medium text-zinc-500">الرئيسية</Link></div></main>;
 
   const resolved = resolveTheme(themeSettings?.theme_id, themeSettings?.primary_color, themeSettings?.accent_color, themeSettings?.font);
 
