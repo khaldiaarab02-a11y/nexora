@@ -132,11 +132,11 @@ export default function AppearancePage() {
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-zinc-50 p-6" dir="rtl"><div className="mx-auto max-w-6xl animate-pulse"><div className="h-10 w-48 rounded bg-zinc-200" /><div className="mt-8 h-96 rounded-3xl bg-zinc-200" /></div></main>;
+    return <main className="min-h-screen bg-zinc-50 p-6"><div className="mx-auto max-w-6xl animate-pulse"><div className="h-10 w-48 rounded bg-zinc-200" /><div className="mt-8 h-96 rounded-3xl bg-zinc-200" /></div></main>;
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
