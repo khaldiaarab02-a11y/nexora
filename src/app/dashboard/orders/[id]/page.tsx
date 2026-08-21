@@ -90,7 +90,7 @@ export default function OrderDetailPage() {
       }
 
       if (!orderData) {
-        setMessage("الطلب غير موجود أو لا تملكين صلاحية الوصول إليه.");
+        setMessage("الطلب غير موجود أو لا تملك صلاحية الوصول إليه.");
         setLoading(false);
         return;
       }
@@ -141,7 +141,7 @@ export default function OrderDetailPage() {
 
     if (sessionError || !token) {
       setStatusError(true);
-      setStatusMessage("انتهت الجلسة. سجّلي الدخول من جديد.");
+      setStatusMessage("انتهت الجلسة. سجّل الدخول من جديد.");
       setSavingStatus(false);
       return;
     }
