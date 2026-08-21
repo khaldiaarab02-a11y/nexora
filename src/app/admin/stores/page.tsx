@@ -65,7 +65,7 @@ export default function AdminStoresPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h1 className="text-2xl font-bold text-zinc-900">المتاجر</h1>
 
