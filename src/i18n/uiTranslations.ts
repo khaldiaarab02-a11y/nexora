@@ -255,7 +255,7 @@ export const UI_TRANSLATIONS: Entry[] = [  ["اختيار", "Choose", "Choisisse
   ["البريد الإلكتروني أو كلمة المرور غير صحيحة.", "Email or password is incorrect.", "L’e-mail ou le mot de passe est incorrect."],
   ["يجب تأكيد البريد الإلكتروني أولًا. يُرجى التحقق من صندوق الوارد.", "Please verify your email first. Check your inbox.", "Veuillez d’abord vérifier votre e-mail. Consultez votre boîte de réception."],
   ["هذا البريد مسجل بالفعل. يُرجى تسجيل الدخول بدلًا من إنشاء حساب جديد.", "This email is already registered. Sign in instead of creating a new account.", "Cet e-mail est déjà enregistré. Connectez-vous au lieu de créer un nouveau compte."],
-  ["كلمة المرور قصيرة جدًا. استخدمي 6 أحرف على الأقل.", "Password is too short. Use at least 6 characters.", "Le mot de passe est trop court. Utilisez au moins 6 caractères."],
+  ["كلمة المرور قصيرة جدًا. استخدم 6 أحرف على الأقل.", "Password is too short. Use at least 6 characters.", "Le mot de passe est trop court. Utilisez au moins 6 caractères."],
   ["صيغة البريد الإلكتروني غير صحيحة.", "Invalid email format.", "Format d’e-mail invalide."],
   ["كلمتا المرور غير متطابقتين.", "Passwords do not match.", "Les mots de passe ne correspondent pas."],
   ["هل تريدين إزالة شعار المتجر؟", "Remove the store logo?", "Supprimer le logo de la boutique ?"],
@@ -285,6 +285,150 @@ export const UI_TRANSLATIONS: Entry[] = [  ["اختيار", "Choose", "Choisisse
   ["تمت إعادة إرسال رسالة التحقق.", "Verification email resent.", "E-mail de vérification renvoyé."],
   ["إذا كان البريد صالحًا، ستصلك رسالة لإعادة تعيين كلمة المرور.", "If the email is valid, you will receive a password reset message.", "Si l’e-mail est valide, vous recevrez un message pour réinitialiser le mot de passe."],
   ["إذا كان البريد صالحًا، ستصلك رسالة لإعادة تعيين كلمة المرور.", "If the email is valid, you will receive a password reset message.", "Si l’e-mail est valide, vous recevrez un message pour réinitialiser le mot de passe."],
+  ["الاشتراكات", "Subscriptions", "Abonnements"],
+  ["المالك", "Owner", "Propri\u00e9taire"],
+  ["تاريخ الإنشاء", "Created", "Cr\u00e9ation"],
+  ["مرئي في المتجر", "Visible in store", "Visible dans la boutique"],
+  ["الخطة الحالية", "Current plan", "Plan actuel"],
+  ["الحالة", "Status", "Statut"],
+  ["طلبات الاشتراك والدفع", "Subscription and payment requests", "Demandes d\u2019abonnement et de paiement"],
+  ["مراجعة إثباتات الدفع قبل تفعيل الاشتراك.", "Review payment proofs before activating subscriptions.", "V\u00e9rifiez les preuves de paiement avant d\u2019activer les abonnements."],
+  ["لا توجد طلبات.", "No requests.", "Aucune demande."],
+  ["مفتوح", "Open", "Ouvert"],
+  ["حل", "Resolve", "R\u00e9soudre"],
+  ["دعم التجار", "Merchant support", "Support des marchands"],
+  ["لا توجد محادثات.", "No conversations.", "Aucune conversation."],
+  ["السلة", "Cart", "Panier"],
+  ["السلة 🛒", "Cart \ud83d\uded2", "Panier \ud83d\uded2"],
+  ["سلة المشتريات 🛒", "Shopping cart \ud83d\uded2", "Panier d\u2019achat \ud83d\uded2"],
+  ["إضافة منتج", "+ Add product", "+ Ajouter un produit"],
+  ["+ إضافة منتج", "+ Add product", "+ Ajouter un produit"],
+  ["إضافة منتج", "Add product", "Ajouter un produit"],
+  ["إضافة أول منتج", "Add your first product", "Ajouter votre premier produit"],
+  ["أضف بيانات المنتج وصوره إلى متجرك.", "Add product details and images to your store.", "Ajoutez les informations et images du produit \u00e0 votre boutique."],
+  ["أضف منتجًا من المتجر أولًا لإتمام الطلب.", "Add a product from the store first to complete the order.", "Ajoutez d\u2019abord un produit depuis la boutique pour finaliser la commande."],
+  ["أضف منتجًا أولًا من المتجر.", "Add a product from the store first.", "Ajoutez d\u2019abord un produit depuis la boutique."],
+  ["أول منتج لمتجرك يبدأ من هنا.", "Your store\u2019s first product starts here.", "Le premier produit de votre boutique commence ici."],
+  ["أنشئ متجرك الأول", "Create your first store", "Cr\u00e9ez votre premi\u00e8re boutique"],
+  ["التحليلات", "Analytics", "Analyses"],
+  ["المبيعات اليومية", "Daily sales", "Ventes quotidiennes"],
+  ["حالات الطلبات", "Order statuses", "Statuts des commandes"],
+  ["أفضل المنتجات · آخر 30 يومًا", "Top products \u00b7 Last 30 days", "Meilleurs produits \u00b7 30 derniers jours"],
+  ["آخر طلب", "Last order", "Derni\u00e8re commande"],
+  ["الإنفاق", "Spending", "D\u00e9penses"],
+  ["العميل", "Customer", "Client"],
+  ["الكمية", "Quantity", "Quantit\u00e9"],
+  ["المخزون بحالة جيدة ✓", "Stock is healthy \u2713", "Le stock est suffisant \u2713"],
+  ["تنبيه المخزون", "Stock alert", "Alerte de stock"],
+  ["المنتجات الأكثر مبيعًا", "Best-selling products", "Produits les plus vendus"],
+  ["المنتجات المطلوبة", "Requested products", "Produits demand\u00e9s"],
+  ["المنتج نشط", "Product active", "Produit actif"],
+  ["المظهر والتخصيص", "Appearance and customization", "Apparence et personnalisation"],
+  ["المظهر يغيّر طريقة عرض نفس المنتجات والسلة والشراء.", "Appearance changes how the same products, cart, and checkout are displayed.", "L\u2019apparence modifie l\u2019affichage des m\u00eames produits, du panier et du paiement."],
+  ["اختر مظهرًا جاهزًا ثم خصصي ألوان متجرك وهويته البصرية.", "Choose a ready-made appearance, then customize your store colors and visual identity.", "Choisissez une apparence pr\u00eate \u00e0 l\u2019emploi, puis personnalisez les couleurs et l\u2019identit\u00e9 visuelle de votre boutique."],
+  ["تعديلاتك تستبدل ألوان الثيم فقط، ولا تغيّر منطق المتجر.", "Your changes only replace theme colors and do not change store logic.", "Vos modifications remplacent uniquement les couleurs du th\u00e8me et ne changent pas la logique de la boutique."],
+  ["خطوط آمنة من النظام بدون تحميل أصول ثقيلة.", "System-safe fonts without loading heavy assets.", "Polices syst\u00e8me s\u00fbres sans charger de ressources lourdes."],
+  ["بيانات المتجر", "Store data", "Donn\u00e9es de la boutique"],
+  ["معلومات المتجر", "Store information", "Informations de la boutique"],
+  ["إدارة بيانات المتجر ←", "Manage store data \u2192", "G\u00e9rer les donn\u00e9es de la boutique \u2192"],
+  ["عدّل بيانات متجرك العامة وإعدادات الشحن.", "Edit your store details and shipping settings.", "Modifiez les informations g\u00e9n\u00e9rales de votre boutique et les param\u00e8tres de livraison."],
+  ["وصف المتجر", "Store description", "Description de la boutique"],
+  ["اسم المتجر", "Store name", "Nom de la boutique"],
+  ["رابط المتجر", "Store URL", "URL de la boutique"],
+  ["العملة", "Currency", "Devise"],
+  ["الشحن والعملة", "Shipping and currency", "Livraison et devise"],
+  ["تكلفة التوصيل الافتراضية", "Default shipping fee", "Frais de livraison par d\u00e9faut"],
+  ["صور المنتج", "Product images", "Images du produit"],
+  ["شعار المتجر", "Store logo", "Logo de la boutique"],
+  ["تاريخ إنشاء الحساب", "Account creation date", "Date de cr\u00e9ation du compte"],
+  ["تصفّح المتاجر", "Browse stores", "Parcourir les boutiques"],
+  ["عرض المتجر", "View store", "Voir la boutique"],
+  ["عرض جميع الطلبات", "View all orders", "Voir toutes les commandes"],
+  ["أحدث الطلبات", "Recent orders", "Commandes r\u00e9centes"],
+  ["لوحة تحكم Nexora", "Nexora Dashboard", "Tableau de bord Nexora"],
+  ["اللوحة", "Dashboard", "Tableau de bord"],
+  ["متجر إلكتروني", "Online store", "Boutique en ligne"],
+  ["نظرة عامة على المتاجر والاشتراكات.", "Overview of stores and subscriptions.", "Vue d\u2019ensemble des boutiques et abonnements."],
+  ["هذه اللوحة مخصصة لفريق Nexora فقط.", "This dashboard is for the Nexora team only.", "Ce tableau de bord est r\u00e9serv\u00e9 \u00e0 l\u2019\u00e9quipe Nexora."],
+  ["لا توجد متاجر بعد.", "No stores yet.", "Aucune boutique pour le moment."],
+  ["لا توجد منتجات بعد", "No products yet", "Aucun produit pour le moment"],
+  ["لا توجد منتجات متاحة حاليًا", "No products are currently available", "Aucun produit n\u2019est actuellement disponible"],
+  ["لا توجد طلبات حتى الآن", "No orders yet", "Aucune commande pour le moment"],
+  ["لا توجد مبيعات كافية بعد.", "Not enough sales yet.", "Pas encore assez de ventes."],
+  ["لا يوجد عملاء مطابقون.", "No matching customers.", "Aucun client correspondant."],
+  ["لم نجد أي طلب مطابق", "No matching order found", "Aucune commande correspondante trouv\u00e9e"],
+  ["لم نجد أي منتج مطابق", "No matching product found", "Aucun produit correspondant trouv\u00e9"],
+  ["لا توجد صور بعد", "No images yet", "Aucune image pour le moment"],
+  ["لا توجد صورة", "No image", "Aucune image"],
+  ["المحادثة غير موجودة.", "Conversation not found.", "Conversation introuvable."],
+  ["غير مصرح لك بالوصول", "You are not authorized to access this.", "Vous n\u2019\u00eates pas autoris\u00e9 \u00e0 acc\u00e9der \u00e0 cette ressource."],
+  ["كل الحالات", "All statuses", "Tous les statuts"],
+  ["كل المخزون", "All stock", "Tout le stock"],
+  ["مسح الفلاتر", "Clear filters", "Effacer les filtres"],
+  ["معاينة سريعة", "Quick preview", "Aper\u00e7u rapide"],
+  ["معلومات التوصيل", "Shipping information", "Informations de livraison"],
+  ["معلومات العميل", "Customer information", "Informations client"],
+  ["ملخص الطلب", "Order summary", "R\u00e9sum\u00e9 de la commande"],
+  ["مميز", "Featured", "\u00c0 la une"],
+  ["منتج مميز", "Featured product", "Produit \u00e0 la une"],
+  ["منتجات أخرى قد تعجبك", "Other products you may like", "Autres produits susceptibles de vous plaire"],
+  ["نص تجريبي للمتجر", "Sample store text", "Texte d\u2019exemple de la boutique"],
+  ["اكتشفي مجموعتنا", "Discover our collection", "D\u00e9couvrez notre collection"],
+  ["الألوان", "Colors", "Couleurs"],
+  ["التوصيل يحسب في صفحة الطلب.", "Shipping is calculated on the order page.", "La livraison est calcul\u00e9e sur la page de commande."],
+  ["الحالة الحالية:", "Current status:", "Statut actuel :"],
+  ["الخطة:", "Plan:", "Plan :"],
+  ["رئيسية", "Main", "Principale"],
+  ["تعيين كرئيسية", "Set as main", "D\u00e9finir comme principale"],
+  ["إزالة", "Remove", "Supprimer"],
+  ["إزالة الشعار", "Remove logo", "Supprimer le logo"],
+  ["تغيير الصورة", "Change image", "Changer l\u2019image"],
+  ["رفع شعار", "Upload logo", "T\u00e9l\u00e9verser le logo"],
+  ["استبدال الشعار", "Replace logo", "Remplacer le logo"],
+  ["العودة", "Back", "Retour"],
+  ["العودة إلى الطلبات", "Back to orders", "Retour aux commandes"],
+  ["العودة إلى المتجر", "Back to store", "Retour \u00e0 la boutique"],
+  ["العودة للوحة التحكم", "Back to dashboard", "Retour au tableau de bord"],
+  ["العودة لتسجيل الدخول", "Back to login", "Retour \u00e0 la connexion"],
+  ["الذهاب إلى لوحة متجري", "Go to my store dashboard", "Acc\u00e9der au tableau de bord de ma boutique"],
+  ["الانتقال إلى السلة →", "Go to cart \u2192", "Acc\u00e9der au panier \u2192"],
+  ["متابعة التسوق", "Continue shopping", "Continuer les achats"],
+  ["متابعة الطلب", "Continue to order", "Continuer la commande"],
+  ["تأخير →", "Delay \u2192", "Diff\u00e9rer \u2192"],
+  ["→ كل المتاجر", "\u2192 All stores", "\u2192 Toutes les boutiques"],
+  ["تغيير الخطة إلى", "Change plan to", "Changer le plan en"],
+  ["تفعيل", "Activate", "Activer"],
+  ["تعطيل / إلغاء", "Disable / Cancel", "D\u00e9sactiver / Annuler"],
+  ["حفظ التاريخ", "Save history", "Enregistrer l\u2019historique"],
+  ["رابط غير صالح", "Invalid link", "Lien invalide"],
+  ["الرابط غير صالح أو منتهي. اطلبي رابطًا جديدًا.", "The link is invalid or expired. Request a new one.", "Le lien est invalide ou expir\u00e9. Demandez-en un nouveau."],
+  ["جاري التحقق من الجلسة...", "Checking session...", "V\u00e9rification de la session..."],
+  ["جاري تأكيد الحساب...", "Confirming account...", "Confirmation du compte..."],
+  ["جاري تحميل المنتج...", "Loading product...", "Chargement du produit..."],
+  ["جاري تحميل تفاصيل الطلب...", "Loading order details...", "Chargement des d\u00e9tails de la commande..."],
+  ["جرّب تعديل كلمة البحث أو الفلاتر.", "Try adjusting your search or filters.", "Essayez de modifier votre recherche ou vos filtres."],
+  ["جرّب تعديل كلمة البحث أو الفلتر.", "Try adjusting your search or filter.", "Essayez de modifier votre recherche ou votre filtre."],
+  ["تم استلام طلبك ❤️", "Your order has been received \u2764\ufe0f", "Votre commande a \u00e9t\u00e9 re\u00e7ue \u2764\ufe0f"],
+  ["شكرًا لك. تم تسجيل الطلب وسيتم التواصل معك لتأكيده.", "Thank you. Your order has been recorded and you will be contacted to confirm it.", "Merci. Votre commande a \u00e9t\u00e9 enregistr\u00e9e et vous serez contact\u00e9 pour la confirmer."],
+  ["ستظهر مبيعاتك هنا بعد استلام أول طلب", "Your sales will appear here after your first order", "Vos ventes appara\u00eetront ici apr\u00e8s votre premi\u00e8re commande"],
+  ["ستظهر هنا الطلبات فور استلامها من صفحة المتجر.", "Orders will appear here as soon as they are received from the store page.", "Les commandes appara\u00eetront ici d\u00e8s leur r\u00e9ception depuis la boutique."],
+  ["سيتم عرض المنتجات هنا عندما تصبح متاحة.", "Products will appear here when they become available.", "Les produits appara\u00eetront ici lorsqu\u2019ils seront disponibles."],
+  ["خطوة واحدة تفصلك عن بدء البيع أونلاين — يمكنك تعديل كل هذه البيانات لاحقًا من إعدادات المتجر.", "One step away from selling online \u2014 you can edit all of this later from store settings.", "Une \u00e9tape vous s\u00e9pare du lancement en ligne \u2014 vous pourrez modifier toutes ces donn\u00e9es depuis les param\u00e8tres de la boutique."],
+  ["أحرف إنجليزية صغيرة وأرقام وشرطات فقط، 3 أحرف على الأقل.", "Lowercase English letters, numbers, and hyphens only, at least 3 characters.", "Lettres anglaises minuscules, chiffres et tirets uniquement, 3 caract\u00e8res minimum."],
+  ["اضغط لاختيار صورة أو أكثر", "Click to choose one or more images", "Cliquez pour choisir une ou plusieurs images"],
+  ["السلة فارغة", "Your cart is empty", "Votre panier est vide"],
+  ["نفد", "Out of stock", "Rupture de stock"],
+  ["نفد المخزون — يرجى حذف المنتج للمتابعة", "Out of stock \u2014 please remove the product to continue", "Rupture de stock \u2014 veuillez supprimer le produit pour continuer"],
+  ["مختارة", "Selected", "S\u00e9lectionn\u00e9"],
+  ["طلبات الدفع", "Payment requests", "Demandes de paiement"],
+  ["إعادة الإرسال", "Resubmit", "Renvoyer"],
+  ["إرسال إثبات الدفع", "Submit payment proof", "Envoyer la preuve de paiement"],
+  ["اختر الخطة ثم أرسلي إثبات الدفع للمراجعة.", "Choose a plan, then submit payment proof for review.", "Choisissez un plan, puis envoyez la preuve de paiement pour examen."],
+  ["تمديد الاشتراك حتى", "Extend subscription until", "Prolonger l\u2019abonnement jusqu\u2019au"],
+  ["بعد اختيار الخطة، استخدم طريقة الدفع التي يوفرها فريق Nexora، ثم أرفق صورة أو PDF لإثبات الدفع. لا يتم تفعيل الاشتراك حتى تتم المراجعة اليدوية.", "After choosing a plan, use the payment method provided by the Nexora team, then upload an image or PDF as proof. The subscription is activated only after manual review.", "Apr\u00e8s avoir choisi un plan, utilisez le moyen de paiement fourni par l\u2019\u00e9quipe Nexora, puis envoyez une image ou un PDF comme preuve. L\u2019abonnement n\u2019est activ\u00e9 qu\u2019apr\u00e8s examen manuel."],
+  ["طريقة الدفع والتعليمات النهائية يقدمها فريق Nexora. أكمل الدفع بالطريقة المتفق عليها ثم ارفعي الإثبات هنا. لن يتم تفعيل الاشتراك من المتصفح.", "The Nexora team provides the payment method and final instructions. Complete the payment as agreed, then upload the proof here. The subscription will not be activated from the browser.", "L\u2019\u00e9quipe Nexora fournit le moyen de paiement et les instructions finales. Effectuez le paiement convenu, puis envoyez la preuve ici. L\u2019abonnement ne sera pas activ\u00e9 depuis le navigateur."],
+  ["رقم/مرجع الدفع (اختياري)", "Payment number/reference (optional)", "Num\u00e9ro/r\u00e9f\u00e9rence de paiement (facultatif)"],
+  ["مرجع الدفع (اختياري)", "Payment reference (optional)", "R\u00e9f\u00e9rence de paiement (facultatif)"],
 ];
 
 const byLanguage = new Map<UiLanguage, Map<string, string>>();
@@ -301,13 +445,53 @@ for (const [ar, en, fr] of UI_TRANSLATIONS) {
   reverse.set(fr, [ar, en, fr]);
 }
 
+function translateDynamicUiText(text: string, language: UiLanguage): string {
+  if (language === "ar") return text;
+  let m = text.match(/^(\\d+) من (\\d+) طلب$/);
+  if (m) return language === "en" ? `${m[1]} of ${m[2]} orders` : `${m[1]} sur ${m[2]} commandes`;
+  m = text.match(/^(\\d+) من (\\d+) منتج$/);
+  if (m) return language === "en" ? `${m[1]} of ${m[2]} products` : `${m[1]} sur ${m[2]} produits`;
+  m = text.match(/^طلب #(.+)$/);
+  if (m) return language === "en" ? `Order #${m[1]}` : `Commande #${m[1]}`;
+  m = text.match(/^متجر (.+) — مدعوم بواسطة Nexora$/);
+  if (m) return language === "en" ? `Store ${m[1]} — Powered by Nexora` : `Boutique ${m[1]} — Propulsée par Nexora`;
+  m = text.match(/^حتى (.+)$/);
+  if (m) return language === "en" ? `until ${m[1]}` : `jusqu’au ${m[1]}`;
+  m = text.match(/^تم تفعيل (.+)\\.$/);
+  if (m) return language === "en" ? `${m[1]} activated.` : `${m[1]} activé.`;
+  m = text.match(/^المخزون: (.+)$/);
+  if (m) return language === "en" ? `Stock: ${m[1]}` : `Stock : ${m[1]}`;
+  m = text.match(/^متوفر — (.+) قطعة$/);
+  if (m) return language === "en" ? `Available — ${m[1]} items` : `Disponible — ${m[1]} articles`;
+  m = text.match(/^(.+) قطعة مباعة$/);
+  if (m) return language === "en" ? `${m[1]} items sold` : `${m[1]} articles vendus`;
+  m = text.match(/^(.+) قطعة · (.+)$/);
+  if (m) return language === "en" ? `${m[1]} items · ${m[2]}` : `${m[1]} articles · ${m[2]}`;
+  m = text.match(/^(.+) متبقي$/);
+  if (m) return language === "en" ? `${m[1]} remaining` : `${m[1]} restant(s)`;
+  m = text.match(/^(.+) يومًا$/);
+  if (m) return language === "en" ? `${m[1]} days` : `${m[1]} jours`;
+  m = text.match(/^آخر (.+)$/);
+  if (m) return language === "en" ? `Last ${m[1]}` : `Dernier ${m[1]}`;
+  m = text.match(/^منتجات (.+) قد تعجبك$/);
+  if (m) return language === "en" ? `Products you may like` : `Produits susceptibles de vous plaire`;
+  return text;
+}
+
 export function translateUiText(text: string, language: UiLanguage): string {
-  const direct = byLanguage.get(language)?.get(text);
-  if (direct) return direct;
-  const entry = reverse.get(text);
-  if (entry) return entry[language === "ar" ? 0 : language === "en" ? 1 : 2];
+  const leading = text.match(/^\\s*/)?.[0] ?? "";
+  const trailing = text.match(/\\s*$/)?.[0] ?? "";
+  const core = text.trim();
+
+  const direct = byLanguage.get(language)?.get(core);
+  if (direct) return leading + direct + trailing;
+
+  const entry = reverse.get(core);
+  if (entry) return leading + entry[language === "ar" ? 0 : language === "en" ? 1 : 2] + trailing;
 
   // Common dynamic labels that contain a number/plan name.
+  const dynamic = translateDynamicUiText(core, language);
+  if (dynamic !== core) return leading + dynamic + trailing;
   if (language !== "ar") {
     let m = text.match(/^المخزون:\s*(.+)$/);
     if (m) return language === "en" ? `Stock: ${m[1]}` : `Stock : ${m[1]}`;
