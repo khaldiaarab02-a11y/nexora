@@ -315,7 +315,7 @@ export default function StoreSettingsPage() {
     <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         <h1 className="text-2xl font-bold text-zinc-900">إعدادات المتجر</h1>
-        <p className="mt-1 text-sm text-zinc-500">عدّلي بيانات متجرك العامة وإعدادات الشحن.</p>
+        <p className="mt-1 text-sm text-zinc-500">تعديل بيانات المتجر العامة وإعدادات الشحن.</p>
 
         {/* Public preview */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
