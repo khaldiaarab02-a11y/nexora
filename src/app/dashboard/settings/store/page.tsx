@@ -293,7 +293,7 @@ export default function StoreSettingsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-4 sm:p-6" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-4 sm:p-6">
         <div className="mx-auto max-w-2xl animate-pulse space-y-4 py-6">
           <div className="h-8 w-48 rounded bg-zinc-200" />
           <div className="h-40 rounded-3xl bg-zinc-200" />
@@ -305,14 +305,14 @@ export default function StoreSettingsPage() {
 
   if (!store) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-6 text-center" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-6 text-center">
         <p className="rounded-2xl bg-red-50 p-4 text-red-700">{message}</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         <h1 className="text-2xl font-bold text-zinc-900">إعدادات المتجر</h1>
         <p className="mt-1 text-sm text-zinc-500">تعديل بيانات المتجر العامة وإعدادات الشحن.</p>
