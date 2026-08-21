@@ -245,7 +245,7 @@ export default function OrdersPage() {
           ) : filteredOrders.length === 0 ? (
             <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center">
               <h2 className="text-xl font-bold text-zinc-900">لم نجد أي طلب مطابق</h2>
-              <p className="mt-2 text-sm text-zinc-500">جرّبي تعديل كلمة البحث أو الفلتر.</p>
+              <p className="mt-2 text-sm text-zinc-500">جرّب تعديل كلمة البحث أو الفلتر.</p>
               <button
                 onClick={clearFilters}
                 className="mt-5 inline-flex rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white"
