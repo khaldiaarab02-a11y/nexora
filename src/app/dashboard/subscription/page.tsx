@@ -63,7 +63,7 @@ export default function SubscriptionPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!proof) {
-      setMessage("أرفق إثبات الدفع.");
+      setMessage("يرجى إرفاق إثبات الدفع.");
       return;
     }
     setSending(true);
