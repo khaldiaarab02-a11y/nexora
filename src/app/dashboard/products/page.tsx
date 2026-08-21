@@ -175,7 +175,7 @@ export default function ProductsPage() {
   const hasActiveFilters = searchTerm !== "" || statusFilter !== "all" || stockFilter !== "all";
 
   return (
-    <main className="min-h-screen bg-zinc-50" dir="rtl">
+    <main className="min-h-screen bg-zinc-50">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <div>
