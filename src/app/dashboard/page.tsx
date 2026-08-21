@@ -242,7 +242,7 @@ export default function DashboardPage() {
             ) : (
               <p className="text-sm text-amber-800">
                 اشتراكك غير فعال حاليًا ({subscription.status === "pending" ? "قيد الانتظار" : subscription.status === "expired" ? "منتهي" : "ملغى"}).
-                تواصلي مع فريق Nexora لتفعيل متجرك.
+                التواصل مع فريق Nexora لتفعيل المتجر.
               </p>
             )}
           </div>
