@@ -162,11 +162,11 @@ export default function StorefrontPage() {
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-zinc-50 p-6" dir="rtl"><div className="mx-auto max-w-6xl animate-pulse"><div className="h-48 rounded-[2rem] bg-zinc-200" /><div className="mt-8 h-14 rounded-2xl bg-zinc-200" /><div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((item) => <div key={item} className="h-80 rounded-3xl bg-zinc-200" />)}</div></div></main>;
+    return <main className="min-h-screen bg-zinc-50 p-6"><div className="mx-auto max-w-6xl animate-pulse"><div className="h-48 rounded-[2rem] bg-zinc-200" /><div className="mt-8 h-14 rounded-2xl bg-zinc-200" /><div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((item) => <div key={item} className="h-80 rounded-3xl bg-zinc-200" />)}</div></div></main>;
   }
 
   if (error || !store) {
-    return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6" dir="rtl"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><p className="text-sm font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p><h1 className="mt-4 text-2xl font-bold text-zinc-900">{error || "المتجر غير موجود"}</h1></div></main>;
+    return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><p className="text-sm font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p><h1 className="mt-4 text-2xl font-bold text-zinc-900">{error || "المتجر غير موجود"}</h1></div></main>;
   }
 
   const resolved = resolveTheme(themeSettings?.theme_id, themeSettings?.primary_color, themeSettings?.accent_color, themeSettings?.font);
