@@ -6,8 +6,8 @@ export const fr = {
   support: { title: "Support", new: "Nouvelle demande", subject: "Sujet", message: "Message", category: "Catégorie", reply: "Répondre", send: "Envoyer", technical: "Problème technique", store: "Problème boutique", subscription: "Abonnement", payment: "Paiement", general: "Question générale" },
   landing: {
     platformLabel: "Plateforme e-commerce tout-en-un",
-    heroTitle: "Tout ce qu’il vous faut pour créer et développer votre boutique en ligne.",
-    heroDescription: "Créez votre vitrine, gérez vos produits et commandes, personnalisez votre marque et commencez à vendre — depuis une seule plateforme.",
+    heroTitle: "Lancez votre boutique. Vendez avec confiance. Grandissez sereinement.",
+    heroDescription: "Tout ce qu’il vous faut pour créer une vitrine élégante, gérer vos produits et commandes et développer votre marque depuis une seule plateforme connectée.",
     storeStatus: "Active",
     explore: "Découvrir Nexora",
     trustOne: "Sans code",

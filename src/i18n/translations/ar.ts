@@ -6,8 +6,8 @@ export const ar = {
   support: { title: "الدعم", new: "طلب دعم جديد", subject: "الموضوع", message: "الرسالة", category: "التصنيف", reply: "رد", send: "إرسال", technical: "مشكلة تقنية", store: "مشكلة في المتجر", subscription: "الاشتراك", payment: "الدفع", general: "سؤال عام" },
   landing: {
     platformLabel: "منصة تجارة إلكترونية متكاملة",
-    heroTitle: "كل ما تحتاجه لبناء متجرك الإلكتروني وتنميته.",
-    heroDescription: "أنشئ واجهة متجرك، أدر المنتجات والطلبات، خصص علامتك التجارية وابدأ البيع — من منصة واحدة بسيطة.",
+    heroTitle: "أطلق متجرك. ابدأ البيع. وانمُ بثقة.",
+    heroDescription: "كل ما تحتاجه لبناء متجر احترافي، إدارة منتجاتك وطلباتك، وتقديم تجربة تحمل اسم علامتك — من منصة واحدة.",
     storeStatus: "نشط",
     explore: "اكتشف Nexora",
     trustOne: "بدون برمجة",

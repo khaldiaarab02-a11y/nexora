@@ -6,8 +6,8 @@ export const en = {
   support: { title: "Support", new: "New request", subject: "Subject", message: "Message", category: "Category", reply: "Reply", send: "Send", technical: "Technical issue", store: "Store issue", subscription: "Subscription", payment: "Payment", general: "General question" },
   landing: {
     platformLabel: "All-in-one e-commerce platform",
-    heroTitle: "Everything you need to build and grow your online store.",
-    heroDescription: "Create your storefront, manage products and orders, customize your brand, and start selling — from one simple platform.",
+    heroTitle: "Launch your store. Sell with confidence. Scale with ease.",
+    heroDescription: "Everything you need to build a polished storefront, manage products and orders, and grow your brand from one connected platform.",
     storeStatus: "Active",
     explore: "Explore Nexora",
     trustOne: "No code required",
