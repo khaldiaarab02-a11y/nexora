@@ -1,3 +1,29 @@
 "use client";
-import {useI18n} from "@/i18n/LanguageProvider";import Hero,{HeroSection} from "@/components/landing/Hero";import Features from "@/components/landing/Features";import HowItWorks from "@/components/landing/HowItWorks";import PlansPreview from "@/components/landing/PlansPreview";import WhyNexora from "@/components/landing/WhyNexora";import MediaSection from "@/components/landing/MediaSection";import CTA from "@/components/landing/CTA";import Footer from "@/components/landing/Footer";
-export default function LandingPage(){const {dir}=useI18n();return <main dir={dir} className="min-h-screen overflow-x-hidden bg-white text-zinc-900"><Hero/><HeroSection/><WhyNexora/><Features/><HowItWorks/><MediaSection/><PlansPreview/><CTA/><Footer/></main>}
+
+import Hero, { HeroSection } from "@/components/landing/Hero";
+import WhyNexora from "@/components/landing/WhyNexora";
+import Features from "@/components/landing/Features";
+import MediaSection from "@/components/landing/MediaSection";
+import HowItWorks from "@/components/landing/HowItWorks";
+import PlansPreview from "@/components/landing/PlansPreview";
+import CTA from "@/components/landing/CTA";
+import Footer from "@/components/landing/Footer";
+import { useI18n } from "@/i18n/LanguageProvider";
+
+export default function LandingPage() {
+  const { dir } = useI18n();
+
+  return (
+    <main dir={dir} className="landing-page min-h-screen overflow-x-hidden bg-white text-zinc-950">
+      <Hero />
+      <HeroSection />
+      <WhyNexora />
+      <Features />
+      <MediaSection />
+      <HowItWorks />
+      <PlansPreview />
+      <CTA />
+      <Footer />
+    </main>
+  );
+}
