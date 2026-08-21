@@ -40,7 +40,7 @@ export default function CheckoutPage() {
     const storeSlug = items[0].storeSlug;
 
     if (items.some((item) => item.storeId !== storeId)) {
-      setError("السلة تحتوي منتجات من متاجر مختلفة. أفرغي السلة وابدئي من متجر واحد.");
+      setError("السلة تحتوي منتجات من متاجر مختلفة. أفرغي السلة وابدأ من متجر واحد.");
       setSubmitting(false);
       return;
     }
@@ -64,7 +64,7 @@ export default function CheckoutPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error || "تعذر إنشاء الطلب. حاولي مرة أخرى.");
+      setError(data.error || "تعذر إنشاء الطلب. حاول مرة أخرى.");
       setSubmitting(false);
       return;
     }
@@ -98,7 +98,7 @@ export default function CheckoutPage() {
     return (
       <main className="min-h-screen bg-zinc-50 p-8 text-center" dir="rtl">
         <h1 className="text-2xl font-bold">السلة فارغة</h1>
-        <p className="mt-2 text-sm text-zinc-500">أضيفي منتجًا من المتجر أولًا لإتمام الطلب.</p>
+        <p className="mt-2 text-sm text-zinc-500">أضف منتجًا من المتجر أولًا لإتمام الطلب.</p>
         <Link href="/" className="mt-4 inline-block text-zinc-500">العودة</Link>
       </main>
     );
