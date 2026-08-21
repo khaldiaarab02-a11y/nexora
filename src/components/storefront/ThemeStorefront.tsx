@@ -78,7 +78,7 @@ export default function ThemeStorefront({
           </div>
           <Link href="/cart" className={`${theme.layout.button} relative shrink-0 bg-[var(--nexora-primary)] px-4 py-2.5 text-sm font-semibold text-white`}>
             السلة 🛒
-            {cartCount > 0 && <span className="mr-2 inline-flex min-w-6 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-[var(--nexora-primary)]">{cartCount}</span>}
+            {cartCount > 0 && <span className="ms-2 inline-flex min-w-6 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-[var(--nexora-primary)]">{cartCount}</span>}
           </Link>
         </div>
       </header>
@@ -117,7 +117,7 @@ export default function ThemeStorefront({
                 <Link href={`/shop/${store.slug}/product/${product.slug}`} className="block">
                   <div className="relative aspect-[4/3] overflow-hidden bg-black/5">
                     {product.image_url ? <img src={product.image_url} alt={product.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center text-sm opacity-40">لا توجد صورة</div>}
-                    <div className="absolute right-4 top-4 flex flex-col items-end gap-1.5">
+                    <div className="absolute end-4 top-4 flex flex-col items-end gap-1.5">
                       {product.is_featured && <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold shadow-sm">مميز</span>}
                       {product.extraImageCount > 0 && <span className="rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-medium text-white">+{product.extraImageCount} صور</span>}
                     </div>

@@ -60,9 +60,9 @@ export default function ThemeProductDetail({
             <div className="relative aspect-square touch-pan-y select-none bg-black/5" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
               {selectedImage ? <img src={selectedImage} alt={product.name} className="h-full w-full object-cover" draggable={false} /> : <div className="flex h-full items-center justify-center opacity-40">لا توجد صورة</div>}
               {gallery.length > 1 && <>
-                <button type="button" onClick={onPrevious} aria-label="الصورة السابقة" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow">›</button>
-                <button type="button" onClick={onNext} aria-label="الصورة التالية" className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow">‹</button>
-                <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white">{selectedIndex + 1} / {gallery.length}</span>
+                <button type="button" onClick={onPrevious} aria-label="الصورة السابقة" className="absolute end-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow">›</button>
+                <button type="button" onClick={onNext} aria-label="الصورة التالية" className="absolute start-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow">‹</button>
+                <span className="absolute bottom-3 start-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white">{selectedIndex + 1} / {gallery.length}</span>
               </>}
             </div>
             {gallery.length > 1 && <div className="flex gap-2.5 overflow-x-auto p-4">{gallery.map((url, index) => <button key={url + index} type="button" onClick={() => onSelectImage(index)} className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 ${selectedIndex === index ? "border-[var(--nexora-accent)]" : "border-transparent"}`}><img src={url} alt="" className="h-full w-full object-cover" /></button>)}</div>}
@@ -72,7 +72,7 @@ export default function ThemeProductDetail({
             <p className="text-sm opacity-50">{store.name}</p>
             <h1 className="mt-3 text-3xl font-bold">{product.name}</h1>
             {product.description && <p className="mt-5 leading-7 opacity-70">{product.description}</p>}
-            <div className="mt-7"><span className="text-3xl font-bold">{Number(product.price).toLocaleString("fr-DZ")} {currency}</span>{product.compare_at_price && product.compare_at_price > product.price && <span className="mr-3 opacity-40 line-through">{Number(product.compare_at_price).toLocaleString("fr-DZ")} {currency}</span>}</div>
+            <div className="mt-7"><span className="text-3xl font-bold">{Number(product.price).toLocaleString("fr-DZ")} {currency}</span>{product.compare_at_price && product.compare_at_price > product.price && <span className="ms-3 opacity-40 line-through">{Number(product.compare_at_price).toLocaleString("fr-DZ")} {currency}</span>}</div>
             <p className={`mt-3 text-sm ${unavailable ? "text-red-500" : "text-emerald-600"}`}>{unavailable ? "نفد المخزون" : `متوفر — ${product.stock_quantity} قطعة`}</p>
 
             {!unavailable && <div className="mt-7"><label className="mb-2 block text-sm font-medium">الكمية</label><div className="flex w-fit items-center overflow-hidden rounded-xl border border-black/10"><button type="button" className="px-5 py-3" onClick={() => onQuantity(Math.max(1, quantity - 1))}>−</button><span className="min-w-12 text-center">{quantity}</span><button type="button" className="px-5 py-3" onClick={() => onQuantity(Math.min(product.stock_quantity, quantity + 1))}>+</button></div></div>}

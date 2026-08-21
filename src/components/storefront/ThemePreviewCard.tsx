@@ -27,9 +27,9 @@ export default function ThemePreviewCard({
           <div className="h-20 rounded-xl bg-white/60 shadow-sm" />
           <div className="h-20 rounded-xl bg-white/80 shadow-sm" />
         </div>
-        <div className="absolute bottom-4 right-4 h-2 w-16 rounded-full" style={{ background: theme.preview.accent }} />
+        <div className="absolute bottom-4 end-4 h-2 w-16 rounded-full" style={{ background: theme.preview.accent }} />
         {locked && (
-          <span className="absolute left-3 top-3 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-bold text-white">
+          <span className="absolute start-3 top-3 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-bold text-white">
             🔒 Business
           </span>
         )}
