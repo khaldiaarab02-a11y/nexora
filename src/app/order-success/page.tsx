@@ -91,7 +91,7 @@ function SuccessContent() {
 
 export default function OrderSuccessPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6" dir="rtl">
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6">
       <Suspense fallback={
         <div className="w-full max-w-lg rounded-[2rem] border border-zinc-200 bg-white p-8 text-center text-zinc-500">
           جاري تحميل تفاصيل الطلب...
