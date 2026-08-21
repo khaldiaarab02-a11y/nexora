@@ -14,19 +14,19 @@ function friendlyAuthError(rawMessage: string): string {
     return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
   }
   if (message.includes("email not confirmed")) {
-    return "يجب تأكيد بريدك الإلكتروني أولًا. تحققي من صندوق الوارد.";
+    return "يجب تأكيد بريدك الإلكتروني أولًا. تحقق من صندوق الوارد.";
   }
   if (message.includes("user already registered") || message.includes("already registered")) {
-    return "هذا البريد مسجل بالفعل. سجّلي الدخول بدلًا من إنشاء حساب جديد.";
+    return "هذا البريد مسجل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.";
   }
   if (message.includes("password should be at least")) {
-    return "كلمة المرور قصيرة جدًا. استخدمي 6 أحرف على الأقل.";
+    return "كلمة المرور قصيرة جدًا. استخدم 6 أحرف على الأقل.";
   }
   if (message.includes("unable to validate email") || message.includes("invalid email")) {
     return "صيغة البريد الإلكتروني غير صحيحة.";
   }
   if (message.includes("failed to fetch") || message.includes("network")) {
-    return "تعذر الاتصال بالخادم. تحققي من اتصال الإنترنت وحاولي مجددًا.";
+    return "تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وحاول مجددًا.";
   }
 
   return rawMessage;
@@ -118,7 +118,7 @@ export default function AuthForm() {
     }
 
     if (!result.data.user) {
-      setMessage("تعذر التحقق من الحساب بعد تسجيل الدخول. حاولي مرة أخرى.");
+      setMessage("تعذر التحقق من الحساب بعد تسجيل الدخول. حاول مرة أخرى.");
       setMessageType("error");
       setLoading(false);
       return;
@@ -145,7 +145,7 @@ export default function AuthForm() {
       <div className="mt-8 text-center">
         <h1 className="text-3xl font-bold">{mode === "login" ? t.auth.login : t.auth.signup}</h1>
         <p className="mt-2 text-sm text-zinc-500">
-          {mode === "login" ? "ادخلي إلى لوحة متجرك." : "أنشئي حسابك وابدئي رحلة متجرك."}
+          {mode === "login" ? "ادخلي إلى لوحة متجرك." : "أنشئ حسابك وابدأ رحلة متجرك."}
         </p>
       </div>
 
