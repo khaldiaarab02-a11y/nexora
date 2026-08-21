@@ -96,7 +96,7 @@ export default function CheckoutPage() {
 
   if (!items.length) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-8 text-center" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-8 text-center">
         <h1 className="text-2xl font-bold">السلة فارغة</h1>
         <p className="mt-2 text-sm text-zinc-500">أضف منتجًا من المتجر أولًا لإتمام الطلب.</p>
         <Link href="/" className="mt-4 inline-block text-zinc-500">العودة</Link>
@@ -105,7 +105,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-4xl px-5">
         <p className="text-xs font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p>
         <h1 className="mt-2 text-3xl font-bold">إتمام الطلب</h1>
