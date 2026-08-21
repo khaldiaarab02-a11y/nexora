@@ -106,7 +106,7 @@ export default function EditProductPage() {
   async function removeProduct() {
     if (!product) return;
     const confirmed = window.confirm(
-      `هل أنتِ متأكدة من حذف "${product.name}"؟ هذا الإجراء لا يمكن التراجع عنه.`
+      `هل أنتِ متأكد من حذف "${product.name}"؟ هذا الإجراء لا يمكن التراجع عنه.`
     );
     if (!confirmed) return;
 
