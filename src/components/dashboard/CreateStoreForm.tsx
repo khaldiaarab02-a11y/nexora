@@ -194,7 +194,7 @@ export default function CreateStoreForm() {
   }
 
   return (
-    <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8" dir="rtl">
+    <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
       <div className="mb-7 text-center">
         <p className="text-sm font-medium text-zinc-500">Nexora</p>
         <h1 className="mt-2 text-3xl font-bold text-zinc-900">أنشئ متجرك الأول</h1>

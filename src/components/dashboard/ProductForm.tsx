@@ -94,7 +94,7 @@ export default function ProductForm() {
   }
 
   return (
-    <div className="w-full max-w-2xl rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-7" dir="rtl">
+    <div className="w-full max-w-2xl rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-7">
       <div className="mb-7">
         <p className="text-sm font-medium text-zinc-400">Nexora</p>
         <h1 className="mt-2 text-3xl font-bold text-zinc-900">إضافة منتج</h1>

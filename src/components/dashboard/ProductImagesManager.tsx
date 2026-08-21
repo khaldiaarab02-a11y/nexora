@@ -361,7 +361,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                 <div className="relative aspect-square bg-zinc-100">
                   <img src={img.image_url} alt="" className="h-full w-full object-cover" />
                   {img.is_primary && (
-                    <span className="absolute right-2 top-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-semibold text-white">
+                    <span className="absolute end-2 top-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-semibold text-white">
                       رئيسية
                     </span>
                   )}
@@ -415,7 +415,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
               <div className="relative aspect-square bg-zinc-100">
                 <img src={item.previewUrl} alt="" className="h-full w-full object-cover" />
                 {item.isPrimary && (
-                  <span className="absolute right-2 top-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-semibold text-white">
+                  <span className="absolute end-2 top-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-semibold text-white">
                     رئيسية
                   </span>
                 )}
