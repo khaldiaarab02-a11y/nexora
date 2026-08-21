@@ -135,7 +135,7 @@ export default function CartPage() {
 
   if (checking) {
     return (
-      <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 py-8">
         <div className="mx-auto max-w-4xl animate-pulse px-5">
           <div className="h-10 w-48 rounded-xl bg-zinc-200" />
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -152,7 +152,7 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-4xl px-5">
         <div className="flex items-center justify-between">
           <div>
