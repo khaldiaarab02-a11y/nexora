@@ -173,7 +173,7 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-8 text-center text-zinc-500" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-8 text-center text-zinc-500">
         جاري تحميل تفاصيل الطلب...
       </main>
     );
@@ -181,7 +181,7 @@ export default function OrderDetailPage() {
 
   if (message || !order) {
     return (
-      <main className="min-h-screen bg-zinc-50 p-8" dir="rtl">
+      <main className="min-h-screen bg-zinc-50 p-8">
         <div className="mx-auto max-w-2xl rounded-3xl border border-red-100 bg-red-50 p-6 text-center text-red-700">
           {message || "تعذر تحميل الطلب."}
         </div>
@@ -195,7 +195,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50" dir="rtl">
+    <main className="min-h-screen bg-zinc-50">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
           <div>
