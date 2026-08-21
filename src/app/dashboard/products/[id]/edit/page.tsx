@@ -150,7 +150,7 @@ export default function EditProductPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8" dir="rtl">
+    <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-2xl px-4">
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-zinc-400">Nexora</p>
