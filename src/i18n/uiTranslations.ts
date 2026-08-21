@@ -518,8 +518,8 @@ function translateDynamicUiText(text: string, language: UiLanguage): string {
 }
 
 export function translateUiText(text: string, language: UiLanguage): string {
-  const leading = text.match(/^\\s*/)?.[0] ?? "";
-  const trailing = text.match(/\\s*$/)?.[0] ?? "";
+  const leading = text.match(/^\s*/)?.[0] ?? "";
+  const trailing = text.match(/\s*$/)?.[0] ?? "";
   const core = text.trim();
 
   const direct = byLanguage.get(language)?.get(core);
