@@ -468,6 +468,39 @@ export const UI_TRANSLATIONS: Entry[] = [
   ["طريقة الدفع والتعليمات النهائية يقدمها فريق Nexora. أكمل الدفع بالطريقة المتفق عليها ثم ارفعي الإثبات هنا. لن يتم تفعيل الاشتراك من المتصفح.", "The Nexora team provides the payment method and final instructions. Complete the payment as agreed, then upload the proof here. The subscription will not be activated from the browser.", "L\u2019\u00e9quipe Nexora fournit le moyen de paiement et les instructions finales. Effectuez le paiement convenu, puis envoyez la preuve ici. L\u2019abonnement ne sera pas activ\u00e9 depuis le navigateur."],
   ["رقم/مرجع الدفع (اختياري)", "Payment number/reference (optional)", "Num\u00e9ro/r\u00e9f\u00e9rence de paiement (facultatif)"],
   ["مرجع الدفع (اختياري)", "Payment reference (optional)", "R\u00e9f\u00e9rence de paiement (facultatif)"],
+  ["Store", "Store", "Boutique"],
+  ["Customer information", "Customer information", "Informations client"],
+  ["Requested products", "Requested products", "Produits demandés"],
+  ["Order summary", "Order summary", "Résumé de la commande"],
+  ["Total", "Total", "Total"],
+  ["Subtotal", "Subtotal", "Sous-total"],
+  ["Shipping", "Shipping", "Livraison"],
+  ["Save status", "Save status", "Enregistrer le statut"],
+  ["New request", "New request", "Nouvelle demande"],
+  ["My conversations", "My conversations", "Mes conversations"],
+  ["No image", "No image", "Aucune image"],
+  ["✓ Active", "✓ Active", "✓ Actif"],
+  ["Available", "Available", "Disponible"],
+  ["Low stock", "Low stock", "Stock faible"],
+  ["Email address", "Email address", "Adresse e-mail"],
+  ["Password", "Password", "Mot de passe"],
+  ["Forgot password?", "Forgot password?", "Mot de passe oublié ?"],
+  ["Create account", "Create account", "Créer un compte"],
+  ["Log in", "Log in", "Se connecter"],
+  ["Sign in", "Sign in", "Se connecter"],
+  ["Sign up", "Sign up", "S’inscrire"],
+  ["View store", "View store", "Voir la boutique"],
+  ["Products", "Products", "Produits"],
+  ["Orders", "Orders", "Commandes"],
+  ["Home", "Home", "Accueil"],
+  ["Appearance", "Appearance", "Apparence"],
+  ["Subscription", "Subscription", "Abonnement"],
+  ["Support", "Support", "Support"],
+  ["Account", "Account", "Compte"],
+  ["Save changes", "Save changes", "Enregistrer les modifications"],
+  ["Refresh", "Refresh", "Actualiser"],
+  ["Add product", "Add product", "Ajouter un produit"],
+
 ];
 
 const byLanguage = new Map<UiLanguage, Map<string, string>>();
@@ -485,10 +518,47 @@ for (const [ar, en, fr] of UI_TRANSLATIONS) {
 }
 
 function translateDynamicUiText(text: string, language: UiLanguage): string {
-  if (language === "ar") return text;
-  let m = text.match(/^(\\d+) من (\\d+) طلب$/);
+  // Dynamic legacy labels are still translated from their original source
+  // shape. Keep the Arabic source rules and also understand the English/French
+  // forms so switching back to Arabic never leaves mixed-language fragments.
+  if (language === "ar") {
+    let m = text.match(/^(\d+) of (\d+) orders$/);
+    if (m) return `${m[1]} من ${m[2]} طلب`;
+    m = text.match(/^(\d+) sur (\d+) commandes$/);
+    if (m) return `${m[1]} من ${m[2]} طلب`;
+    m = text.match(/^(\d+) of (\d+) products$/);
+    if (m) return `${m[1]} من ${m[2]} منتج`;
+    m = text.match(/^(\d+) sur (\d+) produits$/);
+    if (m) return `${m[1]} من ${m[2]} منتج`;
+    m = text.match(/^Order #(.+)$/);
+    if (m) return `طلب #${m[1]}`;
+    m = text.match(/^Commande #(.+)$/);
+    if (m) return `طلب #${m[1]}`;
+    m = text.match(/^Stock:\s*(.+)$/);
+    if (m) return `المخزون: ${m[1]}`;
+    m = text.match(/^Stock :\s*(.+)$/);
+    if (m) return `المخزون: ${m[1]}`;
+    m = text.match(/^Available — (.+) items$/);
+    if (m) return `متوفر — ${m[1]} قطعة`;
+    m = text.match(/^Disponible — (.+) articles$/);
+    if (m) return `متوفر — ${m[1]} قطعة`;
+    m = text.match(/^(.+) items sold$/);
+    if (m) return `${m[1]} قطعة مباعة`;
+    m = text.match(/^(.+) articles vendus$/);
+    if (m) return `${m[1]} قطعة مباعة`;
+    m = text.match(/^(.+) remaining$/);
+    if (m) return `${m[1]} متبقي`;
+    m = text.match(/^(.+) restant\(s\)$/);
+    if (m) return `${m[1]} متبقي`;
+    m = text.match(/^Last (.+)$/);
+    if (m) return `آخر ${m[1]}`;
+    m = text.match(/^Dernier (.+)$/);
+    if (m) return `آخر ${m[1]}`;
+    return text;
+  }
+  let m = text.match(/^(\d+) من (\d+) طلب$/);
   if (m) return language === "en" ? `${m[1]} of ${m[2]} orders` : `${m[1]} sur ${m[2]} commandes`;
-  m = text.match(/^(\\d+) من (\\d+) منتج$/);
+  m = text.match(/^(\d+) من (\d+) منتج$/);
   if (m) return language === "en" ? `${m[1]} of ${m[2]} products` : `${m[1]} sur ${m[2]} produits`;
   m = text.match(/^طلب #(.+)$/);
   if (m) return language === "en" ? `Order #${m[1]}` : `Commande #${m[1]}`;
@@ -496,7 +566,7 @@ function translateDynamicUiText(text: string, language: UiLanguage): string {
   if (m) return language === "en" ? `Store ${m[1]} — Powered by Nexora` : `Boutique ${m[1]} — Propulsée par Nexora`;
   m = text.match(/^حتى (.+)$/);
   if (m) return language === "en" ? `until ${m[1]}` : `jusqu’au ${m[1]}`;
-  m = text.match(/^تم تفعيل (.+)\\.$/);
+  m = text.match(/^تم تفعيل (.+)\.$/);
   if (m) return language === "en" ? `${m[1]} activated.` : `${m[1]} activé.`;
   m = text.match(/^المخزون: (.+)$/);
   if (m) return language === "en" ? `Stock: ${m[1]}` : `Stock : ${m[1]}`;

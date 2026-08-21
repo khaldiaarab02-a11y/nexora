@@ -49,16 +49,13 @@ function rememberAndTranslateAttribute(element: Element, attribute: string, lang
   if (element.getAttribute(attribute) !== translated) element.setAttribute(attribute, translated);
 }
 
-function applyDirection(root: ParentNode, language: UiLanguage) {
+function applyDirection(_root: ParentNode, language: UiLanguage) {
+  // Direction belongs to the document, not to every descendant. Overwriting
+  // descendant `dir` attributes here was the source of the RTL/LTR regressions
+  // in Phase 3: a page could switch language while nested components kept
+  // stale alignment/flow rules. React components that genuinely need a local
+  // direction can still opt into it explicitly.
   const direction = languageDirection[language];
-  if (root instanceof Element) root.setAttribute("dir", direction);
-
-  const elements = root instanceof Document
-    ? [...root.querySelectorAll("[dir]")]
-    : [...root.querySelectorAll("[dir]")];
-
-  for (const element of elements) element.setAttribute("dir", direction);
-
   document.documentElement.lang = language;
   document.documentElement.dir = direction;
   document.body.dir = direction;
@@ -111,9 +108,7 @@ export default function I18nDomBridge({ language }: { language: UiLanguage }) {
 
           if (mutation.type === "attributes" && mutation.target instanceof Element) {
             const element = mutation.target;
-            if (mutation.attributeName === "dir") {
-              element.setAttribute("dir", languageDirection[language]);
-            } else if (mutation.attributeName && ATTRIBUTES.includes(mutation.attributeName as (typeof ATTRIBUTES)[number])) {
+            if (mutation.attributeName && ATTRIBUTES.includes(mutation.attributeName as (typeof ATTRIBUTES)[number])) {
               rememberAndTranslateAttribute(element, mutation.attributeName, language);
             }
           }
@@ -138,7 +133,7 @@ export default function I18nDomBridge({ language }: { language: UiLanguage }) {
       childList: true,
       characterData: true,
       attributes: true,
-      attributeFilter: ["dir", ...ATTRIBUTES],
+      attributeFilter: [...ATTRIBUTES],
     });
 
     return () => observer.disconnect();
