@@ -334,7 +334,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
       </div>
 
       <label className="mb-4 block cursor-pointer rounded-2xl border-2 border-dashed border-zinc-300 p-6 text-center">
-        <p className="font-medium text-zinc-700">اضغطي لاختيار صورة أو أكثر</p>
+        <p className="font-medium text-zinc-700">اضغط لاختيار صورة أو أكثر</p>
         <p className="mt-1 text-xs text-zinc-400">JPG, PNG, WEBP — حتى 5MB لكل صورة</p>
         <input
           ref={inputRef}

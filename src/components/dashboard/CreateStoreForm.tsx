@@ -104,7 +104,7 @@ export default function CreateStoreForm() {
 
     if (error) {
       if (error.message.toLowerCase().includes("duplicate") || error.message.toLowerCase().includes("unique")) {
-        setMessage("هذا الرابط مستخدم بالفعل من متجر آخر. اختاري رابطًا مختلفًا.");
+        setMessage("هذا الرابط مستخدم بالفعل من متجر آخر. اختر رابطًا مختلفًا.");
       } else {
         setMessage(error.message);
       }
@@ -197,7 +197,7 @@ export default function CreateStoreForm() {
     <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8" dir="rtl">
       <div className="mb-7 text-center">
         <p className="text-sm font-medium text-zinc-500">Nexora</p>
-        <h1 className="mt-2 text-3xl font-bold text-zinc-900">أنشئي متجرك الأول</h1>
+        <h1 className="mt-2 text-3xl font-bold text-zinc-900">أنشئ متجرك الأول</h1>
         <p className="mt-2 text-sm text-zinc-500">
           خطوة واحدة تفصلك عن بدء البيع أونلاين — يمكنك تعديل كل هذه البيانات لاحقًا من إعدادات المتجر.
         </p>
@@ -218,7 +218,7 @@ export default function CreateStoreForm() {
             <input id="store-slug" required minLength={3} value={slug} onChange={(e) => handleSlugChange(e.target.value)}
               className="w-full rounded-xl px-3 py-3 outline-none" placeholder="my-store" />
           </div>
-          <p className="mt-2 text-xs text-zinc-400">استخدمي الحروف الإنجليزية والأرقام والشرطة فقط.</p>
+          <p className="mt-2 text-xs text-zinc-400">استخدم الحروف الإنجليزية والأرقام والشرطة فقط.</p>
         </div>
 
         <div>
