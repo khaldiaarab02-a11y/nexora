@@ -25,7 +25,7 @@ body {
 
 
 /* Global language direction: LanguageProvider controls <html dir>. Legacy
-   page-level dir="rtl" attributes are intentionally allowed to inherit it. */
+   page-level attributes are intentionally allowed to inherit it. */
 html[dir="rtl"] body { direction: rtl; }
 html[dir="ltr"] body { direction: ltr; }
 body [dir="rtl"], body [dir="ltr"] { direction: inherit !important; }
