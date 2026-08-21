@@ -237,7 +237,7 @@ export default function StoreSettingsPage() {
         .maybeSingle();
 
       if (conflict) {
-        setMessage("هذا الرابط مستخدم من متجر آخر. اختاري رابطًا مختلفًا.");
+        setMessage("هذا الرابط مستخدم من متجر آخر. اختر رابطًا مختلفًا.");
         setMessageType("error");
         setSaving(false);
         return;
@@ -419,7 +419,7 @@ export default function StoreSettingsPage() {
                 maxLength={DESCRIPTION_MAX}
                 onChange={(e) => setStore({ ...store, description: e.target.value })}
                 className="min-h-32 w-full resize-y rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
-                placeholder="اكتبي وصفًا مختصرًا عن متجرك..."
+                placeholder="اكتب وصفًا مختصرًا عن متجرك..."
               />
             </div>
 
