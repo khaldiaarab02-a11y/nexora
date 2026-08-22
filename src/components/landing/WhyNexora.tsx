@@ -11,22 +11,27 @@ export default function WhyNexora() {
   ];
   return (
     <section id="about" className="border-y border-zinc-100 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-        <div className="max-w-3xl">
-          <p className="landing-kicker">{t.landing.whyLabel}</p>
-          <h2 className="landing-heading mt-3">{t.landing.whyTitle}</h2>
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-zinc-600 sm:text-base sm:leading-8">{t.landing.whyDescription}</p>
-        </div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {cards.map(([title, description], index) => (
-            <article key={title} className="landing-card group">
-              <span className={`mb-7 flex h-11 w-11 items-center justify-center rounded-2xl ${index % 2 === 0 ? "bg-violet-50 text-violet-600" : "bg-zinc-100 text-zinc-800"}`}>
-                <span className="h-3 w-3 rounded-full bg-current" />
-              </span>
-              <h3 className="text-[16px] font-bold tracking-tight text-zinc-950">{title}</h3>
-              <p className="mt-2.5 text-sm leading-6 text-zinc-500">{description}</p>
-            </article>
-          ))}
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+          <div>
+            <p className="landing-kicker">{t.landing.whyLabel}</p>
+            <h2 className="landing-heading mt-3 text-[40px] sm:text-[48px] lg:text-[56px]">{t.landing.whyTitle}</h2>
+          </div>
+          <div>
+            <p className="max-w-2xl text-[15px] leading-7 text-zinc-600 sm:text-base sm:leading-8">{t.landing.whyDescription}</p>
+            <div className="mt-10 grid sm:grid-cols-2">
+              {cards.map(([title, description], index) => (
+                <article key={title} className="landing-editorial-item">
+                  <div className="flex items-center gap-3">
+                    <span className="landing-editorial-number">0{index + 1}</span>
+                    <span className="h-px flex-1 bg-zinc-200" />
+                  </div>
+                  <h3 className="mt-5 text-[16px] font-bold tracking-tight text-zinc-950">{title}</h3>
+                  <p className="mt-2.5 text-sm leading-6 text-zinc-500">{description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
