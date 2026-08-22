@@ -7,6 +7,8 @@ import type { PlanId } from "@/config/plans";
 import ThemePreviewCard from "@/components/storefront/ThemePreviewCard";
 import { FONT_OPTIONS, THEMES, getTheme } from "@/themes/registry";
 import type { FontId, ThemeId } from "@/themes/types";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Settings = {
   theme_id: ThemeId;
@@ -19,6 +21,8 @@ type Store = { name: string; logo_url: string | null };
 type Subscription = { plan_id: string; status: string; effectivePlan: PlanId };
 
 export default function AppearancePage() {
+  const toast = useToast();
+  const { t } = useI18n();
   const [store, setStore] = useState<Store | null>(null);
   const [settings, setSettings] = useState<Settings>({
     theme_id: "minimal",
@@ -76,6 +80,7 @@ export default function AppearancePage() {
   }, [load]);
 
   async function save() {
+    if (saving) return;
     setSaving(true);
     setMessage("");
     const headers = await authHeaders();
@@ -87,16 +92,20 @@ export default function AppearancePage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setMessage(data.error || "تعذر حفظ المظهر.");
+      const msg = data.error || t.feedback.appearanceSaveError;
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
     } else {
       setMessage("تم حفظ تخصيص المتجر بنجاح.");
       setMessageType("success");
+      toast.success(t.feedback.appearanceSaveSuccess);
     }
     setSaving(false);
   }
 
   async function reset() {
+    if (resetting) return;
     setResetting(true);
     setMessage("");
     const headers = await authHeaders();
@@ -104,11 +113,14 @@ export default function AppearancePage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setMessage(data.error || "تعذر إعادة الضبط.");
+      const msg = data.error || t.feedback.appearanceSaveError;
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
     } else {
       setMessage("تمت إعادة المظهر إلى Minimal وإعداداته الافتراضية.");
       setMessageType("success");
+      toast.success(t.feedback.appearanceSaveSuccess);
       await load();
     }
     setResetting(false);
