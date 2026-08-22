@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { PLAN_LABELS, type PlanId } from "@/config/plans";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type StoreDetail = {
   store: { id: string; name: string; slug: string; description: string | null; logo_url: string | null; is_active: boolean; created_at: string };
@@ -25,6 +27,8 @@ async function authedFetch(path: string, init?: RequestInit) {
 
 export default function AdminStoreDetailPage() {
   const params = useParams<{ id: string }>();
+  const toast = useToast();
+  const { t } = useI18n();
   const [detail, setDetail] = useState<StoreDetail | null>(null);
   const [endDateInput, setEndDateInput] = useState("");
   const [loading, setLoading] = useState(true);
@@ -65,14 +69,17 @@ export default function AdminStoreDetailPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setMessage(data.error || "تعذر تنفيذ الإجراء.");
+      const msg = data.error || t.feedback.adminActionError;
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       setSaving(false);
       return;
     }
 
     setMessage("تم تحديث الاشتراك بنجاح.");
     setMessageType("success");
+    toast.success(t.feedback.adminActionSuccess);
     await load();
     setSaving(false);
   }
