@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 
 type GuardStatus = "checking" | "unauthenticated" | "forbidden" | "ready";
 
@@ -38,7 +39,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     check();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => check());
+
     return () => subscription.unsubscribe();
   }, [router]);
 
@@ -60,9 +65,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-6">
         <div className="w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-8 text-center">
-          <h1 className="text-2xl font-bold text-zinc-900">غير مصرح لك بالوصول</h1>
-          <p className="mt-3 text-sm text-zinc-500">هذه اللوحة مخصصة لفريق Nexora فقط.</p>
-          <Link href="/dashboard" className="mt-6 inline-block rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white">
+          <h1 className="text-2xl font-bold text-zinc-900">
+            غير مصرح لك بالوصول
+          </h1>
+
+          <p className="mt-3 text-sm text-zinc-500">
+            هذه اللوحة مخصصة لفريق Nexora فقط.
+          </p>
+
+          <Link
+            href="/dashboard"
+            className="mt-6 inline-block rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white"
+          >
             الذهاب إلى لوحة متجري
           </Link>
         </div>
@@ -78,7 +92,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   function isActive(href: string) {
-    return href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+    return href === "/admin"
+      ? pathname === "/admin"
+      : pathname.startsWith(href);
   }
 
   return (
@@ -86,14 +102,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-zinc-900">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-6">
-            <span className="text-sm font-bold text-white">Nexora Admin</span>
+            <span className="text-sm font-bold text-white">
+              Nexora Admin
+            </span>
+
             <div className="hidden gap-1 md:flex">
               {links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    isActive(link.href) ? "bg-white text-zinc-900" : "text-zinc-300 hover:bg-zinc-800"
+                    isActive(link.href)
+                      ? "bg-white text-zinc-900"
+                      : "text-zinc-300 hover:bg-zinc-800"
                   }`}
                 >
                   {link.label}
@@ -101,17 +122,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               ))}
             </div>
           </div>
-          <button onClick={handleSignOut} className="rounded-lg px-3 py-2 text-sm font-medium text-red-300 hover:bg-zinc-800">
-            تسجيل الخروج
-          </button>
+
+          <div className="flex items-center gap-2">
+            {/* Language */}
+            <LanguageSwitcher />
+
+            <button
+              onClick={handleSignOut}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-red-300 hover:bg-zinc-800"
+              type="button"
+            >
+              تسجيل الخروج
+            </button>
+          </div>
         </div>
-        <div className="flex gap-1 border-t border-zinc-800 px-4 py-2 md:hidden">
+
+        {/* Mobile navigation */}
+        <div className="flex gap-1 overflow-x-auto border-t border-zinc-800 px-4 py-2 md:hidden">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-lg px-3 py-2 text-xs font-medium ${
-                isActive(link.href) ? "bg-white text-zinc-900" : "text-zinc-300"
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium ${
+                isActive(link.href)
+                  ? "bg-white text-zinc-900"
+                  : "text-zinc-300"
               }`}
             >
               {link.label}
@@ -119,6 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </div>
       </nav>
+
       {children}
     </div>
   );
