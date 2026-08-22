@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import ProductImagesManager, { type ProductImageRecord } from "@/components/dashboard/ProductImagesManager";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Product = {
   id: string;
@@ -28,6 +30,8 @@ function extractStoragePath(url: string) {
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const toast = useToast();
+  const { t } = useI18n();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<ProductImageRecord[]>([]);
@@ -73,7 +77,7 @@ export default function EditProductPage() {
   }, [params.id]);
 
   async function save() {
-    if (!product) return;
+    if (!product || saving) return;
     setSaving(true);
     setMessage("");
 
@@ -95,7 +99,9 @@ export default function EditProductPage() {
 
     if (error) {
       setMessage(error.message);
+      toast.error(error.message || t.feedback.productUpdateError);
     } else {
+      toast.success(t.feedback.productUpdateSuccess);
       router.push("/dashboard/products");
       router.refresh();
     }
@@ -104,7 +110,7 @@ export default function EditProductPage() {
   }
 
   async function removeProduct() {
-    if (!product) return;
+    if (!product || deleting) return;
     const confirmed = window.confirm(
       `هل أنتِ متأكد من حذف "${product.name}"؟ هذا الإجراء لا يمكن التراجع عنه.`
     );
@@ -133,10 +139,12 @@ export default function EditProductPage() {
 
     if (error) {
       setMessage(error.message);
+      toast.error(error.message || t.feedback.productDeleteError);
       setDeleting(false);
       return;
     }
 
+    toast.success(t.feedback.productDeleteSuccess);
     router.push("/dashboard/products");
     router.refresh();
   }
