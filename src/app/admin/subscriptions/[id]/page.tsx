@@ -5,9 +5,13 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { PLAN_LABELS, type PlanId } from "@/config/plans";
 import type { PaymentRequestRow, PaymentRequestsResponse } from "@/types/api";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 export default function AdminPaymentRequestPage() {
   const { id } = useParams<{ id: string }>();
+  const toast = useToast();
+  const { t } = useI18n();
   const [row, setRow] = useState<PaymentRequestRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,12 +36,20 @@ export default function AdminPaymentRequestPage() {
   useEffect(() => { void load(); }, [load]);
 
   async function action(actionName: "approve" | "reject" | "proof") {
+    if (busy) return;
     setBusy(true);
     const r = await fetch(`/api/admin/payment-requests/${id}`, { method: "POST", headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" }, body: JSON.stringify(actionName === "reject" ? { action: actionName, reason } : { action: actionName }) });
     const d = (await r.json()) as { error?: string; url?: string };
-    if (!r.ok) setError(d.error || "تعذر تنفيذ العملية.");
-    else if (actionName === "proof") setProofUrl(d.url || "");
-    else await load();
+    if (!r.ok) {
+      const msg = d.error || t.feedback.adminActionError;
+      setError(msg);
+      toast.error(msg);
+    } else if (actionName === "proof") {
+      setProofUrl(d.url || "");
+    } else {
+      toast.success(t.feedback.adminActionSuccess);
+      await load();
+    }
     setBusy(false);
   }
 
