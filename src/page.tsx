@@ -1,0 +1,33 @@
+"use client";
+
+import Hero, { HeroSection } from "@/components/landing/Hero";
+import WhyNexora from "@/components/landing/WhyNexora";
+import Features from "@/components/landing/Features";
+import MediaSection from "@/components/landing/MediaSection";
+import ProductsSection from "@/components/landing/ProductsSection";
+import AnalyticsSection from "@/components/landing/AnalyticsSection";
+import HowItWorks from "@/components/landing/HowItWorks";
+import PlansPreview from "@/components/landing/PlansPreview";
+import CTA from "@/components/landing/CTA";
+import Footer from "@/components/landing/Footer";
+import { useI18n } from "@/i18n/LanguageProvider";
+
+export default function LandingPage() {
+  const { dir } = useI18n();
+
+  return (
+    <main dir={dir} className="landing-page min-h-screen overflow-x-hidden bg-white text-zinc-950">
+      <Hero />
+      <HeroSection />
+      <WhyNexora />
+      <Features />
+      <MediaSection />
+      <ProductsSection />
+      <AnalyticsSection />
+      <HowItWorks />
+      <PlansPreview />
+      <CTA />
+      <Footer />
+    </main>
+  );
+}
