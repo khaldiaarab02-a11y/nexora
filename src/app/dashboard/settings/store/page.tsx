@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Store = {
   id: string;
@@ -32,6 +34,8 @@ function sanitizeSlug(value: string) {
 }
 
 export default function StoreSettingsPage() {
+  const toast = useToast();
+  const { t } = useI18n();
   const [store, setStore] = useState<Store | null>(null);
   const [originalSlug, setOriginalSlug] = useState("");
   const [currency, setCurrency] = useState("DZD");
@@ -139,8 +143,10 @@ export default function StoreSettingsPage() {
       .upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
 
     if (uploadError) {
-      setMessage(`تعذر رفع الشعار: ${uploadError.message}`);
+      const msg = `تعذر رفع الشعار: ${uploadError.message}`;
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       setUploadingLogo(false);
       return;
     }
@@ -151,8 +157,10 @@ export default function StoreSettingsPage() {
     const { error: updateError } = await supabase.from("stores").update({ logo_url: publicUrl }).eq("id", store.id);
 
     if (updateError) {
-      setMessage(`تم رفع الصورة لكن تعذر حفظ الشعار: ${updateError.message}`);
+      const msg = `تم رفع الصورة لكن تعذر حفظ الشعار: ${updateError.message}`;
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       await supabase.storage.from("product-images").remove([path]);
       setUploadingLogo(false);
       return;
@@ -165,6 +173,7 @@ export default function StoreSettingsPage() {
     setStore({ ...store, logo_url: publicUrl });
     setMessage("تم تحديث الشعار بنجاح.");
     setMessageType("success");
+    toast.success(t.feedback.logoUpdateSuccess);
     setUploadingLogo(false);
   }
 
@@ -182,6 +191,7 @@ export default function StoreSettingsPage() {
     if (updateError) {
       setMessage(updateError.message);
       setMessageType("error");
+      toast.error(updateError.message);
       setUploadingLogo(false);
       return;
     }
@@ -193,6 +203,7 @@ export default function StoreSettingsPage() {
     setStore({ ...store, logo_url: null });
     setMessage("تمت إزالة الشعار.");
     setMessageType("success");
+    toast.success(t.feedback.logoRemoveSuccess);
     setUploadingLogo(false);
   }
 
@@ -257,6 +268,7 @@ export default function StoreSettingsPage() {
     if (storeUpdateError) {
       setMessage(storeUpdateError.message);
       setMessageType("error");
+      toast.error(storeUpdateError.message || t.feedback.settingsSaveError);
       setSaving(false);
       return;
     }
@@ -266,8 +278,10 @@ export default function StoreSettingsPage() {
       .upsert({ store_id: store.id, currency: currency.trim(), default_shipping_fee: fee }, { onConflict: "store_id" });
 
     if (settingsUpdateError) {
-      setMessage(`تم حفظ بيانات المتجر، لكن تعذر حفظ الإعدادات: ${settingsUpdateError.message}`);
+      const msg = `تم حفظ بيانات المتجر، لكن تعذر حفظ الإعدادات: ${settingsUpdateError.message}`;
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       setSaving(false);
       return;
     }
@@ -276,6 +290,7 @@ export default function StoreSettingsPage() {
     setStore({ ...store, name: trimmedName, slug: cleanSlug, description: trimmedDescription || null });
     setMessage("تم حفظ التغييرات بنجاح.");
     setMessageType("success");
+    toast.success(t.feedback.settingsSaveSuccess);
     setSaving(false);
   }
 
@@ -284,10 +299,12 @@ export default function StoreSettingsPage() {
     try {
       await navigator.clipboard.writeText(storeUrl);
       setCopyFeedback(true);
+      toast.success(t.feedback.linkCopySuccess);
       setTimeout(() => setCopyFeedback(false), 2000);
     } catch {
       setMessage("تعذر نسخ الرابط، انسخيه يدويًا.");
       setMessageType("error");
+      toast.error(t.feedback.linkCopyError);
     }
   }
 
