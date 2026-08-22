@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import { useI18n } from "@/i18n/LanguageProvider";
+import { useToast } from "@/components/ui/Toast";
 
 function friendlyAuthError(rawMessage: string): string {
   const message = rawMessage.toLowerCase();
@@ -55,6 +56,7 @@ export default function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, dir } = useI18n();
+  const toast = useToast();
 
   const [mode, setMode] = useState<"login" | "signup">(searchParams.get("mode") === "signup" ? "signup" : "login");
   const [email, setEmail] = useState("");
@@ -82,8 +84,10 @@ export default function AuthForm() {
     if (loading) return;
 
     if (mode === "signup" && password !== confirmPassword) {
-      setMessage("كلمتا المرور غير متطابقتين.");
+      const msg = "كلمتا المرور غير متطابقتين.";
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       return;
     }
 
@@ -100,8 +104,10 @@ export default function AuthForm() {
         : await supabase.auth.signInWithPassword({ email: email.trim(), password });
 
     if (result.error) {
-      setMessage(friendlyAuthError(result.error.message));
+      const msg = friendlyAuthError(result.error.message);
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       setLoading(false);
       return;
     }
@@ -118,8 +124,10 @@ export default function AuthForm() {
     }
 
     if (!result.data.user) {
-      setMessage("تعذر التحقق من الحساب بعد تسجيل الدخول. حاول مرة أخرى.");
+      const msg = "تعذر التحقق من الحساب بعد تسجيل الدخول. حاول مرة أخرى.";
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg);
       setLoading(false);
       return;
     }
