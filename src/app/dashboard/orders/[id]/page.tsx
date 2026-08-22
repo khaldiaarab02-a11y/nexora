@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { orderStatuses, statusLabel, type OrderStatus } from "@/lib/orderStatus";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type OrderDetail = {
   id: string;
@@ -33,6 +35,8 @@ type OrderItem = {
 export default function OrderDetailPage() {
   const params = useParams();
   const orderId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const toast = useToast();
+  const { t } = useI18n();
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
@@ -131,7 +135,7 @@ export default function OrderDetailPage() {
   }, [orderId]);
 
   async function handleStatusSave() {
-    if (!order || status === order.status) return;
+    if (!order || status === order.status || savingStatus) return;
     setSavingStatus(true);
     setStatusMessage("");
     setStatusError(false);
@@ -141,7 +145,8 @@ export default function OrderDetailPage() {
 
     if (sessionError || !token) {
       setStatusError(true);
-      setStatusMessage("انتهت الجلسة. سجّل الدخول من جديد.");
+      setStatusMessage(t.feedback.sessionExpired);
+      toast.error(t.feedback.sessionExpired);
       setSavingStatus(false);
       return;
     }
@@ -158,8 +163,10 @@ export default function OrderDetailPage() {
     const data = await response.json();
 
     if (!response.ok) {
+      const errMsg = data.error || t.feedback.orderStatusUpdateError;
       setStatusError(true);
-      setStatusMessage(data.error || "تعذر تحديث حالة الطلب.");
+      setStatusMessage(errMsg);
+      toast.error(errMsg);
       setSavingStatus(false);
       return;
     }
@@ -167,7 +174,8 @@ export default function OrderDetailPage() {
     setOrder({ ...order, status: data.status });
     setStatus(data.status);
     setStatusError(false);
-    setStatusMessage("تم تحديث حالة الطلب بنجاح.");
+    setStatusMessage(t.feedback.orderStatusUpdateSuccess);
+    toast.success(t.feedback.orderStatusUpdateSuccess);
     setSavingStatus(false);
   }
 
