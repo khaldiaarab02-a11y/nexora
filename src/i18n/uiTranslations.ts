@@ -6,6 +6,11 @@ type Entry = readonly [string, string, string];
 // older Phase 1/2/3 screens. It is deliberately UI-only: user/store data is
 // never translated unless it exactly matches one of these fixed labels.
 export const UI_TRANSLATIONS: Entry[] = [
+  ["واجهة جريئة بطابع مجلّة أزياء مناسبة للعلامات المرئية.", "Bold editorial fashion interface for visual brands.", "Interface mode éditorial audacieuse pour les marques visuelles."],
+  ["تخطيط عصري واضح مع بطاقات قوية وعناصر حركة خفيفة.", "Clear modern layout with strong cards and subtle motion.", "Mise en page moderne et claire avec des cartes fortes et des animations subtiles."],
+  ["طابع تحريري فاخر مع مساحات واسعة وتفاصيل راقية.", "Luxury editorial feel with generous space and refined details.", "Style éditorial luxueux avec de grands espaces et des détails raffinés."],
+  ["واجهة ناعمة ودافئة مصممة لمنتجات الجمال والعناية.", "Soft, warm interface designed for beauty and care products.", "Interface douce et chaleureuse conçue pour les produits de beauté et de soin."],
+  ["واجهة نظيفة وهادئة تركز على المنتجات وسهولة الشراء.", "Clean, calm interface focused on products and easy shopping.", "Interface épurée et apaisée, centrée sur les produits et la simplicité d’achat."],
   ["التواصل مع فريق Nexora لتفعيل المتجر.", "Contact the Nexora team to activate the store.", "Contactez l’équipe Nexora pour activer la boutique."],
   ["تعديل بيانات المتجر العامة وإعدادات الشحن.", "Edit the store details and shipping settings.", "Modifier les informations de la boutique et les paramètres de livraison."],
   ["يرجى إرفاق إثبات الدفع.", "Please attach the payment proof.", "Veuillez joindre la preuve de paiement."],

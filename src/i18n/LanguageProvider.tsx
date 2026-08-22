@@ -7,17 +7,19 @@ import { DEFAULT_LANGUAGE, languageDirection, LANGUAGES, translations, type Lang
 type I18nContext = { language: Language; setLanguage: (language: Language) => void; dir: "rtl" | "ltr"; t: Translations };
 const Context = createContext<I18nContext | null>(null);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+export function LanguageProvider({ children, initialLanguage }: { children: React.ReactNode; initialLanguage?: Language }) {
+  const [language, setLanguageState] = useState<Language>(initialLanguage ?? DEFAULT_LANGUAGE);
 
   useEffect(() => {
+    if (initialLanguage) return;
     const stored = window.localStorage.getItem("nexora-language") as Language | null;
     if (stored && LANGUAGES.includes(stored)) setLanguageState(stored);
-  }, []);
+  }, [initialLanguage]);
 
   const setLanguage = (next: Language) => {
     setLanguageState(next);
     window.localStorage.setItem("nexora-language", next);
+    document.cookie = `nexora-language=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
     document.documentElement.lang = next;
     document.documentElement.dir = languageDirection[next];
   };
