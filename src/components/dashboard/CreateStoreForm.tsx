@@ -3,12 +3,16 @@
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_LOGO_SIZE = 5 * 1024 * 1024;
 
 export default function CreateStoreForm() {
   const router = useRouter();
+  const toast = useToast();
+  const { t } = useI18n();
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
@@ -103,12 +107,15 @@ export default function CreateStoreForm() {
     });
 
     if (error) {
+      let msg: string;
       if (error.message.toLowerCase().includes("duplicate") || error.message.toLowerCase().includes("unique")) {
-        setMessage("هذا الرابط مستخدم بالفعل من متجر آخر. اختر رابطًا مختلفًا.");
+        msg = "هذا الرابط مستخدم بالفعل من متجر آخر. اختر رابطًا مختلفًا.";
       } else {
-        setMessage(error.message);
+        msg = error.message;
       }
+      setMessage(msg);
       setMessageType("error");
+      toast.error(msg || t.feedback.storeCreateError);
       setLoading(false);
       return;
     }
@@ -128,6 +135,7 @@ export default function CreateStoreForm() {
       // The store itself was created successfully by the RPC (no error
       // above) - only the optional extras below can't be applied right
       // now. The user can still set them from Settings afterward.
+      toast.success(t.feedback.storeCreateSuccess);
       router.push("/dashboard/subscription");
       router.refresh();
       return;
@@ -185,8 +193,11 @@ export default function CreateStoreForm() {
     if (subscriptionError) extras.push("تفعيل الاشتراك (سيتواصل معك فريق Nexora)");
 
     if (extras.length > 0) {
-      setMessage(`تم إنشاء متجرك بنجاح، لكن تعذر حفظ: ${extras.join("، ")}. يمكنك إضافتها لاحقًا من إعدادات المتجر.`);
+      setMessage(t.feedback.storeCreatePartialSuccess);
       setMessageType("success");
+      toast.warning(t.feedback.storeCreatePartialSuccess);
+    } else {
+      toast.success(t.feedback.storeCreateSuccess);
     }
 
     router.push("/dashboard/subscription");

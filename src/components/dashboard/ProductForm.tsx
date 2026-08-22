@@ -4,9 +4,13 @@ import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import ProductImagesManager, { type ProductImagesManagerHandle } from "./ProductImagesManager";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 export default function ProductForm() {
   const router = useRouter();
+  const toast = useToast();
+  const { t } = useI18n();
   const imagesRef = useRef<ProductImagesManagerHandle>(null);
 
   const [name, setName] = useState("");
@@ -32,6 +36,7 @@ export default function ProductForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
     setLoading(true);
     setMessage("");
 
@@ -40,6 +45,7 @@ export default function ProductForm() {
 
     if (!user) {
       setMessage("يجب تسجيل الدخول أولًا.");
+      toast.error(t.feedback.sessionExpired);
       setLoading(false);
       return;
     }
@@ -53,7 +59,9 @@ export default function ProductForm() {
       .maybeSingle();
 
     if (membershipError || !membership) {
-      setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+      const msg = "لم يتم العثور على متجر مرتبط بهذا الحساب.";
+      setMessage(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
@@ -77,7 +85,9 @@ export default function ProductForm() {
       .single();
 
     if (error || !newProduct) {
-      setMessage(error?.message || "تعذر حفظ المنتج.");
+      const msg = error?.message || t.feedback.productCreateError;
+      setMessage(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
@@ -89,6 +99,7 @@ export default function ProductForm() {
       }
     }
 
+    toast.success(t.feedback.productCreateSuccess);
     router.push("/dashboard/products");
     router.refresh();
   }

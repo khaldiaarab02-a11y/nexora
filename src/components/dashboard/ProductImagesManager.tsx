@@ -2,6 +2,8 @@
 
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 export type ProductImageRecord = {
   id: string;
@@ -56,6 +58,8 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+  const { t } = useI18n();
 
   function validateFiles(fileList: FileList): { valid: File[]; error: string } {
     const valid: File[] = [];
@@ -106,12 +110,14 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     const user = userData.user;
     if (!user) {
       setMessage("يجب تسجيل الدخول أولًا.");
+      toast.error(t.feedback.sessionExpired);
       setUploading(false);
       return;
     }
 
     const startOrder = images.length;
     const uploaded: ProductImageRecord[] = [];
+    let uploadFailed = false;
 
     for (let i = 0; i < valid.length; i++) {
       const file = valid[i];
@@ -124,6 +130,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
 
       if (uploadError) {
         setMessage(`تعذر رفع إحدى الصور: ${uploadError.message}`);
+        uploadFailed = true;
         continue;
       }
 
@@ -143,6 +150,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
 
       if (insertError || !row) {
         setMessage(`تعذر حفظ إحدى الصور: ${insertError?.message || "خطأ غير معروف"}`);
+        uploadFailed = true;
         await supabase.storage.from("product-images").remove([path]);
         continue;
       }
@@ -157,6 +165,12 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
 
     if (uploaded.length > 0) {
       setImages((prev) => [...prev, ...uploaded]);
+    }
+
+    if (uploadFailed) {
+      toast.error(t.feedback.imageUploadError);
+    } else if (uploaded.length > 0) {
+      toast.success(t.feedback.imageUploadSuccess);
     }
 
     setUploading(false);
@@ -201,7 +215,9 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     const { error: setError } = await supabase.from("product_images").update({ is_primary: true }).eq("id", imageId);
 
     if (resetError || setError) {
-      setMessage((resetError || setError)?.message || "تعذر تحديث الصورة الرئيسية.");
+      const msg = (resetError || setError)?.message || t.feedback.imageUploadError;
+      setMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -230,7 +246,9 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
       .eq("id", target.id);
 
     if (err1 || err2) {
-      setMessage((err1 || err2)?.message || "تعذر إعادة ترتيب الصور.");
+      const msg = (err1 || err2)?.message || "تعذر إعادة ترتيب الصور.";
+      setMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -255,6 +273,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
 
     if (deleteError) {
       setMessage(deleteError.message);
+      toast.error(deleteError.message || t.feedback.imageDeleteError);
       return;
     }
 
@@ -280,6 +299,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     } else {
       setImages(remaining);
     }
+    toast.success(t.feedback.imageDeleteSuccess);
   }
 
   useImperativeHandle(ref, () => ({
