@@ -3,8 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCart, clearCart, type CartItem } from "@/lib/cart";
+import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 export default function CheckoutPage() {
+  const toast = useToast();
+  const { t } = useI18n();
   const [items, setItems] = useState<CartItem[]>([]);
   const [form, setForm] = useState({ name: "", phone: "", email: "", wilaya: "", commune: "", address: "", notes: "" });
   const [shipping, setShipping] = useState(0);
@@ -40,7 +44,9 @@ export default function CheckoutPage() {
     const storeSlug = items[0].storeSlug;
 
     if (items.some((item) => item.storeId !== storeId)) {
-      setError("السلة تحتوي منتجات من متاجر مختلفة. يُرجى إفراغ السلة والبدء من متجر واحد.");
+      const msg = "السلة تحتوي منتجات من متاجر مختلفة. يُرجى إفراغ السلة والبدء من متجر واحد.";
+      setError(msg);
+      toast.error(msg);
       setSubmitting(false);
       return;
     }
@@ -64,7 +70,9 @@ export default function CheckoutPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error || "تعذر إنشاء الطلب. حاول مرة أخرى.");
+      const msg = data.error || t.feedback.orderCreateError;
+      setError(msg);
+      toast.error(msg);
       setSubmitting(false);
       return;
     }
@@ -91,7 +99,10 @@ export default function CheckoutPage() {
     }
 
     clearCart();
-    window.location.href = `/order-success?order=${encodeURIComponent(data.orderId)}&store=${encodeURIComponent(storeSlug)}`;
+    toast.success(t.feedback.orderCreateSuccess, { duration: 1800 });
+    window.setTimeout(() => {
+      window.location.href = `/order-success?order=${encodeURIComponent(data.orderId)}&store=${encodeURIComponent(storeSlug)}`;
+    }, 650);
   }
 
   if (!items.length) {
