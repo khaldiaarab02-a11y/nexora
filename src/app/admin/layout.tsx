@@ -5,12 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type GuardStatus = "checking" | "unauthenticated" | "forbidden" | "ready";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useI18n();
   const [status, setStatus] = useState<GuardStatus>("checking");
   const checkId = useRef(0);
 
@@ -56,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (status === "checking" || status === "unauthenticated") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400">
-        جاري التحقق من الجلسة...
+        {t.adminNav.checkingSession}
       </div>
     );
   }
@@ -66,18 +68,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-6">
         <div className="w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-8 text-center">
           <h1 className="text-2xl font-bold text-zinc-900">
-            غير مصرح لك بالوصول
+            {t.adminNav.forbiddenTitle}
           </h1>
 
           <p className="mt-3 text-sm text-zinc-500">
-            هذه اللوحة مخصصة لفريق Nexora فقط.
+            {t.adminNav.forbiddenText}
           </p>
 
           <Link
             href="/dashboard"
             className="mt-6 inline-block rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white"
           >
-            الذهاب إلى لوحة متجري
+            {t.adminNav.goToDashboard}
           </Link>
         </div>
       </div>
@@ -85,10 +87,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const links = [
-    { href: "/admin", label: "الرئيسية" },
-    { href: "/admin/stores", label: "المتاجر" },
-    { href: "/admin/subscriptions", label: "الاشتراكات" },
-    { href: "/admin/support", label: "الدعم" },
+    { href: "/admin", label: t.adminNav.home },
+    { href: "/admin/stores", label: t.adminNav.stores },
+    { href: "/admin/subscriptions", label: t.adminNav.subscriptions },
+    { href: "/admin/support", label: t.adminNav.support },
   ];
 
   function isActive(href: string) {
@@ -132,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="rounded-lg px-3 py-2 text-sm font-medium text-red-300 hover:bg-zinc-800"
               type="button"
             >
-              تسجيل الخروج
+              {t.adminNav.logout}
             </button>
           </div>
         </div>

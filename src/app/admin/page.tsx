@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Stats = {
   totalStores: number;
@@ -14,6 +15,7 @@ type Stats = {
 };
 
 export default function AdminDashboardPage() {
+  const { t } = useI18n();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -49,8 +51,8 @@ export default function AdminDashboardPage() {
   return (
     <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h1 className="text-2xl font-bold text-zinc-900">لوحة تحكم Nexora</h1>
-        <p className="mt-1 text-sm text-zinc-500">نظرة عامة على المتاجر والاشتراكات.</p>
+        <h1 className="text-2xl font-bold text-zinc-900">{t.adminHome.title}</h1>
+        <p className="mt-1 text-sm text-zinc-500">{t.adminHome.subtitle}</p>
 
         {loading ? (
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -62,10 +64,10 @@ export default function AdminDashboardPage() {
           <p className="mt-6 rounded-2xl bg-red-50 p-4 text-red-700">{message}</p>
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard title="إجمالي المتاجر" value={stats!.totalStores} />
-            <StatCard title="اشتراك فعال" value={stats!.activeStores} tone="emerald" />
-            <StatCard title="قيد الانتظار" value={stats!.pendingStores} tone="amber" />
-            <StatCard title="منتهي" value={stats!.expiredStores} tone="red" />
+            <StatCard title={t.adminHome.totalStores} value={stats!.totalStores} />
+            <StatCard title={t.adminHome.activeSubscription} value={stats!.activeStores} tone="emerald" />
+            <StatCard title={t.adminHome.pending} value={stats!.pendingStores} tone="amber" />
+            <StatCard title={t.adminHome.expired} value={stats!.expiredStores} tone="red" />
             <StatCard title="Starter" value={stats!.starterStores} />
             <StatCard title="Business" value={stats!.businessStores} />
           </div>
