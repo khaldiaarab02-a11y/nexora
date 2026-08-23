@@ -39,7 +39,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <LanguageProvider>
+        <LanguageProvider initialLanguage={initialLanguage}>
           <ToastProvider>{children}</ToastProvider>
         </LanguageProvider>
       </body>
