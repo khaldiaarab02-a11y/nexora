@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serviceClient } from "@/lib/server/auth";
+import { getRequestTranslations } from "@/lib/server/i18n";
 
 type OrderItemInput = {
   productId: string;
@@ -22,23 +23,23 @@ type OrderInput = {
   items: OrderItemInput[];
 };
 
-function validateBody(body: OrderInput) {
+function validateBody(body: OrderInput, t: ReturnType<typeof getRequestTranslations>) {
   if (
     !body.customerName?.trim() ||
     !body.customerPhone?.trim() ||
     !body.wilaya?.trim() ||
     !body.address?.trim()
   ) {
-    return "بيانات العميل ناقصة. يرجى تعبئة الاسم والهاتف والولاية والعنوان.";
+    return t.orderApi.missingCustomerData;
   }
 
   if (!Array.isArray(body.items) || body.items.length === 0) {
-    return "السلة فارغة.";
+    return t.orderApi.emptyCart;
   }
 
   for (const item of body.items) {
     if (!item.productId || !Number.isInteger(item.quantity) || item.quantity <= 0) {
-      return "بيانات أحد المنتجات في السلة غير صالحة.";
+      return t.orderApi.invalidCartItem;
     }
   }
 
@@ -54,7 +55,8 @@ function isMissingFunctionError(error: { code?: string; message?: string } | nul
 
 async function createOrderViaRpc(
   supabase: ReturnType<typeof serviceClient>,
-  body: OrderInput
+  body: OrderInput,
+  t: ReturnType<typeof getRequestTranslations>
 ) {
   const { data, error } = await supabase.rpc("create_order_with_items", {
     p_items: body.items.map((item) => ({ product_id: item.productId, quantity: item.quantity })),
@@ -80,7 +82,7 @@ async function createOrderViaRpc(
   const row = Array.isArray(data) ? data[0] : data;
 
   if (!row?.order_id) {
-    throw new Error("تعذر إنشاء الطلب.");
+    throw new Error(t.orderApi.createFailed);
   }
 
   return {
@@ -94,7 +96,8 @@ async function createOrderViaRpc(
 
 async function createOrderFallback(
   supabase: ReturnType<typeof serviceClient>,
-  body: OrderInput
+  body: OrderInput,
+  t: ReturnType<typeof getRequestTranslations>
 ) {
   const productIds = body.items.map((item) => item.productId);
 
@@ -106,16 +109,16 @@ async function createOrderFallback(
     .in("id", productIds);
 
   if (productsError) {
-    throw new Error(`تعذر قراءة المنتجات: ${productsError.message}`);
+    throw new Error(`${t.orderApi.readProductsFailed}: ${productsError.message}`);
   }
 
   if (!products || products.length !== body.items.length) {
-    throw new Error("أحد المنتجات في السلة لم يعد متاحًا.");
+    throw new Error(t.orderApi.productNoLongerAvailable);
   }
 
   const distinctStoreIds = new Set(products.map((p) => p.store_id));
   if (distinctStoreIds.size !== 1) {
-    throw new Error("عناصر السلة تنتمي لمتاجر مختلفة، وهذا غير مسموح.");
+    throw new Error(t.orderApi.mixedStoresNotAllowed);
   }
   const storeId = products[0].store_id as string;
 
@@ -124,15 +127,15 @@ async function createOrderFallback(
 
   const orderItems = body.items.map((item) => {
     const product = productMap.get(item.productId);
-    if (!product) throw new Error("المنتج غير موجود.");
+    if (!product) throw new Error(t.orderApi.productNotFound);
 
     const quantity = Number(item.quantity);
 
     if (!product.is_active) {
-      throw new Error(`المنتج غير متاح: ${product.name}`);
+      throw new Error(`${t.orderApi.productInactive}: ${product.name}`);
     }
     if (product.stock_quantity < quantity) {
-      throw new Error(`المخزون غير كافٍ للمنتج "${product.name}". المتوفر: ${product.stock_quantity}`);
+      throw new Error(`${t.orderApi.insufficientStockPrefix} "${product.name}". ${t.orderApi.availableSuffix} ${product.stock_quantity}`);
     }
 
     const unitPrice = Number(product.price);
@@ -177,7 +180,7 @@ async function createOrderFallback(
     .single();
 
   if (orderError || !order) {
-    throw new Error(`تعذر إنشاء الطلب: ${orderError?.message || "لم يتم إنشاء الطلب"}`);
+    throw new Error(`${t.orderApi.createOrderFailedPrefix}: ${orderError?.message || t.orderApi.orderNotCreated}`);
   }
 
   const itemsWithOrderId = orderItems.map((item) => ({ ...item, order_id: order.id }));
@@ -186,7 +189,7 @@ async function createOrderFallback(
 
   if (itemsError) {
     await supabase.from("orders").delete().eq("id", order.id);
-    throw new Error(`تعذر حفظ تفاصيل الطلب: ${itemsError.message}`);
+    throw new Error(`${t.orderApi.saveItemsFailedPrefix}: ${itemsError.message}`);
   }
 
   for (const item of body.items) {
@@ -215,8 +218,8 @@ async function createOrderFallback(
 
       throw new Error(
         stockError
-          ? `تعذر تحديث المخزون: ${stockError.message}`
-          : `المخزون تغير أثناء إنشاء الطلب للمنتج: ${product.name}`
+          ? `${t.orderApi.stockUpdateFailedPrefix}: ${stockError.message}`
+          : `${t.orderApi.stockChangedForProductPrefix} ${product.name}`
       );
     }
   }
@@ -225,26 +228,27 @@ async function createOrderFallback(
 }
 
 export async function POST(request: Request) {
+  const t = getRequestTranslations(request);
   try {
     let body: OrderInput;
     try {
       body = (await request.json()) as OrderInput;
     } catch {
-      return NextResponse.json({ error: "بيانات الطلب غير صالحة." }, { status: 400 });
+      return NextResponse.json({ error: t.orderApi.invalidRequestBody }, { status: 400 });
     }
 
-    const validationError = validateBody(body);
+    const validationError = validateBody(body, t);
     if (validationError) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
     const supabase = serviceClient();
 
-    const rpcResult = await createOrderViaRpc(supabase, body);
+    const rpcResult = await createOrderViaRpc(supabase, body, t);
 
     const result = rpcResult.installed
       ? rpcResult
-      : await createOrderFallback(supabase, body);
+      : await createOrderFallback(supabase, body, t);
 
     return NextResponse.json(
       {
@@ -257,7 +261,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "حدث خطأ غير معروف.";
+    const message = error instanceof Error ? error.message : t.orderApi.unknownError;
 
     console.error("NEXORA ORDER ERROR:", error);
 
