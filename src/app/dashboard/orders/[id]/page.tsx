@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { orderStatuses, statusLabel, type OrderStatus } from "@/lib/orderStatus";
+import { orderStatuses, type OrderStatus } from "@/lib/orderStatus";
 import { useToast } from "@/components/ui/Toast";
 import { useI18n } from "@/i18n/LanguageProvider";
 
@@ -52,14 +52,14 @@ export default function OrderDetailPage() {
   useEffect(() => {
     async function loadOrder() {
       if (!orderId) {
-        setMessage("رقم الطلب غير صالح.");
+        setMessage(t.orderDetail.invalidOrderId);
         setLoading(false);
         return;
       }
 
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) {
-        setMessage("يجب تسجيل الدخول أولًا.");
+        setMessage(t.feedback.authRequired);
         setLoading(false);
         return;
       }
@@ -73,7 +73,7 @@ export default function OrderDetailPage() {
         .maybeSingle();
 
       if (!membership) {
-        setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+        setMessage(t.feedback.storeNotFoundForAccount);
         setLoading(false);
         return;
       }
@@ -94,7 +94,7 @@ export default function OrderDetailPage() {
       }
 
       if (!orderData) {
-        setMessage("الطلب غير موجود أو لا تملك صلاحية الوصول إليه.");
+        setMessage(t.orderDetail.orderNotFoundOrNoAccess);
         setLoading(false);
         return;
       }
@@ -182,7 +182,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-zinc-50 p-8 text-center text-zinc-500">
-        جاري تحميل تفاصيل الطلب...
+        {t.orderDetail.loadingOrder}
       </main>
     );
   }
@@ -191,11 +191,11 @@ export default function OrderDetailPage() {
     return (
       <main className="min-h-screen bg-zinc-50 p-8">
         <div className="mx-auto max-w-2xl rounded-3xl border border-red-100 bg-red-50 p-6 text-center text-red-700">
-          {message || "تعذر تحميل الطلب."}
+          {message || t.orderDetail.loadFailed}
         </div>
         <div className="mx-auto mt-6 max-w-2xl text-center">
           <Link href="/dashboard/orders" className="text-sm font-medium text-zinc-500">
-            العودة إلى الطلبات
+            {t.orderDetail.backToOrders}
           </Link>
         </div>
       </main>
@@ -208,10 +208,10 @@ export default function OrderDetailPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora</p>
-            <h1 className="mt-1 text-2xl font-bold text-zinc-900">طلب #{order.id.slice(0, 8)}</h1>
+            <h1 className="mt-1 text-2xl font-bold text-zinc-900">{t.orderDetail.orderNumberPrefix}{order.id.slice(0, 8)}</h1>
           </div>
           <Link href="/dashboard/orders" className="text-sm font-medium text-zinc-500">
-            العودة إلى الطلبات
+            {t.orderDetail.backToOrders}
           </Link>
         </div>
       </header>
@@ -220,23 +220,23 @@ export default function OrderDetailPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="space-y-6">
             <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-              <h2 className="text-lg font-bold text-zinc-900">معلومات العميل</h2>
+              <h2 className="text-lg font-bold text-zinc-900">{t.orderDetail.customerInfoTitle}</h2>
               <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-                <Detail label="اسم العميل" value={order.customer_name} />
-                <Detail label="الهاتف" value={order.customer_phone} />
-                {order.customer_email && <Detail label="البريد الإلكتروني" value={order.customer_email} />}
-                <Detail label="الولاية" value={order.wilaya} />
-                {order.commune && <Detail label="البلدية" value={order.commune} />}
+                <Detail label={t.orderDetail.customerName} value={order.customer_name} />
+                <Detail label={t.orderDetail.phone} value={order.customer_phone} />
+                {order.customer_email && <Detail label={t.orderDetail.email} value={order.customer_email} />}
+                <Detail label={t.orderDetail.wilaya} value={order.wilaya} />
+                {order.commune && <Detail label={t.orderDetail.commune} value={order.commune} />}
                 <div className="sm:col-span-2">
-                  <Detail label="العنوان" value={order.address} />
+                  <Detail label={t.orderDetail.address} value={order.address} />
                 </div>
                 {order.notes && (
                   <div className="sm:col-span-2">
-                    <Detail label="ملاحظات" value={order.notes} />
+                    <Detail label={t.orderDetail.notes} value={order.notes} />
                   </div>
                 )}
                 <Detail
-                  label="تاريخ الطلب"
+                  label={t.orderDetail.orderDate}
                   value={new Date(order.created_at).toLocaleDateString("fr-DZ", {
                     year: "numeric",
                     month: "short",
@@ -249,7 +249,7 @@ export default function OrderDetailPage() {
             </section>
 
             <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-              <h2 className="text-lg font-bold text-zinc-900">المنتجات المطلوبة</h2>
+              <h2 className="text-lg font-bold text-zinc-900">{t.orderDetail.orderedProductsTitle}</h2>
               <div className="mt-5 space-y-4">
                 {items.map((item) => (
                   <div key={item.product_id} className="flex items-center gap-4 border-b border-zinc-50 pb-4 last:border-0 last:pb-0">
@@ -261,7 +261,7 @@ export default function OrderDetailPage() {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-[10px] text-zinc-400">لا توجد صورة</div>
+                        <div className="flex h-full items-center justify-center text-[10px] text-zinc-400">{t.orderDetail.noImage}</div>
                       )}
                     </div>
                     <div className="flex-1">
@@ -282,7 +282,7 @@ export default function OrderDetailPage() {
 
           <aside className="h-fit space-y-6">
             <div className="rounded-3xl border border-zinc-200 bg-white p-6">
-              <h2 className="text-lg font-bold text-zinc-900">حالة الطلب</h2>
+              <h2 className="text-lg font-bold text-zinc-900">{t.orderDetail.orderStatusTitle}</h2>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
@@ -290,7 +290,7 @@ export default function OrderDetailPage() {
               >
                 {orderStatuses.map((s: OrderStatus) => (
                   <option key={s} value={s}>
-                    {statusLabel[s]}
+                    {t.orderStatus[s]}
                   </option>
                 ))}
               </select>
@@ -299,7 +299,7 @@ export default function OrderDetailPage() {
                 disabled={savingStatus || status === order.status}
                 className="mt-4 w-full rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white disabled:opacity-50"
               >
-                {savingStatus ? "جاري الحفظ..." : "حفظ الحالة"}
+                {savingStatus ? t.orderDetail.saving : t.orderDetail.saveStatus}
               </button>
               {statusMessage && (
                 <p className={`mt-3 rounded-xl p-3 text-sm ${statusError ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>
@@ -309,11 +309,11 @@ export default function OrderDetailPage() {
             </div>
 
             <div className="rounded-3xl border border-zinc-200 bg-white p-6">
-              <h2 className="text-lg font-bold text-zinc-900">ملخص الطلب</h2>
+              <h2 className="text-lg font-bold text-zinc-900">{t.orderDetail.summaryTitle}</h2>
               <div className="mt-5 space-y-3 text-sm">
-                <div className="flex justify-between"><span>المجموع الفرعي</span><strong>{Number(order.subtotal).toLocaleString("fr-DZ")} DZD</strong></div>
-                <div className="flex justify-between"><span>التوصيل</span><strong>{Number(order.shipping_fee).toLocaleString("fr-DZ")} DZD</strong></div>
-                <div className="flex justify-between border-t border-zinc-100 pt-3 text-lg"><span>الإجمالي</span><strong>{Number(order.total).toLocaleString("fr-DZ")} DZD</strong></div>
+                <div className="flex justify-between"><span>{t.orderDetail.subtotal}</span><strong>{Number(order.subtotal).toLocaleString("fr-DZ")} DZD</strong></div>
+                <div className="flex justify-between"><span>{t.orderDetail.shipping}</span><strong>{Number(order.shipping_fee).toLocaleString("fr-DZ")} DZD</strong></div>
+                <div className="flex justify-between border-t border-zinc-100 pt-3 text-lg"><span>{t.orderDetail.total}</span><strong>{Number(order.total).toLocaleString("fr-DZ")} DZD</strong></div>
               </div>
             </div>
           </aside>
