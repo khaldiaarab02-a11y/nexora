@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { PLAN_LABELS, type PlanId } from "@/config/plans";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Row = {
   storeId: string;
@@ -14,13 +15,6 @@ type Row = {
   status: string;
 };
 
-const statusLabel: Record<string, string> = {
-  pending: "قيد الانتظار",
-  active: "فعال",
-  expired: "منتهي",
-  cancelled: "ملغى",
-};
-
 const statusStyle: Record<string, string> = {
   pending: "bg-amber-50 text-amber-700",
   active: "bg-emerald-50 text-emerald-700",
@@ -29,6 +23,7 @@ const statusStyle: Record<string, string> = {
 };
 
 export default function AdminStoresPage() {
+  const { t } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -67,7 +62,7 @@ export default function AdminStoresPage() {
   return (
     <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h1 className="text-2xl font-bold text-zinc-900">المتاجر</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">{t.adminStoresList.title}</h1>
 
         <div className="mt-6">
           {loading ? (
@@ -79,7 +74,7 @@ export default function AdminStoresPage() {
           ) : message ? (
             <p className="rounded-2xl bg-red-50 p-4 text-red-700">{message}</p>
           ) : rows.length === 0 ? (
-            <p className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-zinc-500">لا توجد متاجر بعد.</p>
+            <p className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-zinc-500">{t.adminStoresList.noStoresYet}</p>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
               {rows.map((row) => (
@@ -95,7 +90,7 @@ export default function AdminStoresPage() {
                   <div className="flex shrink-0 items-center gap-3 text-sm">
                     <span className="text-zinc-500">{PLAN_LABELS[row.planId as PlanId] || row.planId}</span>
                     <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyle[row.status] || "bg-zinc-100 text-zinc-500"}`}>
-                      {statusLabel[row.status] || row.status}
+                      {t.storeStatus[row.status as keyof typeof t.storeStatus] || row.status}
                     </span>
                     <span className="text-xs text-zinc-400">
                       {new Date(row.createdAt).toLocaleDateString("fr-DZ", { year: "numeric", month: "short", day: "numeric" })}
