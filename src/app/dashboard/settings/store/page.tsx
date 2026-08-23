@@ -55,7 +55,7 @@ export default function StoreSettingsPage() {
     async function load() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) {
-        setMessage("يجب تسجيل الدخول أولًا.");
+        setMessage(t.feedback.authRequired);
         setMessageType("error");
         setLoading(false);
         return;
@@ -70,7 +70,7 @@ export default function StoreSettingsPage() {
         .maybeSingle();
 
       if (!membership) {
-        setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+        setMessage(t.feedback.storeNotFoundForAccount);
         setMessageType("error");
         setLoading(false);
         return;
@@ -90,7 +90,7 @@ export default function StoreSettingsPage() {
       ]);
 
       if (storeError || !storeData) {
-        setMessage(storeError?.message || "تعذر تحميل بيانات المتجر.");
+        setMessage(storeError?.message || t.feedback.storeLoadError);
         setMessageType("error");
         setLoading(false);
         return;
@@ -113,12 +113,12 @@ export default function StoreSettingsPage() {
 
     if (!file || file.size === 0) return;
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setMessage("يُسمح فقط بصور بصيغة JPG أو PNG أو WEBP.");
+      setMessage(t.feedback.imageTypeError);
       setMessageType("error");
       return;
     }
     if (file.size > MAX_LOGO_SIZE) {
-      setMessage("حجم الشعار يجب ألا يتجاوز 5MB.");
+      setMessage(t.feedback.logoSizeError);
       setMessageType("error");
       return;
     }
@@ -129,7 +129,7 @@ export default function StoreSettingsPage() {
     const { data: userData } = await supabase.auth.getUser();
     const user = userData.user;
     if (!user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       setMessageType("error");
       setUploadingLogo(false);
       return;
@@ -143,7 +143,7 @@ export default function StoreSettingsPage() {
       .upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
 
     if (uploadError) {
-      const msg = `تعذر رفع الشعار: ${uploadError.message}`;
+      const msg = `${t.feedback.logoUploadError}: ${uploadError.message}`;
       setMessage(msg);
       setMessageType("error");
       toast.error(msg);
@@ -157,7 +157,7 @@ export default function StoreSettingsPage() {
     const { error: updateError } = await supabase.from("stores").update({ logo_url: publicUrl }).eq("id", store.id);
 
     if (updateError) {
-      const msg = `تم رفع الصورة لكن تعذر حفظ الشعار: ${updateError.message}`;
+      const msg = `${t.feedback.logoUploadPartialError}: ${updateError.message}`;
       setMessage(msg);
       setMessageType("error");
       toast.error(msg);
@@ -171,7 +171,7 @@ export default function StoreSettingsPage() {
     }
 
     setStore({ ...store, logo_url: publicUrl });
-    setMessage("تم تحديث الشعار بنجاح.");
+    setMessage(t.feedback.logoUpdateSuccess);
     setMessageType("success");
     toast.success(t.feedback.logoUpdateSuccess);
     setUploadingLogo(false);
@@ -179,7 +179,7 @@ export default function StoreSettingsPage() {
 
   async function removeLogo() {
     if (!store || !store.logo_url) return;
-    const confirmed = window.confirm("هل تريدين إزالة شعار المتجر؟");
+    const confirmed = window.confirm(t.feedback.logoRemoveConfirm);
     if (!confirmed) return;
 
     setUploadingLogo(true);
@@ -201,7 +201,7 @@ export default function StoreSettingsPage() {
     }
 
     setStore({ ...store, logo_url: null });
-    setMessage("تمت إزالة الشعار.");
+    setMessage(t.feedback.logoRemoveSuccess);
     setMessageType("success");
     toast.success(t.feedback.logoRemoveSuccess);
     setUploadingLogo(false);
@@ -216,22 +216,22 @@ export default function StoreSettingsPage() {
     const fee = Number(shippingFee);
 
     if (!trimmedName) {
-      setMessage("اسم المتجر لا يمكن أن يكون فارغًا.");
+      setMessage(t.feedback.storeNameRequired);
       setMessageType("error");
       return;
     }
     if (!cleanSlug || cleanSlug.length < 3) {
-      setMessage("رابط المتجر يجب أن يتكوّن من 3 أحرف على الأقل، وأحرف إنجليزية وأرقام وشرطات فقط.");
+      setMessage(t.feedback.storeSlugInvalid);
       setMessageType("error");
       return;
     }
     if (!currency.trim()) {
-      setMessage("عملة المتجر لا يمكن أن تكون فارغة.");
+      setMessage(t.feedback.currencyRequired);
       setMessageType("error");
       return;
     }
     if (Number.isNaN(fee) || fee < 0) {
-      setMessage("قيمة تكلفة التوصيل غير صالحة.");
+      setMessage(t.feedback.shippingFeeInvalid);
       setMessageType("error");
       return;
     }
@@ -248,7 +248,7 @@ export default function StoreSettingsPage() {
         .maybeSingle();
 
       if (conflict) {
-        setMessage("هذا الرابط مستخدم من متجر آخر. اختر رابطًا مختلفًا.");
+        setMessage(t.feedback.slugTaken);
         setMessageType("error");
         setSaving(false);
         return;
@@ -278,7 +278,7 @@ export default function StoreSettingsPage() {
       .upsert({ store_id: store.id, currency: currency.trim(), default_shipping_fee: fee }, { onConflict: "store_id" });
 
     if (settingsUpdateError) {
-      const msg = `تم حفظ بيانات المتجر، لكن تعذر حفظ الإعدادات: ${settingsUpdateError.message}`;
+      const msg = `${t.feedback.settingsSavePartialError}: ${settingsUpdateError.message}`;
       setMessage(msg);
       setMessageType("error");
       toast.error(msg);
@@ -288,7 +288,7 @@ export default function StoreSettingsPage() {
 
     setOriginalSlug(cleanSlug);
     setStore({ ...store, name: trimmedName, slug: cleanSlug, description: trimmedDescription || null });
-    setMessage("تم حفظ التغييرات بنجاح.");
+    setMessage(t.feedback.settingsSaveSuccess);
     setMessageType("success");
     toast.success(t.feedback.settingsSaveSuccess);
     setSaving(false);
@@ -302,7 +302,7 @@ export default function StoreSettingsPage() {
       toast.success(t.feedback.linkCopySuccess);
       setTimeout(() => setCopyFeedback(false), 2000);
     } catch {
-      setMessage("تعذر نسخ الرابط، انسخيه يدويًا.");
+      setMessage(t.feedback.linkCopyError);
       setMessageType("error");
       toast.error(t.feedback.linkCopyError);
     }
@@ -331,12 +331,12 @@ export default function StoreSettingsPage() {
   return (
     <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        <h1 className="text-2xl font-bold text-zinc-900">إعدادات المتجر</h1>
-        <p className="mt-1 text-sm text-zinc-500">تعديل بيانات المتجر العامة وإعدادات الشحن.</p>
+        <h1 className="text-2xl font-bold text-zinc-900">{t.storeSettings.title}</h1>
+        <p className="mt-1 text-sm text-zinc-500">{t.storeSettings.subtitle}</p>
 
         {/* Public preview */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">متجرك</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.storeSettings.yourStore}</h2>
           <p className="mt-2 break-all text-sm text-zinc-500">{storeUrl}</p>
           <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
             <a
@@ -345,31 +345,31 @@ export default function StoreSettingsPage() {
               rel="noopener noreferrer"
               className="flex-1 rounded-xl bg-zinc-900 px-4 py-2.5 text-center text-sm font-semibold text-white"
             >
-              عرض المتجر
+              {t.storeSettings.viewStore}
             </a>
             <button
               onClick={copyStoreLink}
               className="flex-1 rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700"
             >
-              {copyFeedback ? "تم نسخ الرابط ✓" : "نسخ الرابط"}
+              {copyFeedback ? t.storeSettings.linkCopied : t.storeSettings.copyLink}
             </button>
           </div>
         </section>
 
         {/* Logo */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">شعار المتجر</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.storeSettings.logoTitle}</h2>
           <div className="mt-4 flex items-center gap-4">
             <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
               {store.logo_url ? (
                 <img src={store.logo_url} alt={store.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full items-center justify-center text-xs text-zinc-400">لا يوجد</div>
+                <div className="flex h-full items-center justify-center text-xs text-zinc-400">{t.storeSettings.none}</div>
               )}
             </div>
             <div className="flex flex-1 flex-col gap-2">
               <label className="cursor-pointer rounded-xl border border-zinc-300 px-4 py-2.5 text-center text-sm font-medium text-zinc-700">
-                {uploadingLogo ? "جاري الرفع..." : store.logo_url ? "استبدال الشعار" : "رفع شعار"}
+                {uploadingLogo ? t.storeSettings.uploading : store.logo_url ? t.storeSettings.replaceLogo : t.storeSettings.uploadLogo}
                 <input
                   ref={logoInputRef}
                   type="file"
@@ -388,21 +388,21 @@ export default function StoreSettingsPage() {
                   disabled={uploadingLogo}
                   className="rounded-xl border border-red-100 px-4 py-2.5 text-sm font-medium text-red-600 disabled:opacity-50"
                 >
-                  إزالة الشعار
+                  {t.storeSettings.removeLogo}
                 </button>
               )}
             </div>
           </div>
-          <p className="mt-3 text-xs text-zinc-400">JPG, PNG, WEBP — حتى 5MB.</p>
+          <p className="mt-3 text-xs text-zinc-400">{t.storeSettings.logoHint}</p>
         </section>
 
         {/* Store details */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">بيانات المتجر</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.storeSettings.detailsTitle}</h2>
 
           <div className="mt-5 space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">اسم المتجر</label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">{t.storeSettings.storeName}</label>
               <input
                 value={store.name}
                 onChange={(e) => setStore({ ...store, name: e.target.value })}
@@ -411,7 +411,7 @@ export default function StoreSettingsPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">رابط المتجر</label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">{t.storeSettings.storeUrl}</label>
               <div className="flex items-center rounded-xl border border-zinc-300 focus-within:border-zinc-900">
                 <span className="border-l px-3 text-sm text-zinc-400">/shop/</span>
                 <input
@@ -421,12 +421,12 @@ export default function StoreSettingsPage() {
                   className="w-full rounded-xl px-3 py-3 outline-none"
                 />
               </div>
-              <p className="mt-2 text-xs text-zinc-400">أحرف إنجليزية صغيرة وأرقام وشرطات فقط، 3 أحرف على الأقل.</p>
+              <p className="mt-2 text-xs text-zinc-400">{t.storeSettings.urlHint}</p>
             </div>
 
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label className="block text-sm font-medium text-zinc-700">الوصف</label>
+                <label className="block text-sm font-medium text-zinc-700">{t.storeSettings.description}</label>
                 <span className="text-xs text-zinc-400">
                   {(store.description || "").length}/{DESCRIPTION_MAX}
                 </span>
@@ -436,7 +436,7 @@ export default function StoreSettingsPage() {
                 maxLength={DESCRIPTION_MAX}
                 onChange={(e) => setStore({ ...store, description: e.target.value })}
                 className="min-h-32 w-full resize-y rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
-                placeholder="اكتب وصفًا مختصرًا عن متجرك..."
+                placeholder={t.storeSettings.descriptionPlaceholder}
               />
             </div>
 
@@ -447,7 +447,7 @@ export default function StoreSettingsPage() {
                 onChange={(e) => setStore({ ...store, is_active: e.target.checked })}
               />
               <span className="text-sm font-medium text-zinc-700">
-                المتجر نشط ومرئي للعملاء
+                {t.storeSettings.activeLabel}
               </span>
             </label>
           </div>
@@ -455,10 +455,10 @@ export default function StoreSettingsPage() {
 
         {/* Shipping & currency */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">الشحن والعملة</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.storeSettings.shippingTitle}</h2>
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">العملة</label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">{t.storeSettings.currencyLabel}</label>
               <input
                 value={currency}
                 maxLength={6}
@@ -468,7 +468,7 @@ export default function StoreSettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">تكلفة التوصيل الافتراضية</label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">{t.storeSettings.shippingFeeLabel}</label>
               <input
                 type="number"
                 min="0"
@@ -486,7 +486,7 @@ export default function StoreSettingsPage() {
           disabled={saving}
           className="mt-6 w-full rounded-xl bg-zinc-900 px-4 py-3.5 font-semibold text-white disabled:opacity-50"
         >
-          {saving ? "جاري الحفظ..." : "حفظ التغييرات"}
+          {saving ? t.common.saving : t.storeSettings.saveChanges}
         </button>
 
         {message && (
