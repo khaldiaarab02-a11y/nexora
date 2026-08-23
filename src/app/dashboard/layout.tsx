@@ -5,17 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
-
-const navLinks = [
-  { href: "/dashboard", label: "الرئيسية" },
-  { href: "/dashboard/orders", label: "الطلبات" },
-  { href: "/dashboard/products", label: "المنتجات" },
-  { href: "/dashboard/settings/store", label: "إعدادات المتجر" },
-  { href: "/dashboard/appearance", label: "المظهر" },
-  { href: "/dashboard/subscription", label: "الاشتراك" },
-  { href: "/dashboard/support", label: "الدعم" },
-  { href: "/dashboard/account", label: "الحساب" },
-];
+import { useI18n } from "@/i18n/LanguageProvider";
 
 const ONBOARDING_PATH = "/dashboard/store/new";
 
@@ -24,9 +14,21 @@ type GuardStatus = "checking" | "unauthenticated" | "no-store" | "ready";
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useI18n();
   const [status, setStatus] = useState<GuardStatus>("checking");
   const [storeSlug, setStoreSlug] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = [
+    { href: "/dashboard", label: t.dashboardNav.home },
+    { href: "/dashboard/orders", label: t.dashboardNav.orders },
+    { href: "/dashboard/products", label: t.dashboardNav.products },
+    { href: "/dashboard/settings/store", label: t.dashboardNav.storeSettings },
+    { href: "/dashboard/appearance", label: t.dashboardNav.appearance },
+    { href: "/dashboard/subscription", label: t.dashboardNav.subscription },
+    { href: "/dashboard/support", label: t.dashboardNav.support },
+    { href: "/dashboard/account", label: t.dashboardNav.account },
+  ];
 
   const checkId = useRef(0);
 
@@ -114,7 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         dir="inherit"
         className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-400"
       >
-        جاري التحقق من الجلسة...
+        {t.dashboardNav.checkingSession}
       </div>
     );
   }
@@ -157,7 +159,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 rel="noopener noreferrer"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100"
               >
-                عرض المتجر
+                {t.dashboardNav.viewStore}
               </Link>
             )}
 
@@ -170,7 +172,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               onClick={handleSignOut}
               className="rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
             >
-              تسجيل الخروج
+              {t.dashboardNav.logout}
             </button>
           </div>
 
@@ -181,7 +183,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button
               onClick={() => setMenuOpen((prev) => !prev)}
               className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700"
-              aria-label="القائمة"
+              aria-label={t.dashboardNav.menu}
               type="button"
             >
               {menuOpen ? "✕" : "☰"}
@@ -216,7 +218,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   onClick={() => setMenuOpen(false)}
                   className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100"
                 >
-                  عرض المتجر
+                  {t.dashboardNav.viewStore}
                 </Link>
               )}
 
@@ -225,7 +227,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="rounded-lg px-3 py-2.5 text-right text-sm font-medium text-red-600 hover:bg-red-50"
                 type="button"
               >
-                تسجيل الخروج
+                {t.dashboardNav.logout}
               </button>
             </div>
           </div>

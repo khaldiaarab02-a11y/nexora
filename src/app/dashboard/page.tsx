@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { orderStatuses, statusLabel, statusStyles, statusBarColor, type OrderStatus } from "@/lib/orderStatus";
+import { orderStatuses, statusStyles, statusBarColor, type OrderStatus } from "@/lib/orderStatus";
 import { PLAN_LABELS, type PlanId } from "@/config/plans";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type StoreInfo = { name: string; slug: string };
 
@@ -34,6 +35,7 @@ type TopProduct = {
 const LOW_STOCK_THRESHOLD = 5;
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const [store, setStore] = useState<StoreInfo | null>(null);
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [productsCount, setProductsCount] = useState(0);
@@ -52,7 +54,7 @@ export default function DashboardPage() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -67,7 +69,7 @@ export default function DashboardPage() {
       .maybeSingle();
 
     if (!membership) {
-      setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+      setMessage(t.feedback.storeNotFoundForAccount);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -197,14 +199,14 @@ export default function DashboardPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora</p>
-            <h1 className="mt-1 truncate text-2xl font-bold text-zinc-900">{loading ? "..." : store?.name || "لوحة التحكم"}</h1>
+            <h1 className="mt-1 truncate text-2xl font-bold text-zinc-900">{loading ? "..." : store?.name || t.dashboardHome.title}</h1>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Link href="/dashboard/analytics" className="hidden rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 sm:inline-flex">
-              التحليلات
+              {t.dashboardHome.analytics}
             </Link>
             <Link href="/dashboard/customers" className="hidden rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 sm:inline-flex">
-              العملاء
+              {t.dashboardHome.customers}
             </Link>
             {store?.slug && (
               <Link
@@ -213,7 +215,7 @@ export default function DashboardPage() {
                 rel="noopener noreferrer"
                 className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900"
               >
-                عرض المتجر
+                {t.dashboardHome.viewStore}
               </Link>
             )}
             <button
@@ -221,7 +223,7 @@ export default function DashboardPage() {
               disabled={refreshing || loading}
               className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 disabled:opacity-50"
             >
-              {refreshing ? "..." : "تحديث"}
+              {refreshing ? "..." : t.dashboardHome.refresh}
             </button>
           </div>
         </div>
@@ -236,13 +238,12 @@ export default function DashboardPage() {
           >
             {subscription.status === "active" ? (
               <p className="text-sm text-emerald-800">
-                الخطة: <strong>{PLAN_LABELS[subscription.plan_id as PlanId] || subscription.plan_id}</strong> — الاشتراك فعال
-                {subscription.end_date && ` حتى ${new Date(subscription.end_date).toLocaleDateString("fr-DZ")}`}
+                {t.dashboardHome.planLabel} <strong>{PLAN_LABELS[subscription.plan_id as PlanId] || subscription.plan_id}</strong> {t.dashboardHome.subscriptionActiveSuffix}
+                {subscription.end_date && ` ${t.dashboardHome.until} ${new Date(subscription.end_date).toLocaleDateString("fr-DZ")}`}
               </p>
             ) : (
               <p className="text-sm text-amber-800">
-                اشتراكك غير فعال حاليًا ({subscription.status === "pending" ? "قيد الانتظار" : subscription.status === "expired" ? "منتهي" : "ملغى"}).
-                التواصل مع فريق Nexora لتفعيل المتجر.
+                {t.dashboardHome.subscriptionInactivePrefix}{subscription.status === "pending" ? t.storeStatus.pending : subscription.status === "expired" ? t.storeStatus.expired : t.orderStatus.cancelled}{t.dashboardHome.subscriptionInactiveSuffix}
               </p>
             )}
           </div>
@@ -261,21 +262,21 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard title="إجمالي المبيعات" value={`${totalSales.toLocaleString("fr-DZ")} DZD`} />
-            <StatCard title="إجمالي الطلبات" value={orders.length} />
-            <StatCard title="قيد الانتظار" value={statusCounts.pending} />
-            <StatCard title="مؤكدة" value={statusCounts.confirmed} />
-            <StatCard title="المنتجات" value={productsCount} />
-            <StatCard title="مخزون منخفض" value={lowStockProducts.length} />
+            <StatCard title={t.dashboardHome.statTotalSales} value={`${totalSales.toLocaleString("fr-DZ")} DZD`} />
+            <StatCard title={t.dashboardHome.statTotalOrders} value={orders.length} />
+            <StatCard title={t.dashboardHome.statPending} value={statusCounts.pending} />
+            <StatCard title={t.dashboardHome.statConfirmed} value={statusCounts.confirmed} />
+            <StatCard title={t.dashboardHome.statProducts} value={productsCount} />
+            <StatCard title={t.dashboardHome.statLowStock} value={lowStockProducts.length} />
           </div>
         )}
 
         {/* Recent orders */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-zinc-900">أحدث الطلبات</h2>
+            <h2 className="text-lg font-bold text-zinc-900">{t.dashboardHome.recentOrdersTitle}</h2>
             <Link href="/dashboard/orders" className="text-sm font-medium text-zinc-500 hover:text-zinc-900">
-              عرض جميع الطلبات
+              {t.dashboardHome.viewAllOrders}
             </Link>
           </div>
 
@@ -287,7 +288,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : recentOrders.length === 0 ? (
-              <p className="py-6 text-center text-sm text-zinc-500">لا توجد طلبات حتى الآن</p>
+              <p className="py-6 text-center text-sm text-zinc-500">{t.dashboardHome.noOrdersYet}</p>
             ) : (
               <div className="space-y-3">
                 {recentOrders.map((order) => (
@@ -306,7 +307,7 @@ export default function DashboardPage() {
                           statusStyles[order.status as OrderStatus] || "bg-zinc-100 text-zinc-700"
                         }`}
                       >
-                        {statusLabel[order.status] || order.status}
+                        {t.orderStatus[order.status as keyof typeof t.orderStatus] || order.status}
                       </span>
                       <span className="text-sm font-bold text-zinc-900">{Number(order.total).toLocaleString("fr-DZ")} DZD</span>
                     </div>
@@ -320,7 +321,7 @@ export default function DashboardPage() {
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           {/* Top selling products */}
           <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-lg font-bold text-zinc-900">المنتجات الأكثر مبيعًا</h2>
+            <h2 className="text-lg font-bold text-zinc-900">{t.dashboardHome.topProductsTitle}</h2>
             <div className="mt-5">
               {loading ? (
                 <div className="space-y-3">
@@ -329,7 +330,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : topProducts.length === 0 ? (
-                <p className="py-6 text-center text-sm text-zinc-500">ستظهر مبيعاتك هنا بعد استلام أول طلب</p>
+                <p className="py-6 text-center text-sm text-zinc-500">{t.dashboardHome.salesWillAppear}</p>
               ) : (
                 <div className="space-y-3">
                   {topProducts.map((product, index) => (
@@ -339,7 +340,7 @@ export default function DashboardPage() {
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium text-zinc-900">{product.product_name}</p>
-                        <p className="text-xs text-zinc-500">{product.quantity} قطعة مباعة</p>
+                        <p className="text-xs text-zinc-500">{product.quantity} {t.dashboardHome.unitsSoldSuffix}</p>
                       </div>
                       <span className="shrink-0 text-sm font-bold text-zinc-900">
                         {product.revenue.toLocaleString("fr-DZ")} DZD
@@ -353,7 +354,7 @@ export default function DashboardPage() {
 
           {/* Low stock alert */}
           <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-lg font-bold text-zinc-900">تنبيه المخزون</h2>
+            <h2 className="text-lg font-bold text-zinc-900">{t.dashboardHome.lowStockTitle}</h2>
             <div className="mt-5">
               {loading ? (
                 <div className="space-y-3">
@@ -362,7 +363,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : lowStockProducts.length === 0 ? (
-                <p className="py-6 text-center text-sm text-zinc-500">المخزون بحالة جيدة ✓</p>
+                <p className="py-6 text-center text-sm text-zinc-500">{t.dashboardHome.stockHealthy}</p>
               ) : (
                 <div className="space-y-3">
                   {lowStockProducts.map((product) => (
@@ -373,7 +374,7 @@ export default function DashboardPage() {
                     >
                       <span className="truncate font-medium text-zinc-900">{product.name}</span>
                       <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-700">
-                        {product.stock_quantity} متبقي
+                        {product.stock_quantity} {t.dashboardHome.remainingSuffix}
                       </span>
                     </Link>
                   ))}
@@ -385,12 +386,12 @@ export default function DashboardPage() {
 
         {/* Status breakdown */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">حالة الطلبات</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.dashboardHome.orderStatusBreakdownTitle}</h2>
           <div className="mt-5 space-y-3">
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-6 animate-pulse rounded-full bg-zinc-100" />)
             ) : orders.length === 0 ? (
-              <p className="py-2 text-center text-sm text-zinc-500">لا توجد طلبات حتى الآن</p>
+              <p className="py-2 text-center text-sm text-zinc-500">{t.dashboardHome.noOrdersYet}</p>
             ) : (
               orderStatuses.map((s) => {
                 const count = statusCounts[s];
@@ -398,7 +399,7 @@ export default function DashboardPage() {
                 return (
                   <div key={s}>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-zinc-700">{statusLabel[s]}</span>
+                      <span className="font-medium text-zinc-700">{t.orderStatus[s]}</span>
                       <span className="text-zinc-500">{count}</span>
                     </div>
                     <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
