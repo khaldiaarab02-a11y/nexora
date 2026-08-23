@@ -8,26 +8,26 @@ import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import { useI18n } from "@/i18n/LanguageProvider";
 import { useToast } from "@/components/ui/Toast";
 
-function friendlyAuthError(rawMessage: string): string {
+function friendlyAuthError(rawMessage: string, t: ReturnType<typeof useI18n>["t"]): string {
   const message = rawMessage.toLowerCase();
 
   if (message.includes("invalid login credentials")) {
-    return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+    return t.auth.invalidCredentials;
   }
   if (message.includes("email not confirmed")) {
-    return "يجب تأكيد بريدك الإلكتروني أولًا. تحقق من صندوق الوارد.";
+    return t.auth.emailNotConfirmed;
   }
   if (message.includes("user already registered") || message.includes("already registered")) {
-    return "هذا البريد مسجل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.";
+    return t.auth.alreadyRegistered;
   }
   if (message.includes("password should be at least")) {
-    return "كلمة المرور قصيرة جدًا. استخدم 6 أحرف على الأقل.";
+    return t.auth.passwordTooShort;
   }
   if (message.includes("unable to validate email") || message.includes("invalid email")) {
-    return "صيغة البريد الإلكتروني غير صحيحة.";
+    return t.auth.invalidEmailFormat;
   }
   if (message.includes("failed to fetch") || message.includes("network")) {
-    return "تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وحاول مجددًا.";
+    return t.auth.networkError;
   }
 
   return rawMessage;
@@ -84,7 +84,7 @@ export default function AuthForm() {
     if (loading) return;
 
     if (mode === "signup" && password !== confirmPassword) {
-      const msg = "كلمتا المرور غير متطابقتين.";
+      const msg = t.auth.passwordMismatch;
       setMessage(msg);
       setMessageType("error");
       toast.error(msg);
@@ -104,7 +104,7 @@ export default function AuthForm() {
         : await supabase.auth.signInWithPassword({ email: email.trim(), password });
 
     if (result.error) {
-      const msg = friendlyAuthError(result.error.message);
+      const msg = friendlyAuthError(result.error.message, t);
       setMessage(msg);
       setMessageType("error");
       toast.error(msg);
@@ -124,7 +124,7 @@ export default function AuthForm() {
     }
 
     if (!result.data.user) {
-      const msg = "تعذر التحقق من الحساب بعد تسجيل الدخول. حاول مرة أخرى.";
+      const msg = t.auth.verifyAfterLoginError;
       setMessage(msg);
       setMessageType("error");
       toast.error(msg);
@@ -153,7 +153,7 @@ export default function AuthForm() {
       <div className="mt-8 text-center">
         <h1 className="text-3xl font-bold">{mode === "login" ? t.auth.login : t.auth.signup}</h1>
         <p className="mt-2 text-sm text-zinc-500">
-          {mode === "login" ? "الوصول إلى لوحة المتجر." : "إنشاء الحساب وبدء رحلة المتجر."}
+          {mode === "login" ? t.auth.loginSubtitle : t.auth.signupSubtitle}
         </p>
       </div>
 
