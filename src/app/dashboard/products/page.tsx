@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Product = {
   id: string;
@@ -24,15 +25,6 @@ type SortOption = "newest" | "oldest" | "priceLow" | "priceHigh" | "nameAsc" | "
 // (src/app/dashboard/page.tsx) so "low stock" means the same thing everywhere.
 const LOW_STOCK_THRESHOLD = 5;
 
-const sortLabel: Record<SortOption, string> = {
-  newest: "الأحدث",
-  oldest: "الأقدم",
-  priceLow: "السعر الأقل",
-  priceHigh: "السعر الأعلى",
-  nameAsc: "الاسم A-Z",
-  nameDesc: "الاسم Z-A",
-};
-
 function stockState(product: Product): "out" | "low" | "available" {
   if (product.stock_quantity <= 0) return "out";
   if (product.stock_quantity <= LOW_STOCK_THRESHOLD) return "low";
@@ -40,6 +32,15 @@ function stockState(product: Product): "out" | "low" | "available" {
 }
 
 export default function ProductsPage() {
+  const { t } = useI18n();
+  const sortLabel: Record<SortOption, string> = {
+    newest: t.productsList.sortNewest,
+    oldest: t.productsList.sortOldest,
+    priceLow: t.productsList.sortPriceLow,
+    priceHigh: t.productsList.sortPriceHigh,
+    nameAsc: t.productsList.sortNameAsc,
+    nameDesc: t.productsList.sortNameDesc,
+  };
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -66,7 +67,7 @@ export default function ProductsPage() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -81,7 +82,7 @@ export default function ProductsPage() {
       .maybeSingle();
 
     if (!membership) {
-      setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+      setMessage(t.feedback.storeNotFoundForAccount);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -180,14 +181,14 @@ export default function ProductsPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora</p>
-            <h1 className="mt-1 text-2xl font-bold text-zinc-900">المنتجات</h1>
+            <h1 className="mt-1 text-2xl font-bold text-zinc-900">{t.productsList.title}</h1>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="hidden text-sm font-medium text-zinc-500 sm:inline">
-              العودة للوحة التحكم
+              {t.productsList.backToDashboard}
             </Link>
             <Link href="/dashboard/products/new" className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white">
-              + إضافة منتج
+              {t.productsList.addProduct}
             </Link>
           </div>
         </div>
@@ -204,7 +205,7 @@ export default function ProductsPage() {
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <StatCard
-              title="إجمالي المنتجات"
+              title={t.productsList.statTotal}
               value={stats.all}
               active={statusFilter === "all" && stockFilter === "all"}
               onClick={() => {
@@ -212,10 +213,10 @@ export default function ProductsPage() {
                 setStockFilter("all");
               }}
             />
-            <StatCard title="نشطة" value={stats.active} active={statusFilter === "active"} onClick={() => setStatusFilter("active")} />
-            <StatCard title="غير نشطة" value={stats.inactive} active={statusFilter === "inactive"} onClick={() => setStatusFilter("inactive")} />
-            <StatCard title="مخزون منخفض" value={stats.low} active={stockFilter === "low"} onClick={() => setStockFilter("low")} tone="warning" />
-            <StatCard title="نافدة" value={stats.out} active={stockFilter === "out"} onClick={() => setStockFilter("out")} tone="danger" />
+            <StatCard title={t.productsList.statActive} value={stats.active} active={statusFilter === "active"} onClick={() => setStatusFilter("active")} />
+            <StatCard title={t.productsList.statInactive} value={stats.inactive} active={statusFilter === "inactive"} onClick={() => setStatusFilter("inactive")} />
+            <StatCard title={t.productsList.statLowStock} value={stats.low} active={stockFilter === "low"} onClick={() => setStockFilter("low")} tone="warning" />
+            <StatCard title={t.productsList.statOutOfStock} value={stats.out} active={stockFilter === "out"} onClick={() => setStockFilter("out")} tone="danger" />
           </div>
         )}
 
@@ -225,7 +226,7 @@ export default function ProductsPage() {
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="ابحث باسم المنتج أو SKU..."
+            placeholder={t.productsList.searchPlaceholder}
             className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm outline-none focus:border-zinc-900 sm:flex-1"
           />
           <div className="flex flex-wrap gap-3">
@@ -234,19 +235,19 @@ export default function ProductsPage() {
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none focus:border-zinc-900"
             >
-              <option value="all">كل الحالات</option>
-              <option value="active">نشط</option>
-              <option value="inactive">غير نشط</option>
+              <option value="all">{t.productsList.filterAllStatuses}</option>
+              <option value="active">{t.productsList.filterActive}</option>
+              <option value="inactive">{t.productsList.filterInactive}</option>
             </select>
             <select
               value={stockFilter}
               onChange={(e) => setStockFilter(e.target.value as StockFilter)}
               className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none focus:border-zinc-900"
             >
-              <option value="all">كل المخزون</option>
-              <option value="available">متوفر</option>
-              <option value="low">مخزون منخفض</option>
-              <option value="out">نفد</option>
+              <option value="all">{t.productsList.filterAllStock}</option>
+              <option value="available">{t.productsList.filterAvailable}</option>
+              <option value="low">{t.productsList.filterLowStock}</option>
+              <option value="out">{t.productsList.filterOutOfStock}</option>
             </select>
             <select
               value={sortOption}
@@ -264,7 +265,7 @@ export default function ProductsPage() {
               disabled={refreshing || loading}
               className="rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 disabled:opacity-50"
             >
-              {refreshing ? "..." : "تحديث"}
+              {refreshing ? "..." : t.productsList.refresh}
             </button>
           </div>
         </div>
@@ -281,28 +282,28 @@ export default function ProductsPage() {
             <div className="rounded-3xl border border-red-100 bg-red-50 p-6 text-center text-red-700">{message}</div>
           ) : products.length === 0 ? (
             <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center">
-              <h2 className="text-2xl font-bold text-zinc-900">لا توجد منتجات بعد</h2>
-              <p className="mt-2 text-sm text-zinc-500">أول منتج لمتجرك يبدأ من هنا.</p>
+              <h2 className="text-2xl font-bold text-zinc-900">{t.productsList.noProductsTitle}</h2>
+              <p className="mt-2 text-sm text-zinc-500">{t.productsList.noProductsSubtitle}</p>
               <Link href="/dashboard/products/new" className="mt-6 inline-flex rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white">
-                إضافة أول منتج
+                {t.productsList.addFirstProduct}
               </Link>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center">
-              <h2 className="text-xl font-bold text-zinc-900">لم نجد أي منتج مطابق</h2>
-              <p className="mt-2 text-sm text-zinc-500">جرّب تعديل كلمة البحث أو الفلاتر.</p>
+              <h2 className="text-xl font-bold text-zinc-900">{t.productsList.noMatchTitle}</h2>
+              <p className="mt-2 text-sm text-zinc-500">{t.productsList.noMatchSubtitle}</p>
               <button
                 onClick={clearFilters}
                 className="mt-5 inline-flex rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white"
               >
-                مسح الفلاتر
+                {t.productsList.clearFilters}
               </button>
             </div>
           ) : (
             <>
               {hasActiveFilters && (
                 <p className="mb-3 text-xs text-zinc-400">
-                  {filteredProducts.length} من {products.length} منتج
+                  {filteredProducts.length} {t.productsList.of} {products.length} {t.productsList.productsWord}
                 </p>
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -318,7 +319,7 @@ export default function ProductsPage() {
                         {product.image_url ? (
                           <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-sm text-zinc-400">لا توجد صورة</div>
+                          <div className="flex h-full items-center justify-center text-sm text-zinc-400">{t.productsList.noImage}</div>
                         )}
                       </div>
                       <div className="p-5">
@@ -328,7 +329,7 @@ export default function ProductsPage() {
                             <p className="mt-1 truncate text-xs text-zinc-400">{product.sku ? `SKU: ${product.sku}` : product.slug}</p>
                           </div>
                           <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${product.is_active ? "bg-emerald-50 text-emerald-700" : "bg-zinc-100 text-zinc-500"}`}>
-                            {product.is_active ? "نشط" : "غير نشط"}
+                            {product.is_active ? t.productsList.filterActive : t.productsList.filterInactive}
                           </span>
                         </div>
                         <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
@@ -342,7 +343,7 @@ export default function ProductsPage() {
                                 : "bg-zinc-100 text-zinc-600"
                             }`}
                           >
-                            {state === "out" ? "نفد المخزون" : `المخزون: ${product.stock_quantity}`}
+                            {state === "out" ? t.productsList.outOfStockBadge : `${t.productsList.stockLabelPrefix} ${product.stock_quantity}`}
                           </span>
                         </div>
                       </div>
