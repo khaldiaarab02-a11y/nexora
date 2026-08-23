@@ -41,12 +41,12 @@ export default function CreateStoreForm() {
     if (!file) return;
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setMessage("يُسمح فقط بصور بصيغة JPG أو PNG أو WEBP.");
+      setMessage(t.feedback.imageTypeError);
       setMessageType("error");
       return;
     }
     if (file.size > MAX_LOGO_SIZE) {
-      setMessage("حجم الشعار يجب ألا يتجاوز 5MB.");
+      setMessage(t.feedback.logoSizeError);
       setMessageType("error");
       return;
     }
@@ -71,17 +71,17 @@ export default function CreateStoreForm() {
     const fee = Number(shippingFee);
 
     if (!trimmedName) {
-      setMessage("اسم المتجر لا يمكن أن يكون فارغًا.");
+      setMessage(t.feedback.storeNameRequired);
       setMessageType("error");
       return;
     }
     if (!slug || slug.length < 3) {
-      setMessage("رابط المتجر يجب أن يتكوّن من 3 أحرف على الأقل.");
+      setMessage(t.createStore.slugMinLength);
       setMessageType("error");
       return;
     }
     if (Number.isNaN(fee) || fee < 0) {
-      setMessage("قيمة تكلفة التوصيل غير صالحة.");
+      setMessage(t.feedback.shippingFeeInvalid);
       setMessageType("error");
       return;
     }
@@ -91,7 +91,7 @@ export default function CreateStoreForm() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       setMessageType("error");
       setLoading(false);
       return;
@@ -109,7 +109,7 @@ export default function CreateStoreForm() {
     if (error) {
       let msg: string;
       if (error.message.toLowerCase().includes("duplicate") || error.message.toLowerCase().includes("unique")) {
-        msg = "هذا الرابط مستخدم بالفعل من متجر آخر. اختر رابطًا مختلفًا.";
+        msg = t.feedback.slugTaken;
       } else {
         msg = error.message;
       }
@@ -208,55 +208,55 @@ export default function CreateStoreForm() {
     <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
       <div className="mb-7 text-center">
         <p className="text-sm font-medium text-zinc-500">Nexora</p>
-        <h1 className="mt-2 text-3xl font-bold text-zinc-900">أنشئ متجرك الأول</h1>
+        <h1 className="mt-2 text-3xl font-bold text-zinc-900">{t.createStore.title}</h1>
         <p className="mt-2 text-sm text-zinc-500">
-          خطوة واحدة تفصلك عن بدء البيع أونلاين — يمكنك تعديل كل هذه البيانات لاحقًا من إعدادات المتجر.
+          {t.createStore.subtitle}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="store-name" className="mb-2 block text-sm font-medium text-zinc-700">اسم المتجر</label>
+          <label htmlFor="store-name" className="mb-2 block text-sm font-medium text-zinc-700">{t.createStore.storeName}</label>
           <input id="store-name" required value={name} onChange={(e) => setName(e.target.value)}
             className="w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
-            placeholder="مثال: متجر الأناقة" />
+            placeholder={t.createStore.storeNamePlaceholder} />
         </div>
 
         <div>
-          <label htmlFor="store-slug" className="mb-2 block text-sm font-medium text-zinc-700">رابط المتجر</label>
+          <label htmlFor="store-slug" className="mb-2 block text-sm font-medium text-zinc-700">{t.createStore.storeUrl}</label>
           <div className="flex items-center rounded-xl border border-zinc-300 focus-within:border-zinc-900">
             <span className="border-l px-3 text-sm text-zinc-400">/shop/</span>
             <input id="store-slug" required minLength={3} value={slug} onChange={(e) => handleSlugChange(e.target.value)}
               className="w-full rounded-xl px-3 py-3 outline-none" placeholder="my-store" />
           </div>
-          <p className="mt-2 text-xs text-zinc-400">استخدم الحروف الإنجليزية والأرقام والشرطة فقط.</p>
+          <p className="mt-2 text-xs text-zinc-400">{t.createStore.urlHint}</p>
         </div>
 
         <div>
           <label htmlFor="store-description" className="mb-2 block text-sm font-medium text-zinc-700">
-            وصف المتجر <span className="text-zinc-400">(اختياري)</span>
+            {t.createStore.descriptionLabel} <span className="text-zinc-400">{t.createStore.optional}</span>
           </label>
           <textarea id="store-description" value={description} maxLength={500}
             onChange={(e) => setDescription(e.target.value)}
             className="min-h-24 w-full resize-y rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
-            placeholder="بضع كلمات عن متجرك ومنتجاتك..." />
+            placeholder={t.createStore.descriptionPlaceholder} />
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-medium text-zinc-700">
-            شعار المتجر <span className="text-zinc-400">(اختياري)</span>
+            {t.createStore.logoLabel} <span className="text-zinc-400">{t.createStore.optional}</span>
           </label>
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
               {logoPreview ? (
                 <img src={logoPreview} alt="" className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full items-center justify-center text-[10px] text-zinc-400">لا يوجد</div>
+                <div className="flex h-full items-center justify-center text-[10px] text-zinc-400">{t.createStore.none}</div>
               )}
             </div>
             <div className="flex flex-1 gap-2">
               <label className="flex-1 cursor-pointer rounded-xl border border-zinc-300 px-4 py-2.5 text-center text-sm font-medium text-zinc-700">
-                {logoFile ? "تغيير الصورة" : "رفع شعار"}
+                {logoFile ? t.createStore.changeImage : t.createStore.uploadLogo}
                 <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
                   onChange={(e) => {
                     handleLogoSelected(e.target.files);
@@ -266,24 +266,24 @@ export default function CreateStoreForm() {
               {logoFile && (
                 <button type="button" onClick={removeStagedLogo}
                   className="rounded-xl border border-red-100 px-4 py-2.5 text-sm font-medium text-red-600">
-                  إزالة
+                  {t.createStore.remove}
                 </button>
               )}
             </div>
           </div>
-          <p className="mt-2 text-xs text-zinc-400">JPG, PNG, WEBP — حتى 5MB.</p>
+          <p className="mt-2 text-xs text-zinc-400">{t.createStore.logoHint}</p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="store-currency" className="mb-2 block text-sm font-medium text-zinc-700">العملة</label>
+            <label htmlFor="store-currency" className="mb-2 block text-sm font-medium text-zinc-700">{t.createStore.currency}</label>
             <input id="store-currency" value={currency} maxLength={6}
               onChange={(e) => setCurrency(e.target.value.toUpperCase())}
               className="w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900"
               placeholder="DZD" />
           </div>
           <div>
-            <label htmlFor="store-shipping" className="mb-2 block text-sm font-medium text-zinc-700">تكلفة التوصيل الافتراضية</label>
+            <label htmlFor="store-shipping" className="mb-2 block text-sm font-medium text-zinc-700">{t.createStore.shippingFee}</label>
             <input id="store-shipping" type="number" min="0" step="0.01" value={shippingFee}
               onChange={(e) => setShippingFee(e.target.value)}
               className="w-full rounded-xl border border-zinc-300 px-4 py-3 outline-none focus:border-zinc-900" />
@@ -292,7 +292,7 @@ export default function CreateStoreForm() {
 
         <button type="submit" disabled={loading}
           className="w-full rounded-xl bg-zinc-900 px-4 py-3 font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50">
-          {loading ? "جاري إنشاء المتجر..." : "إنشاء المتجر"}
+          {loading ? t.createStore.creating : t.createStore.submit}
         </button>
       </form>
 
