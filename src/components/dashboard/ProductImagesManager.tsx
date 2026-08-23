@@ -66,10 +66,10 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     for (const file of Array.from(fileList)) {
       if (!file || file.size === 0) continue;
       if (!ACCEPTED_TYPES.includes(file.type)) {
-        return { valid: [], error: "يُسمح فقط بصور بصيغة JPG أو PNG أو WEBP." };
+        return { valid: [], error: t.feedback.imageTypeError };
       }
       if (file.size > MAX_SIZE) {
-        return { valid: [], error: "حجم كل صورة يجب ألا يتجاوز 5MB." };
+        return { valid: [], error: t.feedback.logoSizeError };
       }
       valid.push(file);
     }
@@ -84,7 +84,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
       return;
     }
     if (valid.length === 0) {
-      setMessage("لم يتم اختيار أي صورة صالحة.");
+      setMessage(t.productImages.noValidImage);
       return;
     }
     setMessage("");
@@ -109,7 +109,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     const { data: userData } = await supabase.auth.getUser();
     const user = userData.user;
     if (!user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       toast.error(t.feedback.sessionExpired);
       setUploading(false);
       return;
@@ -129,7 +129,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
         .upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
 
       if (uploadError) {
-        setMessage(`تعذر رفع إحدى الصور: ${uploadError.message}`);
+        setMessage(`${t.productImages.uploadOneFailed}: ${uploadError.message}`);
         uploadFailed = true;
         continue;
       }
@@ -149,7 +149,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
         .single();
 
       if (insertError || !row) {
-        setMessage(`تعذر حفظ إحدى الصور: ${insertError?.message || "خطأ غير معروف"}`);
+        setMessage(`${t.productImages.saveOneFailed}: ${insertError?.message || t.productImages.unknownError}`);
         uploadFailed = true;
         await supabase.storage.from("product-images").remove([path]);
         continue;
@@ -246,7 +246,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
       .eq("id", target.id);
 
     if (err1 || err2) {
-      const msg = (err1 || err2)?.message || "تعذر إعادة ترتيب الصور.";
+      const msg = (err1 || err2)?.message || t.productImages.reorderError;
       setMessage(msg);
       toast.error(msg);
       return;
@@ -265,7 +265,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
     const target = images.find((img) => img.id === imageId);
     if (!target) return;
 
-    const confirmed = window.confirm("هل تريد حذف هذه الصورة؟ لا يمكن التراجع عن هذا الإجراء.");
+    const confirmed = window.confirm(t.productImages.confirmDelete);
     if (!confirmed) return;
 
     setMessage("");
@@ -319,7 +319,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
           .upload(path, item.file, { cacheControl: "3600", upsert: false, contentType: item.file.type });
 
         if (uploadError) {
-          setMessage(`تم حفظ المنتج، لكن تعذر رفع إحدى الصور: ${uploadError.message}`);
+          setMessage(`${t.productImages.savedButUploadFailed}: ${uploadError.message}`);
           continue;
         }
 
@@ -333,7 +333,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
         });
 
         if (insertError) {
-          setMessage(`تم حفظ المنتج، لكن تعذر حفظ إحدى الصور: ${insertError.message}`);
+          setMessage(`${t.productImages.savedButSaveFailed}: ${insertError.message}`);
           await supabase.storage.from("product-images").remove([path]);
           continue;
         }
@@ -349,13 +349,13 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <label className="block text-sm font-medium text-zinc-700">صور المنتج</label>
-        {uploading && <span className="text-xs text-zinc-400">جاري الرفع...</span>}
+        <label className="block text-sm font-medium text-zinc-700">{t.productImages.label}</label>
+        {uploading && <span className="text-xs text-zinc-400">{t.productImages.uploading}</span>}
       </div>
 
       <label className="mb-4 block cursor-pointer rounded-2xl border-2 border-dashed border-zinc-300 p-6 text-center">
-        <p className="font-medium text-zinc-700">اضغط لاختيار صورة أو أكثر</p>
-        <p className="mt-1 text-xs text-zinc-400">JPG, PNG, WEBP — حتى 5MB لكل صورة</p>
+        <p className="font-medium text-zinc-700">{t.productImages.dropHint}</p>
+        <p className="mt-1 text-xs text-zinc-400">{t.productImages.sizeHint}</p>
         <input
           ref={inputRef}
           type="file"
@@ -373,7 +373,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
 
       {productId ? (
         images.length === 0 ? (
-          <p className="rounded-2xl border border-zinc-200 p-6 text-center text-sm text-zinc-400">لا توجد صور بعد</p>
+          <p className="rounded-2xl border border-zinc-200 p-6 text-center text-sm text-zinc-400">{t.productImages.noImagesYet}</p>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {images.map((img, index) => (
@@ -382,7 +382,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                   <img src={img.image_url} alt="" className="h-full w-full object-cover" />
                   {img.is_primary && (
                     <span className="absolute end-2 top-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-semibold text-white">
-                      رئيسية
+                      {t.productImages.primaryBadge}
                     </span>
                   )}
                 </div>
@@ -393,7 +393,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                       onClick={() => setExistingPrimary(img.id)}
                       className="w-full rounded-lg border border-zinc-200 py-1.5 text-xs font-medium text-zinc-700"
                     >
-                      تعيين كرئيسية
+                      {t.productImages.setPrimary}
                     </button>
                   )}
                   <div className="flex gap-1.5">
@@ -403,7 +403,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                       onClick={() => moveExisting(img.id, -1)}
                       className="flex-1 rounded-lg border border-zinc-200 py-1.5 text-xs text-zinc-600 disabled:opacity-30"
                     >
-                      ← تقديم
+                      {t.productImages.moveForward}
                     </button>
                     <button
                       type="button"
@@ -411,7 +411,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                       onClick={() => moveExisting(img.id, 1)}
                       className="flex-1 rounded-lg border border-zinc-200 py-1.5 text-xs text-zinc-600 disabled:opacity-30"
                     >
-                      تأخير →
+                      {t.productImages.moveBackward}
                     </button>
                   </div>
                   <button
@@ -419,7 +419,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                     onClick={() => deleteExisting(img.id)}
                     className="w-full rounded-lg border border-red-100 py-1.5 text-xs font-medium text-red-600"
                   >
-                    حذف
+                    {t.productImages.delete}
                   </button>
                 </div>
               </div>
@@ -427,7 +427,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
           </div>
         )
       ) : staged.length === 0 ? (
-        <p className="rounded-2xl border border-zinc-200 p-6 text-center text-sm text-zinc-400">لا توجد صور بعد</p>
+        <p className="rounded-2xl border border-zinc-200 p-6 text-center text-sm text-zinc-400">{t.productImages.noImagesYet}</p>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {staged.map((item, index) => (
@@ -436,7 +436,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                 <img src={item.previewUrl} alt="" className="h-full w-full object-cover" />
                 {item.isPrimary && (
                   <span className="absolute end-2 top-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[10px] font-semibold text-white">
-                    رئيسية
+                    {t.productImages.primaryBadge}
                   </span>
                 )}
               </div>
@@ -447,7 +447,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                     onClick={() => setStagedPrimary(item.localId)}
                     className="w-full rounded-lg border border-zinc-200 py-1.5 text-xs font-medium text-zinc-700"
                   >
-                    تعيين كرئيسية
+                    {t.productImages.setPrimary}
                   </button>
                 )}
                 <div className="flex gap-1.5">
@@ -457,7 +457,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                     onClick={() => moveStaged(item.localId, -1)}
                     className="flex-1 rounded-lg border border-zinc-200 py-1.5 text-xs text-zinc-600 disabled:opacity-30"
                   >
-                    ← تقديم
+                    {t.productImages.moveForward}
                   </button>
                   <button
                     type="button"
@@ -465,7 +465,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                     onClick={() => moveStaged(item.localId, 1)}
                     className="flex-1 rounded-lg border border-zinc-200 py-1.5 text-xs text-zinc-600 disabled:opacity-30"
                   >
-                    تأخير →
+                    {t.productImages.moveBackward}
                   </button>
                 </div>
                 <button
@@ -473,7 +473,7 @@ const ProductImagesManager = forwardRef<ProductImagesManagerHandle, Props>(funct
                   onClick={() => removeStaged(item.localId)}
                   className="w-full rounded-lg border border-red-100 py-1.5 text-xs font-medium text-red-600"
                 >
-                  إزالة
+                  {t.productImages.remove}
                 </button>
               </div>
             </div>

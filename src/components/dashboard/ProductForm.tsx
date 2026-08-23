@@ -44,7 +44,7 @@ export default function ProductForm() {
     const user = userData.user;
 
     if (!user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       toast.error(t.feedback.sessionExpired);
       setLoading(false);
       return;
@@ -59,7 +59,7 @@ export default function ProductForm() {
       .maybeSingle();
 
     if (membershipError || !membership) {
-      const msg = "لم يتم العثور على متجر مرتبط بهذا الحساب.";
+      const msg = t.feedback.storeNotFoundForAccount;
       setMessage(msg);
       toast.error(msg);
       setLoading(false);
@@ -108,47 +108,47 @@ export default function ProductForm() {
     <div className="w-full max-w-2xl rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-7">
       <div className="mb-7">
         <p className="text-sm font-medium text-zinc-400">Nexora</p>
-        <h1 className="mt-2 text-3xl font-bold text-zinc-900">إضافة منتج</h1>
+        <h1 className="mt-2 text-3xl font-bold text-zinc-900">{t.productForm.addTitle}</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-500">
-          أضف بيانات المنتج وصوره إلى متجرك.
+          {t.productForm.addSubtitle}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <ProductImagesManager ref={imagesRef} productId={null} />
 
-        <Field label="اسم المنتج">
+        <Field label={t.productForm.name}>
           <input required value={name} onChange={(e) => { setName(e.target.value); makeSlug(e.target.value); }}
-            className={inputClass} placeholder="مثال: حقيبة جلدية" />
+            className={inputClass} placeholder={t.productForm.namePlaceholder} />
         </Field>
 
-        <Field label="رابط المنتج">
+        <Field label={t.productForm.urlLabel}>
           <input required minLength={2} value={slug} onChange={(e) => makeSlug(e.target.value)}
             className={inputClass} placeholder="leather-bag" />
         </Field>
 
-        <Field label="الوصف">
+        <Field label={t.productForm.description}>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-            className={`${inputClass} min-h-28 resize-y`} placeholder="وصف مختصر للمنتج..." />
+            className={`${inputClass} min-h-28 resize-y`} placeholder={t.productForm.descriptionPlaceholder} />
         </Field>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="السعر (DZD)">
+          <Field label={t.productForm.price}>
             <input required type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)}
               className={inputClass} placeholder="2500" />
           </Field>
 
-          <Field label="السعر قبل التخفيض (اختياري)">
+          <Field label={t.productForm.compareAtPrice}>
             <input type="number" min="0" step="0.01" value={compareAtPrice} onChange={(e) => setCompareAtPrice(e.target.value)}
               className={inputClass} placeholder="3000" />
           </Field>
 
-          <Field label="المخزون">
+          <Field label={t.productForm.stock}>
             <input required type="number" min="0" step="1" value={stock} onChange={(e) => setStock(e.target.value)}
               className={inputClass} placeholder="10" />
           </Field>
 
-          <Field label="SKU (اختياري)">
+          <Field label={t.productForm.sku}>
             <input value={sku} onChange={(e) => setSku(e.target.value)}
               className={inputClass} placeholder="BAG-001" />
           </Field>
@@ -157,17 +157,17 @@ export default function ProductForm() {
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex items-center gap-3 rounded-xl border border-zinc-200 p-4">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
-            <span className="text-sm font-medium text-zinc-700">المنتج نشط</span>
+            <span className="text-sm font-medium text-zinc-700">{t.productForm.activeLabel}</span>
           </label>
           <label className="flex items-center gap-3 rounded-xl border border-zinc-200 p-4">
             <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
-            <span className="text-sm font-medium text-zinc-700">منتج مميز</span>
+            <span className="text-sm font-medium text-zinc-700">{t.productForm.featuredLabel}</span>
           </label>
         </div>
 
         <button type="submit" disabled={loading}
           className="w-full rounded-xl bg-zinc-900 px-4 py-3 font-medium text-white disabled:opacity-50">
-          {loading ? "جاري حفظ المنتج والصور..." : "حفظ المنتج"}
+          {loading ? t.productForm.savingWithImages : t.productForm.saveProduct}
         </button>
       </form>
 
