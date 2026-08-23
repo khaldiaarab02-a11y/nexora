@@ -44,7 +44,7 @@ export default function EditProductPage() {
     async function load() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) {
-        setMessage("يجب تسجيل الدخول أولًا.");
+        setMessage(t.feedback.authRequired);
         setLoading(false);
         return;
       }
@@ -63,7 +63,7 @@ export default function EditProductPage() {
       ]);
 
       if (productError || !productData) {
-        setMessage(productError?.message || "لم يتم العثور على المنتج.");
+        setMessage(productError?.message || t.productEdit.notFound);
         setLoading(false);
         return;
       }
@@ -112,7 +112,7 @@ export default function EditProductPage() {
   async function removeProduct() {
     if (!product || deleting) return;
     const confirmed = window.confirm(
-      `هل أنتِ متأكد من حذف "${product.name}"؟ هذا الإجراء لا يمكن التراجع عنه.`
+      `${t.productEdit.confirmDeletePrefix} "${product.name}"${t.productEdit.confirmDeleteSuffix}`
     );
     if (!confirmed) return;
 
@@ -150,7 +150,7 @@ export default function EditProductPage() {
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500">جاري تحميل المنتج...</main>;
+    return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500">{t.productEdit.loadingProduct}</main>;
   }
 
   if (!product) {
@@ -162,7 +162,7 @@ export default function EditProductPage() {
       <div className="mx-auto max-w-2xl px-4">
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-zinc-400">Nexora</p>
-          <h1 className="mt-2 text-3xl font-bold text-zinc-900">تعديل المنتج</h1>
+          <h1 className="mt-2 text-3xl font-bold text-zinc-900">{t.productEdit.title}</h1>
 
           <div className="mt-7 space-y-5">
             <ProductImagesManager
@@ -171,38 +171,38 @@ export default function EditProductPage() {
               onPrimaryUrlChange={(url) => setProduct((prev) => (prev ? { ...prev, image_url: url } : prev))}
             />
 
-            <Field label="اسم المنتج">
+            <Field label={t.productEdit.name}>
               <input className={inputClass} value={product.name}
                 onChange={(e) => setProduct({ ...product, name: e.target.value })} />
             </Field>
 
-            <Field label="رابط المنتج">
+            <Field label={t.productEdit.urlLabel}>
               <input className={inputClass} value={product.slug}
                 onChange={(e) => setProduct({ ...product, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} />
             </Field>
 
-            <Field label="الوصف">
+            <Field label={t.productEdit.description}>
               <textarea className={`${inputClass} min-h-28`} value={product.description || ""}
                 onChange={(e) => setProduct({ ...product, description: e.target.value })} />
             </Field>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="السعر (DZD)">
+              <Field label={t.productEdit.price}>
                 <input type="number" min="0" className={inputClass} value={product.price}
                   onChange={(e) => setProduct({ ...product, price: Number(e.target.value) })} />
               </Field>
 
-              <Field label="السعر قبل التخفيض">
+              <Field label={t.productEdit.compareAtPrice}>
                 <input type="number" min="0" className={inputClass} value={product.compare_at_price ?? ""}
                   onChange={(e) => setProduct({ ...product, compare_at_price: e.target.value ? Number(e.target.value) : null })} />
               </Field>
 
-              <Field label="المخزون">
+              <Field label={t.productEdit.stock}>
                 <input type="number" min="0" className={inputClass} value={product.stock_quantity}
                   onChange={(e) => setProduct({ ...product, stock_quantity: Number(e.target.value) })} />
               </Field>
 
-              <Field label="SKU">
+              <Field label={t.productEdit.sku}>
                 <input className={inputClass} value={product.sku || ""}
                   onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
               </Field>
@@ -212,23 +212,23 @@ export default function EditProductPage() {
               <label className="flex items-center gap-3 rounded-xl border border-zinc-200 p-4">
                 <input type="checkbox" checked={product.is_active}
                   onChange={(e) => setProduct({ ...product, is_active: e.target.checked })} />
-                <span className="text-sm font-medium">المنتج نشط</span>
+                <span className="text-sm font-medium">{t.productEdit.activeLabel}</span>
               </label>
               <label className="flex items-center gap-3 rounded-xl border border-zinc-200 p-4">
                 <input type="checkbox" checked={product.is_featured}
                   onChange={(e) => setProduct({ ...product, is_featured: e.target.checked })} />
-                <span className="text-sm font-medium">منتج مميز</span>
+                <span className="text-sm font-medium">{t.productEdit.featuredLabel}</span>
               </label>
             </div>
 
             <button onClick={save} disabled={saving || deleting}
               className="w-full rounded-xl bg-zinc-900 px-4 py-3 font-medium text-white disabled:opacity-50">
-              {saving ? "جاري الحفظ..." : "حفظ التعديلات"}
+              {saving ? t.productEdit.saving : t.productEdit.saveChanges}
             </button>
 
             <button onClick={removeProduct} disabled={saving || deleting}
               className="w-full rounded-xl border border-red-200 px-4 py-3 font-medium text-red-600 disabled:opacity-50">
-              {deleting ? "جاري الحذف..." : "حذف المنتج"}
+              {deleting ? t.productEdit.deleting : t.productEdit.deleteProduct}
             </button>
 
             {message && <p className="rounded-xl bg-red-50 p-3 text-center text-sm text-red-700">{message}</p>}
