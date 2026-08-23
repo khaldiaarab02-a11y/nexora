@@ -58,7 +58,7 @@ export default function AppearancePage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setMessage(data.error || "تعذر تحميل المظهر.");
+      setMessage(data.error || t.appearance.loadError);
       setMessageType("error");
       setLoading(false);
       return;
@@ -97,7 +97,7 @@ export default function AppearancePage() {
       setMessageType("error");
       toast.error(msg);
     } else {
-      setMessage("تم حفظ تخصيص المتجر بنجاح.");
+      setMessage(t.appearance.saveSuccess);
       setMessageType("success");
       toast.success(t.feedback.appearanceSaveSuccess);
     }
@@ -118,7 +118,7 @@ export default function AppearancePage() {
       setMessageType("error");
       toast.error(msg);
     } else {
-      setMessage("تمت إعادة المظهر إلى Minimal وإعداداته الافتراضية.");
+      setMessage(t.appearance.resetSuccess);
       setMessageType("success");
       toast.success(t.feedback.appearanceSaveSuccess);
       await load();
@@ -130,7 +130,7 @@ export default function AppearancePage() {
     const theme = getTheme(themeId);
     const locked = Boolean(theme.requiredFeature) && !canAdvancedThemes;
     if (locked) {
-      setMessage("هذه الميزة متاحة ضمن خطة Business.");
+      setMessage(t.appearance.themeLockedError);
       setMessageType("error");
       return;
     }
@@ -153,16 +153,16 @@ export default function AppearancePage() {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora</p>
-            <h1 className="mt-2 text-3xl font-bold text-zinc-900">المظهر والتخصيص</h1>
-            <p className="mt-2 text-sm text-zinc-500">اختر مظهرًا جاهزًا ثم خصصي ألوان متجرك وهويته البصرية.</p>
+            <h1 className="mt-2 text-3xl font-bold text-zinc-900">{t.appearance.title}</h1>
+            <p className="mt-2 text-sm text-zinc-500">{t.appearance.subtitle}</p>
           </div>
-          <Link href="/dashboard/settings/store" className="text-sm font-medium text-zinc-500 hover:text-zinc-900">إدارة بيانات المتجر ←</Link>
+          <Link href="/dashboard/settings/store" className="text-sm font-medium text-zinc-500 hover:text-zinc-900">{t.appearance.manageStore}</Link>
         </div>
 
         {subscription?.status !== "active" && (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            الاشتراك الحالي {subscription?.status === "pending" ? "قيد الانتظار" : subscription?.status === "expired" ? "منتهي" : "غير فعال"}.
-            ميزات Business ستبقى مقفلة حتى يصبح الاشتراك فعالًا.
+            {t.appearance.subscriptionBannerPrefix} {subscription?.status === "pending" ? t.storeStatus.pending : subscription?.status === "expired" ? t.storeStatus.expired : t.appearance.inactive}.
+            {t.appearance.subscriptionBannerSuffix}
           </div>
         )}
 
@@ -176,7 +176,7 @@ export default function AppearancePage() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold">Themes</h2>
-              <p className="mt-1 text-sm text-zinc-500">المظهر يغيّر طريقة عرض نفس المنتجات والسلة والشراء.</p>
+              <p className="mt-1 text-sm text-zinc-500">{t.appearance.themesSubtitle}</p>
             </div>
             {store?.logo_url && <img src={store.logo_url} alt={store.name} className="h-12 w-12 rounded-xl object-cover" />}
           </div>
@@ -199,13 +199,13 @@ export default function AppearancePage() {
 
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-5 sm:p-7">
           <div>
-            <h2 className="text-xl font-bold">الألوان</h2>
-            <p className="mt-1 text-sm text-zinc-500">تعديلاتك تستبدل ألوان الثيم فقط، ولا تغيّر منطق المتجر.</p>
+            <h2 className="text-xl font-bold">{t.appearance.colorsTitle}</h2>
+            <p className="mt-1 text-sm text-zinc-500">{t.appearance.colorsSubtitle}</p>
           </div>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <ColorField label="Primary color" value={settings.primary_color} onChange={(value) => setSettings({ ...settings, primary_color: value })} />
-            <ColorField label="Accent color" value={settings.accent_color} onChange={(value) => setSettings({ ...settings, accent_color: value })} />
+            <ColorField label={t.appearance.primaryColor} value={settings.primary_color} onChange={(value) => setSettings({ ...settings, primary_color: value })} />
+            <ColorField label={t.appearance.accentColor} value={settings.accent_color} onChange={(value) => setSettings({ ...settings, accent_color: value })} />
           </div>
         </section>
 
@@ -213,7 +213,7 @@ export default function AppearancePage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-bold">Typography</h2>
-              <p className="mt-1 text-sm text-zinc-500">خطوط آمنة من النظام بدون تحميل أصول ثقيلة.</p>
+              <p className="mt-1 text-sm text-zinc-500">{t.appearance.typographySubtitle}</p>
             </div>
             {!canAdvancedCustomization && <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-bold text-zinc-600">🔒 Business</span>}
           </div>
@@ -227,7 +227,7 @@ export default function AppearancePage() {
                   type="button"
                   onClick={() => {
                     if (locked) {
-                      setMessage("تخصيص الخطوط متاح ضمن خطة Business.");
+                      setMessage(t.appearance.fontLockedError);
                       setMessageType("error");
                       return;
                     }
@@ -237,7 +237,7 @@ export default function AppearancePage() {
                   style={{ fontFamily: font.stack }}
                 >
                   <p className="font-bold">{font.name}</p>
-                  <p className="mt-2 text-sm text-zinc-500">نص تجريبي للمتجر</p>
+                  <p className="mt-2 text-sm text-zinc-500">{t.appearance.sampleText}</p>
                   {locked && <span className="mt-2 inline-block text-[10px] font-bold text-zinc-500">🔒 Business</span>}
                 </button>
               );
@@ -247,7 +247,7 @@ export default function AppearancePage() {
 
         <section className="mt-6 overflow-hidden rounded-3xl border border-zinc-200 bg-white">
           <div className="border-b border-zinc-100 p-5 sm:p-7">
-            <h2 className="text-xl font-bold">معاينة سريعة</h2>
+            <h2 className="text-xl font-bold">{t.appearance.previewTitle}</h2>
           </div>
           <div
             className="p-5 sm:p-8"
@@ -260,7 +260,7 @@ export default function AppearancePage() {
             <div className="mx-auto max-w-4xl">
               <div className="rounded-2xl p-6 text-white" style={{ background: settings.primary_color }}>
                 <p className="text-xs opacity-70">NEXORA STORE</p>
-                <h3 className="mt-2 text-3xl font-bold">{store?.name || "متجرك"}</h3>
+                <h3 className="mt-2 text-3xl font-bold">{store?.name || t.appearance.yourStore}</h3>
                 <div className="mt-5 h-2 w-24 rounded-full" style={{ background: settings.accent_color }} />
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -277,10 +277,10 @@ export default function AppearancePage() {
 
         <div className="sticky bottom-3 z-20 mt-6 flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white/95 p-3 shadow-lg backdrop-blur sm:flex-row sm:justify-end">
           <button type="button" onClick={reset} disabled={resetting || saving} className="rounded-xl border border-zinc-300 px-5 py-3 text-sm font-semibold text-zinc-700 disabled:opacity-50">
-            {resetting ? "جاري إعادة الضبط..." : "Reset to defaults"}
+            {resetting ? t.appearance.resetting : t.appearance.resetToDefaults}
           </button>
           <button type="button" onClick={save} disabled={saving || resetting} className="rounded-xl bg-zinc-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-50">
-            {saving ? "جاري الحفظ..." : "Save customization"}
+            {saving ? t.appearance.saving : t.appearance.saveCustomization}
           </button>
         </div>
       </div>
