@@ -14,7 +14,6 @@ type StoreDetail = {
   subscription: { plan_id: string; status: string; start_date: string | null; end_date: string | null } | null;
 };
 
-const statusLabel: Record<string, string> = { pending: "قيد الانتظار", active: "فعال", expired: "منتهي", cancelled: "ملغى" };
 
 async function authedFetch(path: string, init?: RequestInit) {
   const { data } = await supabase.auth.getSession();
@@ -41,7 +40,7 @@ export default function AdminStoreDetailPage() {
     const response = await authedFetch(`/api/admin/stores/${params.id}`);
     const data = await response.json();
     if (!response.ok) {
-      setMessage(data.error || "تعذر تحميل بيانات المتجر.");
+      setMessage(data.error || t.adminStoreDetail.loadError);
       setMessageType("error");
       setLoading(false);
       return;
@@ -77,7 +76,7 @@ export default function AdminStoreDetailPage() {
       return;
     }
 
-    setMessage("تم تحديث الاشتراك بنجاح.");
+    setMessage(t.adminStoreDetail.subscriptionUpdateSuccess);
     setMessageType("success");
     toast.success(t.feedback.adminActionSuccess);
     await load();
@@ -85,7 +84,7 @@ export default function AdminStoreDetailPage() {
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500">جاري التحميل...</main>;
+    return <main className="min-h-screen bg-zinc-50 p-6 text-center text-zinc-500">{t.adminStoreDetail.loading}</main>;
   }
 
   if (!detail) {
@@ -101,47 +100,47 @@ export default function AdminStoreDetailPage() {
   return (
     <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        <Link href="/admin/stores" className="text-sm text-zinc-500">→ كل المتاجر</Link>
+        <Link href="/admin/stores" className="text-sm text-zinc-500">{t.adminStoreDetail.allStores}</Link>
         <h1 className="mt-2 text-2xl font-bold text-zinc-900">{detail.store.name}</h1>
         <p className="text-sm text-zinc-400">/shop/{detail.store.slug}</p>
 
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">معلومات المتجر</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.adminStoreDetail.storeInfoTitle}</h2>
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div><dt className="text-xs text-zinc-400">المالك</dt><dd className="mt-1 text-sm">{detail.ownerEmail || "غير معروف"}</dd></div>
-            <div><dt className="text-xs text-zinc-400">تاريخ الإنشاء</dt><dd className="mt-1 text-sm">{new Date(detail.store.created_at).toLocaleDateString("fr-DZ")}</dd></div>
-            <div><dt className="text-xs text-zinc-400">مرئي في المتجر</dt><dd className="mt-1 text-sm">{detail.store.is_active ? "نعم" : "لا"}</dd></div>
+            <div><dt className="text-xs text-zinc-400">{t.adminStoreDetail.owner}</dt><dd className="mt-1 text-sm">{detail.ownerEmail || t.adminStoreDetail.unknown}</dd></div>
+            <div><dt className="text-xs text-zinc-400">{t.adminStoreDetail.createdAt}</dt><dd className="mt-1 text-sm">{new Date(detail.store.created_at).toLocaleDateString("fr-DZ")}</dd></div>
+            <div><dt className="text-xs text-zinc-400">{t.adminStoreDetail.visibleInStore}</dt><dd className="mt-1 text-sm">{detail.store.is_active ? t.adminStoreDetail.yes : t.adminStoreDetail.no}</dd></div>
           </dl>
         </section>
 
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-bold text-zinc-900">الاشتراك</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t.adminStoreDetail.subscriptionTitle}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div><dt className="text-xs text-zinc-400">الخطة الحالية</dt><dd className="mt-1 text-sm font-semibold">{sub ? PLAN_LABELS[sub.plan_id as PlanId] || sub.plan_id : "لا يوجد اشتراك"}</dd></div>
-            <div><dt className="text-xs text-zinc-400">الحالة</dt><dd className="mt-1 text-sm font-semibold">{sub ? statusLabel[sub.status] || sub.status : "—"}</dd></div>
+            <div><dt className="text-xs text-zinc-400">{t.adminStoreDetail.currentPlan}</dt><dd className="mt-1 text-sm font-semibold">{sub ? PLAN_LABELS[sub.plan_id as PlanId] || sub.plan_id : t.adminStoreDetail.noSubscription}</dd></div>
+            <div><dt className="text-xs text-zinc-400">{t.common.status}</dt><dd className="mt-1 text-sm font-semibold">{sub ? t.storeStatus[sub.status as keyof typeof t.storeStatus] || sub.status : "—"}</dd></div>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
             <button disabled={saving} onClick={() => updateSubscription({ status: "active" })}
-              className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">تفعيل</button>
+              className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">{t.adminStoreDetail.activate}</button>
             <button disabled={saving} onClick={() => updateSubscription({ status: "cancelled" })}
-              className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">تعطيل / إلغاء</button>
+              className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">{t.adminStoreDetail.deactivate}</button>
             <button disabled={saving} onClick={() => updateSubscription({ planId: sub?.plan_id === "starter" ? "business" : "starter" })}
               className="rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 disabled:opacity-50">
-              تغيير الخطة إلى {sub?.plan_id === "starter" ? "Business" : "Starter"}
+              {t.adminStoreDetail.changePlanTo} {sub?.plan_id === "starter" ? "Business" : "Starter"}
             </button>
           </div>
 
           <div className="mt-6 flex flex-wrap items-end gap-3">
             <div>
-              <label className="mb-2 block text-xs text-zinc-500">تمديد الاشتراك حتى</label>
+              <label className="mb-2 block text-xs text-zinc-500">{t.adminStoreDetail.extendUntil}</label>
               <input type="date" value={endDateInput} onChange={(e) => setEndDateInput(e.target.value)}
                 className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm" />
             </div>
             <button disabled={saving || !endDateInput}
               onClick={() => updateSubscription({ endDate: new Date(endDateInput).toISOString() })}
               className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
-              حفظ التاريخ
+              {t.adminStoreDetail.saveDate}
             </button>
           </div>
 
