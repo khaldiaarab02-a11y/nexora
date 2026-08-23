@@ -8,6 +8,7 @@ import ThemeStorefront, { type ThemeStorefrontProduct } from "@/components/store
 import { getTheme } from "@/themes/registry";
 import { resolveTheme } from "@/themes/utils";
 import type { ThemeId } from "@/themes/types";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Store = {
   id: string;
@@ -27,14 +28,15 @@ type ThemeSettings = {
 };
 
 type SortOption = "newest" | "priceLow" | "priceHigh" | "nameAsc";
-const sortLabel: Record<SortOption, string> = {
-  newest: "الأحدث",
-  priceLow: "السعر: من الأقل للأعلى",
-  priceHigh: "السعر: من الأعلى للأقل",
-  nameAsc: "الاسم أبجديًا",
-};
 
 export default function StorefrontPage() {
+  const { t } = useI18n();
+  const sortLabel: Record<SortOption, string> = {
+    newest: t.shopPage.sortNewest,
+    priceLow: t.shopPage.sortPriceLow,
+    priceHigh: t.shopPage.sortPriceHigh,
+    nameAsc: t.shopPage.sortNameAsc,
+  };
   const params = useParams<{ slug: string }>();
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -76,7 +78,7 @@ export default function StorefrontPage() {
         .maybeSingle();
 
       if (storeError || !storeData) {
-        setError("المتجر غير موجود أو غير متاح.");
+        setError(t.shopPage.storeNotFoundOrUnavailable);
         setLoading(false);
         return;
       }
@@ -166,7 +168,7 @@ export default function StorefrontPage() {
   }
 
   if (error || !store) {
-    return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><p className="text-sm font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p><h1 className="mt-4 text-2xl font-bold text-zinc-900">{error || "المتجر غير موجود"}</h1></div></main>;
+    return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><p className="text-sm font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p><h1 className="mt-4 text-2xl font-bold text-zinc-900">{error || t.shopPage.storeNotFound}</h1></div></main>;
   }
 
   const resolved = resolveTheme(themeSettings?.theme_id, themeSettings?.primary_color, themeSettings?.accent_color, themeSettings?.font);
