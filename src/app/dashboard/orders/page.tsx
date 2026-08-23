@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { orderStatuses, statusLabel, statusStyles, type OrderStatus } from "@/lib/orderStatus";
+import { orderStatuses, statusStyles, type OrderStatus } from "@/lib/orderStatus";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Order = {
   id: string;
@@ -19,14 +20,14 @@ type Order = {
 type SortOption = "newest" | "oldest" | "priceHigh" | "priceLow";
 type StatusFilter = "all" | OrderStatus;
 
-const sortLabel: Record<SortOption, string> = {
-  newest: "الأحدث",
-  oldest: "الأقدم",
-  priceHigh: "الأعلى سعرًا",
-  priceLow: "الأقل سعرًا",
-};
-
 export default function OrdersPage() {
+  const { t } = useI18n();
+  const sortLabel: Record<SortOption, string> = {
+    newest: t.ordersList.sortNewest,
+    oldest: t.ordersList.sortOldest,
+    priceHigh: t.ordersList.sortPriceHigh,
+    priceLow: t.ordersList.sortPriceLow,
+  };
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,7 +51,7 @@ export default function OrdersPage() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
-      setMessage("يجب تسجيل الدخول أولًا.");
+      setMessage(t.feedback.authRequired);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -65,7 +66,7 @@ export default function OrdersPage() {
       .maybeSingle();
 
     if (!membership) {
-      setMessage("لم يتم العثور على متجر مرتبط بهذا الحساب.");
+      setMessage(t.feedback.storeNotFoundForAccount);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -153,10 +154,10 @@ export default function OrdersPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400">Nexora</p>
-            <h1 className="mt-1 text-2xl font-bold text-zinc-900">الطلبات</h1>
+            <h1 className="mt-1 text-2xl font-bold text-zinc-900">{t.ordersList.title}</h1>
           </div>
           <Link href="/dashboard" className="text-sm font-medium text-zinc-500">
-            العودة للوحة التحكم
+            {t.ordersList.backToDashboard}
           </Link>
         </div>
       </header>
@@ -171,11 +172,11 @@ export default function OrdersPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard title="إجمالي الطلبات" value={stats.all} active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
+            <StatCard title={t.ordersList.statTotalOrders} value={stats.all} active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
             {orderStatuses.map((s) => (
               <StatCard
                 key={s}
-                title={statusLabel[s]}
+                title={t.orderStatus[s]}
                 value={stats[s]}
                 active={statusFilter === s}
                 onClick={() => setStatusFilter(s)}
@@ -190,7 +191,7 @@ export default function OrdersPage() {
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="ابحث برقم الطلب أو اسم العميل أو الهاتف..."
+            placeholder={t.ordersList.searchPlaceholder}
             className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm outline-none focus:border-zinc-900 sm:flex-1"
           />
           <div className="flex gap-3">
@@ -199,10 +200,10 @@ export default function OrdersPage() {
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none focus:border-zinc-900"
             >
-              <option value="all">كل الحالات</option>
+              <option value="all">{t.ordersList.filterAllStatuses}</option>
               {orderStatuses.map((s) => (
                 <option key={s} value={s}>
-                  {statusLabel[s]}
+                  {t.orderStatus[s]}
                 </option>
               ))}
             </select>
@@ -222,7 +223,7 @@ export default function OrdersPage() {
               disabled={refreshing || loading}
               className="rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 disabled:opacity-50"
             >
-              {refreshing ? "..." : "تحديث"}
+              {refreshing ? "..." : t.ordersList.refresh}
             </button>
           </div>
         </div>
@@ -239,25 +240,25 @@ export default function OrdersPage() {
             <div className="rounded-3xl border border-red-100 bg-red-50 p-6 text-center text-red-700">{message}</div>
           ) : orders.length === 0 ? (
             <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center">
-              <h2 className="text-2xl font-bold text-zinc-900">لا توجد طلبات حتى الآن</h2>
-              <p className="mt-2 text-sm text-zinc-500">ستظهر هنا الطلبات فور استلامها من صفحة المتجر.</p>
+              <h2 className="text-2xl font-bold text-zinc-900">{t.ordersList.noOrdersTitle}</h2>
+              <p className="mt-2 text-sm text-zinc-500">{t.ordersList.noOrdersSubtitle}</p>
             </div>
           ) : filteredOrders.length === 0 ? (
             <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center">
-              <h2 className="text-xl font-bold text-zinc-900">لم نجد أي طلب مطابق</h2>
-              <p className="mt-2 text-sm text-zinc-500">جرّب تعديل كلمة البحث أو الفلتر.</p>
+              <h2 className="text-xl font-bold text-zinc-900">{t.ordersList.noMatchTitle}</h2>
+              <p className="mt-2 text-sm text-zinc-500">{t.ordersList.noMatchSubtitle}</p>
               <button
                 onClick={clearFilters}
                 className="mt-5 inline-flex rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white"
               >
-                مسح الفلاتر
+                {t.ordersList.clearFilters}
               </button>
             </div>
           ) : (
             <>
               {hasActiveFilters && (
                 <p className="mb-3 text-xs text-zinc-400">
-                  {filteredOrders.length} من {orders.length} طلب
+                  {filteredOrders.length} {t.ordersList.of} {orders.length} {t.ordersList.orderWord}
                 </p>
               )}
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -270,7 +271,7 @@ export default function OrdersPage() {
                     <div className="flex items-start justify-between gap-3">
                       <span className="font-bold text-zinc-900">#{order.id.slice(0, 8)}</span>
                       <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[order.status as OrderStatus] || "bg-zinc-100 text-zinc-700"}`}>
-                        {statusLabel[order.status] || order.status}
+                        {t.orderStatus[order.status as keyof typeof t.orderStatus] || order.status}
                       </span>
                     </div>
                     <p className="mt-3 font-semibold text-zinc-900">{order.customer_name}</p>
