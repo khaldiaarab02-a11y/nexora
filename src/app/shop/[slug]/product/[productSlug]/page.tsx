@@ -8,6 +8,7 @@ import { addToCart } from "@/lib/cart";
 import ThemeProductDetail from "@/components/storefront/ThemeProductDetail";
 import { resolveTheme } from "@/themes/utils";
 import type { ThemeId } from "@/themes/types";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type Product = {
   id: string;
@@ -30,6 +31,7 @@ type ThemeSettings = { theme_id: ThemeId; primary_color: string; accent_color: s
 const SWIPE_THRESHOLD = 40;
 
 export default function ProductPage() {
+  const { t } = useI18n();
   const params = useParams<{ slug: string; productSlug: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [store, setStore] = useState<Store | null>(null);
@@ -47,14 +49,14 @@ export default function ProductPage() {
   useEffect(() => {
     async function load() {
       const { data: storeData } = await supabase.from("stores").select("id,name,slug").eq("slug", params.slug).eq("is_active", true).maybeSingle();
-      if (!storeData) { setError("المتجر غير موجود."); setLoading(false); return; }
+      if (!storeData) { setError(t.shopPage.storeNotFound); setLoading(false); return; }
 
       const { data, error: productError } = await supabase
         .from("products")
         .select("id,store_id,name,slug,description,price,compare_at_price,stock_quantity,is_active,image_url,sku")
         .eq("store_id", storeData.id).eq("slug", params.productSlug).eq("is_active", true).maybeSingle();
 
-      if (productError || !data) { setError("المنتج غير موجود."); setLoading(false); return; }
+      if (productError || !data) { setError(t.shopPage.productNotFound); setLoading(false); return; }
 
       const [{ data: imagesData }, { data: relatedData }, { data: settingsData }, { data: themeData }] = await Promise.all([
         supabase.from("product_images").select("image_url").eq("product_id", data.id).order("sort_order", { ascending: true }),
@@ -98,7 +100,7 @@ export default function ProductPage() {
 
   if (loading) return <main className="min-h-screen bg-zinc-50 p-6"><div className="mx-auto max-w-5xl animate-pulse"><div className="h-14 rounded-2xl bg-zinc-200" /><div className="mt-6 grid gap-0 overflow-hidden rounded-[2rem] bg-white md:grid-cols-2"><div className="aspect-square bg-zinc-200" /><div className="space-y-4 p-8"><div className="h-6 w-2/3 rounded bg-zinc-200" /><div className="h-4 w-full rounded bg-zinc-200" /><div className="h-10 w-1/3 rounded bg-zinc-200" /></div></div></div></main>;
 
-  if (error || !product || !store) return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><h1 className="text-2xl font-bold text-red-600">{error || "المنتج غير موجود."}</h1><Link href="/" className="mt-4 inline-block text-sm font-medium text-zinc-500">الرئيسية</Link></div></main>;
+  if (error || !product || !store) return <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8"><div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-10 text-center"><h1 className="text-2xl font-bold text-red-600">{error || t.shopPage.productNotFound}</h1><Link href="/" className="mt-4 inline-block text-sm font-medium text-zinc-500">{t.shopPage.home}</Link></div></main>;
 
   const resolved = resolveTheme(themeSettings?.theme_id, themeSettings?.primary_color, themeSettings?.accent_color, themeSettings?.font);
 
