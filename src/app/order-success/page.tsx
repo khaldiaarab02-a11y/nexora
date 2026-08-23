@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type OrderSummary = {
   orderId: string;
@@ -14,6 +15,7 @@ type OrderSummary = {
 };
 
 function SuccessContent() {
+  const { t } = useI18n();
   const params = useSearchParams();
   const order = params.get("order");
   const store = params.get("store");
@@ -42,14 +44,14 @@ function SuccessContent() {
     <div className="w-full max-w-lg rounded-[2rem] border border-zinc-200 bg-white p-8 text-center shadow-sm">
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-3xl">✓</div>
       <p className="mt-6 text-sm font-semibold tracking-[0.2em] text-zinc-400">NEXORA</p>
-      <h1 className="mt-3 text-3xl font-bold">تم استلام طلبك ❤️</h1>
+      <h1 className="mt-3 text-3xl font-bold">{t.orderSuccess.title}</h1>
       <p className="mt-3 leading-7 text-zinc-500">
-        شكرًا لك. تم تسجيل الطلب وسيتم التواصل معك لتأكيده.
+        {t.orderSuccess.subtitle}
       </p>
 
       {order && (
         <div className="mt-6 rounded-2xl bg-zinc-50 p-5 text-right">
-          <p className="text-center text-sm text-zinc-500">رقم الطلب</p>
+          <p className="text-center text-sm text-zinc-500">{t.orderSuccess.orderNumber}</p>
           <p className="text-center text-2xl font-bold">#{order.slice(0, 8)}</p>
 
           {summary && (
@@ -63,12 +65,12 @@ function SuccessContent() {
                 ))}
               </div>
               <div className="mt-4 space-y-2 border-t border-zinc-200 pt-4 text-sm">
-                <div className="flex justify-between"><span>المجموع الفرعي</span><span>{summary.subtotal.toLocaleString("fr-DZ")} {summary.currency}</span></div>
+                <div className="flex justify-between"><span>{t.orderSuccess.subtotal}</span><span>{summary.subtotal.toLocaleString("fr-DZ")} {summary.currency}</span></div>
                 <div className="flex justify-between">
-                  <span>التوصيل</span>
-                  <span>{summary.shippingFee === 0 ? "مجاني" : `${summary.shippingFee.toLocaleString("fr-DZ")} ${summary.currency}`}</span>
+                  <span>{t.orderSuccess.shipping}</span>
+                  <span>{summary.shippingFee === 0 ? t.orderSuccess.free : `${summary.shippingFee.toLocaleString("fr-DZ")} ${summary.currency}`}</span>
                 </div>
-                <div className="flex justify-between text-base font-bold"><span>الإجمالي</span><span>{summary.total.toLocaleString("fr-DZ")} {summary.currency}</span></div>
+                <div className="flex justify-between text-base font-bold"><span>{t.orderSuccess.total}</span><span>{summary.total.toLocaleString("fr-DZ")} {summary.currency}</span></div>
               </div>
             </>
           )}
@@ -78,10 +80,10 @@ function SuccessContent() {
       {store && (
         <div className="mt-6 space-y-3">
           <Link href={`/shop/${store}`} className="block rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white">
-            العودة إلى المتجر
+            {t.orderSuccess.backToStore}
           </Link>
           <Link href={`/shop/${store}`} className="block rounded-xl border border-zinc-300 px-4 py-3 font-medium text-zinc-700">
-            متابعة التسوق
+            {t.orderSuccess.continueShopping}
           </Link>
         </div>
       )}
@@ -90,11 +92,12 @@ function SuccessContent() {
 }
 
 export default function OrderSuccessPage() {
+  const { t } = useI18n();
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6">
       <Suspense fallback={
         <div className="w-full max-w-lg rounded-[2rem] border border-zinc-200 bg-white p-8 text-center text-zinc-500">
-          جاري تحميل تفاصيل الطلب...
+          {t.orderSuccess.loadingOrder}
         </div>
       }>
         <SuccessContent />
