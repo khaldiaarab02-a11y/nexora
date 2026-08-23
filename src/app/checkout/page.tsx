@@ -44,7 +44,7 @@ export default function CheckoutPage() {
     const storeSlug = items[0].storeSlug;
 
     if (items.some((item) => item.storeId !== storeId)) {
-      const msg = "السلة تحتوي منتجات من متاجر مختلفة. يُرجى إفراغ السلة والبدء من متجر واحد.";
+      const msg = t.checkout.mixedStoresError;
       setError(msg);
       toast.error(msg);
       setSubmitting(false);
@@ -108,9 +108,9 @@ export default function CheckoutPage() {
   if (!items.length) {
     return (
       <main className="min-h-screen bg-zinc-50 p-8 text-center">
-        <h1 className="text-2xl font-bold">السلة فارغة</h1>
-        <p className="mt-2 text-sm text-zinc-500">أضف منتجًا من المتجر أولًا لإتمام الطلب.</p>
-        <Link href="/" className="mt-4 inline-block text-zinc-500">العودة</Link>
+        <h1 className="text-2xl font-bold">{t.checkout.emptyTitle}</h1>
+        <p className="mt-2 text-sm text-zinc-500">{t.checkout.emptySubtitle}</p>
+        <Link href="/" className="mt-4 inline-block text-zinc-500">{t.checkout.back}</Link>
       </main>
     );
   }
@@ -119,25 +119,25 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-4xl px-5">
         <p className="text-xs font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p>
-        <h1 className="mt-2 text-3xl font-bold">إتمام الطلب</h1>
+        <h1 className="mt-2 text-3xl font-bold">{t.checkout.title}</h1>
 
         <form onSubmit={submitOrder} className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-xl font-bold">معلومات التوصيل</h2>
+            <h2 className="text-xl font-bold">{t.checkout.deliveryInfoTitle}</h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Field label="الاسم الكامل" required><input required className={input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
-              <Field label="رقم الهاتف" required><input required type="tel" className={input} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></Field>
-              <Field label="البريد الإلكتروني"><input type="email" className={input} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></Field>
-              <Field label="الولاية" required><input required className={input} value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value })} /></Field>
-              <Field label="البلدية"><input className={input} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} /></Field>
-              <Field label="العنوان" required><input required className={input} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></Field>
-              <div className="sm:col-span-2"><Field label="ملاحظات"><textarea className={`${input} min-h-24`} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field></div>
+              <Field label={t.checkout.fullName} required><input required className={input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
+              <Field label={t.checkout.phone} required><input required type="tel" className={input} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></Field>
+              <Field label={t.checkout.email}><input type="email" className={input} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></Field>
+              <Field label={t.checkout.wilaya} required><input required className={input} value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value })} /></Field>
+              <Field label={t.checkout.commune}><input className={input} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} /></Field>
+              <Field label={t.checkout.address} required><input required className={input} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></Field>
+              <div className="sm:col-span-2"><Field label={t.checkout.notes}><textarea className={`${input} min-h-24`} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field></div>
             </div>
             {error && <p className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
           </div>
 
           <aside className="h-fit rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-xl font-bold">ملخص الطلب</h2>
+            <h2 className="text-xl font-bold">{t.checkout.summaryTitle}</h2>
             <div className="mt-5 space-y-3 text-sm">
               {items.map((item) => (
                 <div key={item.productId} className="flex justify-between gap-3">
@@ -147,17 +147,17 @@ export default function CheckoutPage() {
               ))}
             </div>
             <div className="mt-5 space-y-3 border-t border-zinc-100 pt-5">
-              <div className="flex justify-between"><span>المجموع الفرعي</span><strong>{subtotal.toLocaleString("fr-DZ")} {currency}</strong></div>
+              <div className="flex justify-between"><span>{t.checkout.subtotal}</span><strong>{subtotal.toLocaleString("fr-DZ")} {currency}</strong></div>
               <div className="flex justify-between">
-                <span>التوصيل</span>
+                <span>{t.checkout.shipping}</span>
                 <strong className={freeShipping ? "text-emerald-600" : ""}>
-                  {freeShipping ? "مجاني" : `${shipping.toLocaleString("fr-DZ")} ${currency}`}
+                  {freeShipping ? t.checkout.free : `${shipping.toLocaleString("fr-DZ")} ${currency}`}
                 </strong>
               </div>
-              <div className="flex justify-between text-lg"><span>الإجمالي</span><strong>{total.toLocaleString("fr-DZ")} {currency}</strong></div>
+              <div className="flex justify-between text-lg"><span>{t.checkout.total}</span><strong>{total.toLocaleString("fr-DZ")} {currency}</strong></div>
             </div>
             <button disabled={submitting} className="mt-6 w-full rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white disabled:opacity-50">
-              {submitting ? "جاري إرسال الطلب..." : "تأكيد الطلب"}
+              {submitting ? t.checkout.submitting : t.checkout.confirmOrder}
             </button>
           </aside>
         </form>
