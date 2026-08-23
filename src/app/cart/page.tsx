@@ -10,6 +10,7 @@ import {
   updateCartQuantity,
   type CartItem,
 } from "@/lib/cart";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 type ProductRow = {
   id: string;
@@ -22,6 +23,7 @@ type ProductRow = {
 type ItemIssue = "removed_missing" | "removed_inactive" | "stock_reduced" | "price_changed";
 
 export default function CartPage() {
+  const { t } = useI18n();
   const [items, setItems] = useState<CartItem[]>([]);
   const [currency, setCurrency] = useState("DZD");
   const [checking, setChecking] = useState(true);
@@ -122,13 +124,13 @@ export default function CartPage() {
     if (issues.length === 0) return null;
     const parts: string[] = [];
     if (issues.includes("removed_missing") || issues.includes("removed_inactive")) {
-      parts.push("تم حذف منتج أو أكثر من سلتك لأنه لم يعد متاحًا.");
+      parts.push(t.cart.issueRemoved);
     }
     if (issues.includes("price_changed")) {
-      parts.push("تم تحديث سعر بعض المنتجات.");
+      parts.push(t.cart.issuePriceChanged);
     }
     if (issues.includes("stock_reduced")) {
-      parts.push("تم تعديل كمية بعض المنتجات بسبب نقص المخزون.");
+      parts.push(t.cart.issueStockReduced);
     }
     return parts.join(" ");
   })();
@@ -157,9 +159,9 @@ export default function CartPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold tracking-[0.25em] text-zinc-400">NEXORA</p>
-            <h1 className="mt-2 text-3xl font-bold">سلة المشتريات 🛒</h1>
+            <h1 className="mt-2 text-3xl font-bold">{t.cart.title}</h1>
           </div>
-          <Link href="/" className="text-sm text-zinc-500">الرئيسية</Link>
+          <Link href="/" className="text-sm text-zinc-500">{t.cart.home}</Link>
         </div>
 
         {issueMessage && (
@@ -170,20 +172,20 @@ export default function CartPage() {
 
         {items.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-zinc-200 bg-white p-12 text-center">
-            <h2 className="text-2xl font-bold">السلة فارغة</h2>
-            <p className="mt-2 text-zinc-500">أضف منتجًا أولًا من المتجر.</p>
+            <h2 className="text-2xl font-bold">{t.cart.emptyTitle}</h2>
+            <p className="mt-2 text-zinc-500">{t.cart.emptySubtitle}</p>
             <Link
               href="/"
               className="mt-6 inline-flex rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white"
             >
-              تصفّح المتاجر
+              {t.cart.browseStores}
             </Link>
           </div>
         ) : (
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="space-y-4">
               <Link href={continueShoppingHref} className="inline-block text-sm font-medium text-zinc-500">
-                ← متابعة التسوق
+                {t.cart.continueShopping}
               </Link>
               {items.map((item) => {
                 const isOutOfStock = outOfStockIds.includes(item.productId);
@@ -206,7 +208,7 @@ export default function CartPage() {
                       </p>
                       {isOutOfStock && (
                         <p className="mt-1 text-sm font-medium text-red-600">
-                          نفد المخزون — يرجى حذف المنتج للمتابعة
+                          {t.cart.outOfStockMsg}
                         </p>
                       )}
                       <div className="mt-4 flex items-center justify-between gap-3">
@@ -234,7 +236,7 @@ export default function CartPage() {
                             setOutOfStockIds((ids) => ids.filter((id) => id !== item.productId));
                           }}
                         >
-                          حذف
+                          {t.cart.remove}
                         </button>
                       </div>
                     </div>
@@ -244,25 +246,25 @@ export default function CartPage() {
             </div>
 
             <aside className="h-fit rounded-3xl border border-zinc-200 bg-white p-6">
-              <h2 className="text-xl font-bold">ملخص الطلب</h2>
+              <h2 className="text-xl font-bold">{t.cart.summaryTitle}</h2>
               <div className="mt-5 flex justify-between border-t border-zinc-100 pt-5">
-                <span className="text-zinc-500">المجموع الفرعي</span>
+                <span className="text-zinc-500">{t.cart.subtotalLabel}</span>
                 <strong>
                   {subtotal.toLocaleString("fr-DZ")} {currency}
                 </strong>
               </div>
-              <p className="mt-2 text-xs text-zinc-400">التوصيل يحسب في صفحة الطلب.</p>
+              <p className="mt-2 text-xs text-zinc-400">{t.cart.shippingNote}</p>
 
               {hasBlockingIssue ? (
                 <p className="mt-6 rounded-xl bg-red-50 p-3 text-center text-sm text-red-700">
-                  أزل المنتجات غير المتوفرة من السلة قبل المتابعة
+                  {t.cart.blockingIssueMsg}
                 </p>
               ) : (
                 <Link
                   href={items.length ? "/checkout" : "#"}
                   className="mt-6 block rounded-xl bg-zinc-900 px-4 py-3 text-center font-semibold text-white"
                 >
-                  متابعة الطلب
+                  {t.cart.continueToCheckout}
                 </Link>
               )}
             </aside>
