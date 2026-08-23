@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 export default function AccountPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
   const [emailConfirmed, setEmailConfirmed] = useState<boolean | null>(null);
@@ -47,32 +49,32 @@ export default function AccountPage() {
   return (
     <main className="min-h-screen bg-zinc-50 py-8">
       <div className="mx-auto max-w-lg px-4 sm:px-6">
-        <h1 className="text-2xl font-bold text-zinc-900">الحساب</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">{t.accountPage.title}</h1>
 
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6">
           {email ? (
             <>
               <div>
-                <p className="text-xs text-zinc-400">البريد الإلكتروني</p>
+                <p className="text-xs text-zinc-400">{t.accountPage.email}</p>
                 <p className="mt-1 break-all text-sm font-medium text-zinc-900">{email}</p>
               </div>
 
               {emailConfirmed !== null && (
                 <div className="mt-4">
-                  <p className="text-xs text-zinc-400">حالة الحساب</p>
+                  <p className="text-xs text-zinc-400">{t.accountPage.accountStatus}</p>
                   <span
                     className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
                       emailConfirmed ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
                     }`}
                   >
-                    {emailConfirmed ? "البريد مؤكَّد" : "بانتظار تأكيد البريد"}
+                    {emailConfirmed ? t.accountPage.emailConfirmed : t.accountPage.emailPending}
                   </span>
                 </div>
               )}
 
               {createdAt && (
                 <div className="mt-4">
-                  <p className="text-xs text-zinc-400">تاريخ إنشاء الحساب</p>
+                  <p className="text-xs text-zinc-400">{t.accountPage.createdAt}</p>
                   <p className="mt-1 text-sm text-zinc-700">
                     {new Date(createdAt).toLocaleDateString("fr-DZ", { year: "numeric", month: "short", day: "numeric" })}
                   </p>
@@ -80,7 +82,7 @@ export default function AccountPage() {
               )}
             </>
           ) : (
-            <p className="text-sm text-red-600">يجب تسجيل الدخول أولًا.</p>
+            <p className="text-sm text-red-600">{t.accountPage.notSignedIn}</p>
           )}
 
           <button
@@ -88,7 +90,7 @@ export default function AccountPage() {
             disabled={signingOut || !email}
             className="mt-6 w-full rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white disabled:opacity-50"
           >
-            {signingOut ? "جاري تسجيل الخروج..." : "تسجيل الخروج"}
+            {signingOut ? t.accountPage.signingOut : t.accountPage.signOut}
           </button>
         </section>
       </div>
