@@ -42,7 +42,6 @@ export default function Hero() {
       "
     >
       <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-
         <Link
           href="/"
           className="flex shrink-0 items-center"
@@ -90,7 +89,6 @@ export default function Hero() {
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-
           <ThemeToggle />
 
           <LanguageSwitcher />
@@ -142,7 +140,6 @@ export default function Hero() {
 
             <ArrowIcon />
           </Link>
-
         </div>
       </div>
     </header>
@@ -167,9 +164,19 @@ export function HeroSection() {
       />
 
       <div className="mx-auto max-w-7xl px-4 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
-
-        <div className="landing-hero-visual relative overflow-hidden rounded-[30px] border border-violet-100/80 bg-white shadow-[0_35px_100px_rgba(76,29,149,0.10)] sm:rounded-[38px]">
-
+        <div
+          className="
+            landing-hero-visual
+            relative overflow-hidden
+            rounded-[30px]
+            border border-violet-100/80
+            bg-white
+            shadow-[0_35px_100px_rgba(76,29,149,0.10)]
+            sm:rounded-[38px]
+            dark:border-zinc-800
+            dark:bg-zinc-950
+          "
+        >
           <Image
             src="/assets/landing/nexora-hero.png"
             alt={t.landing.previewDashboard}
@@ -180,32 +187,83 @@ export function HeroSection() {
             className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
           />
 
+          {/* Light/Dark readability overlay */}
           <div
-            className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-white/5 sm:via-white/90"
+            className="
+              absolute inset-0
+              bg-gradient-to-r
+              from-white
+              via-white/95
+              to-white/5
+              sm:via-white/90
+              dark:from-zinc-950/95
+              dark:via-zinc-950/70
+              dark:to-transparent
+              dark:sm:via-zinc-950/65
+            "
             aria-hidden="true"
           />
 
           <div className="relative z-10 flex min-h-[560px] items-center px-6 py-14 sm:min-h-[600px] sm:px-10 lg:min-h-[650px] lg:px-14">
-
             <div className="max-w-[500px]">
-
               <span className="landing-eyebrow">
                 {t.landing.platformLabel}
               </span>
 
-              <h1 className="mt-6 text-[43px] font-black leading-[0.98] tracking-[-0.06em] text-zinc-950 sm:text-[58px] lg:text-[72px]">
+              <h1
+                className="
+                  mt-6
+                  text-[43px]
+                  font-black
+                  leading-[0.98]
+                  tracking-[-0.06em]
+                  text-zinc-950
+                  dark:text-white
+                  sm:text-[58px]
+                  lg:text-[72px]
+                "
+              >
                 {t.landing.heroTitle}
               </h1>
 
-              <p className="mt-6 max-w-lg text-[15px] leading-7 text-zinc-600 sm:text-[17px] sm:leading-8">
+              <p
+                className="
+                  mt-6
+                  max-w-lg
+                  text-[15px]
+                  leading-7
+                  text-zinc-600
+                  dark:text-zinc-200
+                  sm:text-[17px]
+                  sm:leading-8
+                "
+              >
                 {t.landing.heroDescription}
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-
                 <Link
                   href="/auth?mode=signup"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-6 text-sm font-bold text-white shadow-[0_16px_36px_rgba(24,24,27,0.16)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
+                  className="
+                    inline-flex
+                    min-h-12
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-2xl
+                    bg-zinc-950
+                    px-6
+                    text-sm
+                    font-bold
+                    text-white
+                    shadow-[0_16px_36px_rgba(24,24,27,0.16)]
+                    transition
+                    hover:-translate-y-0.5
+                    hover:bg-zinc-800
+                    dark:bg-white
+                    dark:text-zinc-950
+                    dark:hover:bg-zinc-200
+                  "
                 >
                   {t.nav.createStore}
                   <ArrowIcon />
@@ -213,29 +271,69 @@ export function HeroSection() {
 
                 <a
                   href="#features"
-                  className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-zinc-200 bg-white/90 px-6 text-sm font-bold text-zinc-800 transition hover:border-zinc-300 hover:bg-white"
+                  className="
+                    inline-flex
+                    min-h-12
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    border
+                    border-zinc-200
+                    bg-white/90
+                    px-6
+                    text-sm
+                    font-bold
+                    text-zinc-800
+                    transition
+                    hover:border-zinc-300
+                    hover:bg-white
+                    dark:border-zinc-700
+                    dark:bg-zinc-900/80
+                    dark:text-white
+                    dark:hover:border-zinc-600
+                    dark:hover:bg-zinc-800
+                  "
                 >
                   {t.landing.explore}
                 </a>
-
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-xs font-medium text-zinc-500">
-                {[t.landing.trustOne, t.landing.trustTwo, t.landing.trustThree].map(
-                  (item) => (
+              <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-xs font-medium text-zinc-500 dark:text-zinc-300">
+                {[
+                  t.landing.trustOne,
+                  t.landing.trustTwo,
+                  t.landing.trustThree,
+                ].map((item) => (
+                  <span
+                    key={item}
+                    className="inline-flex items-center gap-2"
+                  >
                     <span
-                      key={item}
-                      className="inline-flex items-center gap-2"
+                      className="
+                        flex
+                        h-4
+                        w-4
+                        items-center
+                        justify-center
+                        rounded-full
+                        border
+                        border-violet-100
+                        bg-violet-50
+                        text-[9px]
+                        font-bold
+                        text-violet-600
+                        dark:border-violet-400/30
+                        dark:bg-violet-400/10
+                        dark:text-violet-300
+                      "
                     >
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full border border-violet-100 bg-violet-50 text-[9px] font-bold text-violet-600">
-                        ✓
-                      </span>
-                      {item}
+                      ✓
                     </span>
-                  )
-                )}
-              </div>
 
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -257,7 +355,6 @@ export function HeroSection() {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );
