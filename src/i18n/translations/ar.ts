@@ -106,6 +106,10 @@ export const ar = {
     saving: "جاري الحفظ...",
     sending: "جاري الإرسال...",
     deleting: "جاري الحذف...",
+    theme: "المظهر",
+    themeLight: "فاتح",
+    themeDark: "داكن",
+    themeSystem: "النظام",
   },
 
   plans: {
