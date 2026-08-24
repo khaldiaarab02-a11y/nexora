@@ -414,3 +414,151 @@ html[dir="rtl"] .landing-capability-item {
     transition: none;
   }
 }
+/* =========================================================
+   NEXORA LANDING — DARK MODE OVERRIDE
+   This applies ONLY to the landing page.
+   Storefront/dashboard/admin are untouched.
+   ========================================================= */
+
+.dark .landing-page {
+  background: #09090b !important;
+  color: #f4f4f5;
+}
+
+/* Force landing sections to follow the dark surface */
+.dark .landing-page section {
+  background-color: transparent;
+  color: #f4f4f5;
+}
+
+/* Tailwind white surfaces used by the landing page */
+.dark .landing-page [class~="bg-white"],
+.dark .landing-page [class~="bg-zinc-50"],
+.dark .landing-page [class~="bg-zinc-100"] {
+  background-color: #09090b !important;
+}
+
+/* Light gray surfaces */
+.dark .landing-page [class~="bg-gray-50"],
+.dark .landing-page [class~="bg-gray-100"] {
+  background-color: #111116 !important;
+}
+
+/* Main text colors */
+.dark .landing-page [class~="text-zinc-900"],
+.dark .landing-page [class~="text-zinc-800"],
+.dark .landing-page [class~="text-zinc-700"] {
+  color: #f4f4f5 !important;
+}
+
+/* Secondary text */
+.dark .landing-page [class~="text-zinc-600"],
+.dark .landing-page [class~="text-zinc-500"],
+.dark .landing-page [class~="text-zinc-400"] {
+  color: #a1a1aa !important;
+}
+
+/* Borders */
+.dark .landing-page [class~="border-zinc-200"],
+.dark .landing-page [class~="border-zinc-300"],
+.dark .landing-page [class~="border-gray-200"] {
+  border-color: #27272a !important;
+}
+
+/* Hero */
+.dark .landing-page .landing-image-frame {
+  background: #111116 !important;
+  border-color: #27272a !important;
+}
+
+/* Hero floating cards */
+.dark .landing-page .landing-float-card {
+  background: rgba(24, 24, 27, 0.92) !important;
+  border-color: #3f3f46 !important;
+  color: #f4f4f5 !important;
+}
+
+/* Capability strip */
+.dark .landing-page .landing-capability-strip {
+  background: #111116 !important;
+  border-color: #27272a !important;
+}
+
+.dark .landing-page .landing-capability-item {
+  background: transparent !important;
+}
+
+.dark .landing-page .landing-capability-item + .landing-capability-item {
+  border-color: #27272a !important;
+}
+
+/* Generic cards used by landing */
+.dark .landing-page [class*="rounded-"] {
+  border-color: #27272a;
+}
+
+/* Buttons that intentionally stay dark */
+.dark .landing-page button[class*="bg-zinc-900"],
+.dark .landing-page a[class*="bg-zinc-900"] {
+  background: #18181b !important;
+  color: #ffffff !important;
+}
+
+/* White buttons must become dark surfaces */
+.dark .landing-page button[class~="bg-white"],
+.dark .landing-page a[class~="bg-white"] {
+  background: #18181b !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+}
+
+/* Keep violet branding */
+.dark .landing-page .landing-kicker,
+.dark .landing-page .landing-eyebrow {
+  color: #a78bfa;
+}
+
+/* Violet badge */
+.dark .landing-page .landing-eyebrow {
+  background: rgba(139, 92, 246, 0.12) !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
+}
+
+/* Dark image section */
+.dark .landing-page .landing-dark-image {
+  background: #09090b;
+}
+
+/* Dividers */
+.dark .landing-page hr {
+  border-color: #27272a;
+}
+
+/* Footer inside landing */
+.dark .landing-page footer {
+  background: #050507 !important;
+  color: #f4f4f5;
+}
+
+/* Links */
+.dark .landing-page a {
+  color: inherit;
+}
+
+.dark .landing-page a:hover {
+  color: #a78bfa;
+}
+
+/* Inputs / controls if present */
+.dark .landing-page input,
+.dark .landing-page select,
+.dark .landing-page textarea {
+  background: #111116 !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+}
+
+.dark .landing-page input::placeholder,
+.dark .landing-page textarea::placeholder {
+  color: #71717a !important;
+}
