@@ -5,6 +5,45 @@
 :root {
   --background: #ffffff;
   --foreground: #09090b;
+
+  /* Nexora theme tokens (light) */
+  --nx-bg: #fafafa;
+  --nx-surface: #ffffff;
+  --nx-muted: #f4f4f5;
+  --nx-muted-strong: #e4e4e7;
+  --nx-border-subtle: #f4f4f5;
+  --nx-border: #e4e4e7;
+  --nx-border-strong: #d4d4d8;
+  --nx-fg: #09090b;
+  --nx-fg-secondary: #3f3f46;
+  --nx-fg-muted: #71717a;
+  --nx-fg-faint: #a1a1aa;
+  --nx-accent: #7c3aed;
+  --nx-accent-strong: #6d28d9;
+  --nx-accent-soft: #f5f3ff;
+}
+
+.dark {
+  --background: #0a0a0d;
+  --foreground: #f4f4f6;
+
+  /* Nexora theme tokens (dark) — deep charcoal surfaces, soft-gray type,
+     violet accents. Kept close in structure to the light tokens above so
+     components only ever read the token, never the raw color. */
+  --nx-bg: #08080b;
+  --nx-surface: #131318;
+  --nx-muted: #1b1b22;
+  --nx-muted-strong: #26262f;
+  --nx-border-subtle: #1e1e26;
+  --nx-border: #29293380;
+  --nx-border-strong: #383846;
+  --nx-fg: #f4f4f6;
+  --nx-fg-secondary: #d4d4dc;
+  --nx-fg-muted: #a0a0ac;
+  --nx-fg-faint: #6f6f7c;
+  --nx-accent: #a78bfa;
+  --nx-accent-strong: #c4b5fd;
+  --nx-accent-soft: #211b3d;
 }
 
 * {
@@ -21,7 +60,58 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
+
+/* ==================================================================
+   Dark mode compatibility layer
+   ------------------------------------------------------------------
+   The app is built with literal Tailwind zinc/white utility classes
+   (bg-white, text-zinc-900, border-zinc-200, ...) rather than semantic
+   tokens. Rather than introducing a second, competing theme system or
+   hand-editing every page, this single centralized layer remaps the
+   handful of neutral utilities actually used across the app to the
+   --nx-* tokens above whenever `.dark` is active on <html>. Anything
+   intentionally dark in light mode already (bg-zinc-900/950/black
+   buttons, the admin bar, etc.) is left alone on purpose so it keeps
+   working as a fixed "ink" brand color in both themes.
+   ================================================================== */
+.dark .bg-white { background-color: var(--nx-surface); }
+.dark .bg-zinc-50 { background-color: var(--nx-bg); }
+.dark .bg-zinc-100 { background-color: var(--nx-muted); }
+.dark .bg-zinc-200 { background-color: var(--nx-muted-strong); }
+
+.dark .text-zinc-950,
+.dark .text-zinc-900,
+.dark .text-black { color: var(--nx-fg); }
+.dark .text-zinc-800,
+.dark .text-zinc-700 { color: var(--nx-fg-secondary); }
+.dark .text-zinc-600,
+.dark .text-zinc-500 { color: var(--nx-fg-muted); }
+.dark .text-zinc-400,
+.dark .text-zinc-300 { color: var(--nx-fg-faint); }
+
+.dark .border-zinc-50,
+.dark .border-zinc-100 { border-color: var(--nx-border-subtle); }
+.dark .border-zinc-200 { border-color: var(--nx-border); }
+.dark .border-zinc-300,
+.dark .border-zinc-400 { border-color: var(--nx-border-strong); }
+
+.dark .hover\:bg-zinc-50:hover { background-color: var(--nx-muted); }
+.dark .hover\:bg-zinc-100:hover { background-color: var(--nx-muted-strong); }
+.dark .hover\:bg-white:hover { background-color: var(--nx-surface); }
+.dark .hover\:text-zinc-950:hover,
+.dark .hover\:text-zinc-900:hover { color: var(--nx-fg); }
+.dark .hover\:text-zinc-600:hover { color: var(--nx-fg-muted); }
+.dark .hover\:border-zinc-300:hover { border-color: var(--nx-border-strong); }
+.dark .focus\:border-zinc-900:focus { border-color: var(--nx-accent); }
+
+.dark .from-white { --tw-gradient-from: var(--nx-surface) var(--tw-gradient-from-position); }
+.dark .via-white { --tw-gradient-via: var(--nx-surface) var(--tw-gradient-via-position); }
+.dark .to-white { --tw-gradient-to: var(--nx-surface) var(--tw-gradient-to-position); }
+
+.dark img { filter: brightness(0.94) contrast(1.02); }
+.dark ::selection { background-color: var(--nx-accent-soft); color: var(--nx-fg); }
 
 
 /* Global language direction: LanguageProvider controls <html dir>. Legacy
