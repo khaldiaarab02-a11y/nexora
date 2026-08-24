@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import Logo from "@/components/shared/Logo";
 import { useI18n } from "@/i18n/LanguageProvider";
 
 type GuardStatus = "checking" | "unauthenticated" | "forbidden" | "ready";
@@ -101,12 +103,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div>
-      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-zinc-900">
+      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-zinc-900 dark:border-[var(--nx-border)]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-6">
-            <span className="text-sm font-bold text-white">
-              Nexora Admin
-            </span>
+            <Link href="/admin" className="flex shrink-0 items-center" aria-label="Nexora Admin">
+              <Logo variant="compact" height={20} background="dark" />
+              <span className="ms-2 rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-300">
+                Admin
+              </span>
+            </Link>
 
             <div className="hidden gap-1 md:flex">
               {links.map((link) => (
@@ -126,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Language */}
+            <ThemeToggle />
             <LanguageSwitcher />
 
             <button
