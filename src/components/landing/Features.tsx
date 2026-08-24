@@ -25,7 +25,7 @@ export default function Features() {
     {
       title: t.landing.featureAnalytics,
       description: t.landing.featureAnalyticsDescription,
-      icon: "/assets/landing/features/growth.png",
+      icon: "/assets/landing/features/analytics.png",
     },
     {
       title: t.landing.featureSubscriptions,
