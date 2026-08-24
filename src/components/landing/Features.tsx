@@ -1,33 +1,88 @@
 "use client";
+
+import Image from "next/image";
 import { useI18n } from "@/i18n/LanguageProvider";
 
 export default function Features() {
   const { t } = useI18n();
+
   const items = [
-    [t.landing.featureProducts, t.landing.featureProductsDescription],
-    [t.landing.featureOrders, t.landing.featureOrdersDescription],
-    [t.landing.featureThemes, t.landing.featureThemesDescription],
-    [t.landing.featureAnalytics, t.landing.featureAnalyticsDescription],
-    [t.landing.featureSubscriptions, t.landing.featureSubscriptionsDescription],
-    [t.landing.featureSupport, t.landing.featureSupportDescription],
+    {
+      title: t.landing.featureProducts,
+      description: t.landing.featureProductsDescription,
+      icon: "/assets/icons/shopping-bag.png",
+    },
+    {
+      title: t.landing.featureOrders,
+      description: t.landing.featureOrdersDescription,
+      icon: "/assets/icons/cart.png",
+    },
+    {
+      title: t.landing.featureThemes,
+      description: t.landing.featureThemesDescription,
+      icon: "/assets/icons/settings.png",
+    },
+    {
+      title: t.landing.featureAnalytics,
+      description: t.landing.featureAnalyticsDescription,
+      icon: "/assets/icons/analytics.png",
+    },
+    {
+      title: t.landing.featureSubscriptions,
+      description: t.landing.featureSubscriptionsDescription,
+      icon: "/assets/icons/star.png",
+    },
+    {
+      title: t.landing.featureSupport,
+      description: t.landing.featureSupportDescription,
+      icon: "/assets/icons/support-chat.png",
+    },
   ];
+
   return (
-    <section id="features" className="bg-[#fafafa]">
+    <section id="features" className="bg-[#fafafa] dark:bg-[var(--nx-bg)]">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="max-w-3xl">
           <p className="landing-kicker">{t.landing.featuresLabel}</p>
-          <h2 className="landing-heading mt-3 text-[40px] sm:text-[50px] lg:text-[60px]">{t.landing.featuresTitle}</h2>
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-zinc-600 sm:text-base sm:leading-8">{t.landing.featuresDescription}</p>
+
+          <h2 className="landing-heading mt-3 text-[40px] sm:text-[50px] lg:text-[60px]">
+            {t.landing.featuresTitle}
+          </h2>
+
+          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-zinc-600 dark:text-[var(--nx-fg-muted)] sm:text-base sm:leading-8">
+            {t.landing.featuresDescription}
+          </p>
         </div>
+
         <div className="landing-feature-grid mt-14 grid sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(([title, description], index) => (
-            <article key={title} className="landing-feature-item">
+          {items.map(({ title, description, icon }, index) => (
+            <article
+              key={title}
+              className="landing-feature-item"
+            >
               <div className="flex items-center justify-between">
-                <span className="landing-feature-icon"><span /></span>
-                <span className="text-[10px] font-bold tracking-[0.18em] text-zinc-300">0{index + 1}</span>
+                <div className="relative flex h-16 w-16 items-center justify-center">
+                  <Image
+                    src={icon}
+                    alt=""
+                    width={72}
+                    height={72}
+                    className="h-16 w-16 object-contain drop-shadow-[0_8px_16px_rgba(124,58,237,0.18)] transition-transform duration-300 hover:scale-110"
+                  />
+                </div>
+
+                <span className="text-[10px] font-bold tracking-[0.18em] text-zinc-300 dark:text-zinc-600">
+                  0{index + 1}
+                </span>
               </div>
-              <h3 className="mt-7 text-[16px] font-bold tracking-tight text-zinc-950">{title}</h3>
-              <p className="mt-2.5 max-w-sm text-sm leading-6 text-zinc-500">{description}</p>
+
+              <h3 className="mt-7 text-[16px] font-bold tracking-tight text-zinc-950 dark:text-[var(--nx-fg)]">
+                {title}
+              </h3>
+
+              <p className="mt-2.5 max-w-sm text-sm leading-6 text-zinc-500 dark:text-[var(--nx-fg-muted)]">
+                {description}
+              </p>
             </article>
           ))}
         </div>
