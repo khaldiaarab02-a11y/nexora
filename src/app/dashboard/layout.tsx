@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import Logo from "@/components/shared/Logo";
 import { useI18n } from "@/i18n/LanguageProvider";
 
 const ONBOARDING_PATH = "/dashboard/store/new";
@@ -127,13 +129,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div>
-      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
+      <nav className="sticky top-0 z-30 border-b border-zinc-200 bg-white dark:border-[var(--nx-border)] dark:bg-[var(--nx-surface)]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             href="/dashboard"
-            className="text-sm font-bold tracking-wide text-zinc-900"
+            className="flex shrink-0 items-center"
+            aria-label="Nexora"
           >
-            Nexora
+            <Logo variant="compact" height={22} />
           </Link>
 
           {/* Desktop */}
@@ -163,8 +166,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             )}
 
-            {/* Language */}
-            <div className="ms-1">
+            {/* Theme + Language */}
+            <div className="ms-1 flex items-center gap-1.5">
+              <ThemeToggle />
               <LanguageSwitcher />
             </div>
 
@@ -178,6 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Mobile */}
           <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
             <LanguageSwitcher />
 
             <button
