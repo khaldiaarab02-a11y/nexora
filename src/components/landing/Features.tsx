@@ -10,83 +10,98 @@ export default function Features() {
     {
       title: t.landing.featureProducts,
       description: t.landing.featureProductsDescription,
-      icon: "/assets/icons/shopping-bag.png",
+      icon: "/assets/landing/features/products-3d.png",
     },
     {
       title: t.landing.featureOrders,
       description: t.landing.featureOrdersDescription,
-      icon: "/assets/icons/cart.png",
+      icon: "/assets/landing/features/cart-3d.png",
     },
     {
       title: t.landing.featureThemes,
       description: t.landing.featureThemesDescription,
-      icon: "/assets/icons/settings.png",
+      icon: "/assets/landing/features/settings-3d.png",
     },
     {
       title: t.landing.featureAnalytics,
       description: t.landing.featureAnalyticsDescription,
-      icon: "/assets/icons/analytics.png",
+      icon: "/assets/landing/features/analytics-3d.png",
     },
     {
       title: t.landing.featureSubscriptions,
       description: t.landing.featureSubscriptionsDescription,
-      icon: "/assets/icons/star.png",
+      icon: "/assets/landing/features/star-3d.png",
     },
     {
       title: t.landing.featureSupport,
       description: t.landing.featureSupportDescription,
-      icon: "/assets/icons/support-chat.png",
+      icon: "/assets/landing/features/support-3d.png",
     },
   ];
 
   return (
     <section id="features" className="bg-[#fafafa] dark:bg-[var(--nx-bg)]">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+
         <div className="max-w-3xl">
-          <p className="landing-kicker">{t.landing.featuresLabel}</p>
+          <p className="landing-kicker">
+            {t.landing.featuresLabel}
+          </p>
 
           <h2 className="landing-heading mt-3 text-[40px] sm:text-[50px] lg:text-[60px]">
             {t.landing.featuresTitle}
           </h2>
 
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-zinc-600 dark:text-[var(--nx-fg-muted)] sm:text-base sm:leading-8">
+          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-zinc-600 dark:text-zinc-400 sm:text-base sm:leading-8">
             {t.landing.featuresDescription}
           </p>
         </div>
 
         <div className="landing-feature-grid mt-14 grid sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(({ title, description, icon }, index) => (
+          {items.map((item, index) => (
             <article
-              key={title}
+              key={item.title}
               className="landing-feature-item"
             >
               <div className="flex items-center justify-between">
-                <div className="relative flex h-16 w-16 items-center justify-center">
+
+                {/* 3D FEATURE ICON */}
+                <div className="relative flex h-14 w-14 items-center justify-center">
                   <Image
-                    src={icon}
+                    src={item.icon}
                     alt=""
-                    width={72}
-                    height={72}
-                    className="h-16 w-16 object-contain drop-shadow-[0_8px_16px_rgba(124,58,237,0.18)] transition-transform duration-300 hover:scale-110"
+                    width={64}
+                    height={64}
+                    className="
+                      h-14
+                      w-14
+                      object-contain
+                      drop-shadow-[0_8px_14px_rgba(124,58,237,0.22)]
+                      transition-transform
+                      duration-300
+                      hover:-translate-y-1
+                      hover:scale-110
+                    "
                   />
                 </div>
 
-                <span className="text-[10px] font-bold tracking-[0.18em] text-zinc-300 dark:text-zinc-600">
+                <span className="text-[10px] font-bold tracking-[0.18em] text-zinc-300 dark:text-zinc-700">
                   0{index + 1}
                 </span>
               </div>
 
-              <h3 className="mt-7 text-[16px] font-bold tracking-tight text-zinc-950 dark:text-[var(--nx-fg)]">
-                {title}
+              <h3 className="mt-7 text-[16px] font-bold tracking-tight text-zinc-950 dark:text-white">
+                {item.title}
               </h3>
 
-              <p className="mt-2.5 max-w-sm text-sm leading-6 text-zinc-500 dark:text-[var(--nx-fg-muted)]">
-                {description}
+              <p className="mt-2.5 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                {item.description}
               </p>
             </article>
           ))}
         </div>
+
       </div>
     </section>
   );
-}
+      }
