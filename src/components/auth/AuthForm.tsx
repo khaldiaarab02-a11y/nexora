@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import Logo from "@/components/shared/Logo";
 import { useI18n } from "@/i18n/LanguageProvider";
 import { useToast } from "@/components/ui/Toast";
 
@@ -146,8 +148,13 @@ export default function AuthForm() {
   return (
     <div className="w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm" dir={dir}>
       <div className="flex items-center justify-between">
-        <Link href="/" className="text-sm font-black">Nexora</Link>
-        <LanguageSwitcher />
+        <Link href="/" aria-label="Nexora">
+          <Logo variant="compact" height={22} />
+        </Link>
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
+          <LanguageSwitcher />
+        </div>
       </div>
 
       <div className="mt-8 text-center">
