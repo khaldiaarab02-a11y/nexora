@@ -10,37 +10,40 @@ export default function Features() {
     {
       title: t.landing.featureProducts,
       description: t.landing.featureProductsDescription,
-      icon: "/assets/landing/features/products-3d.png",
+      icon: "/assets/landing/features/shopping-bag.png",
     },
     {
       title: t.landing.featureOrders,
       description: t.landing.featureOrdersDescription,
-      icon: "/assets/landing/features/cart-3d.png",
+      icon: "/assets/landing/features/cart.png",
     },
     {
       title: t.landing.featureThemes,
       description: t.landing.featureThemesDescription,
-      icon: "/assets/landing/features/settings-3d.png",
+      icon: "/assets/landing/features/settings.png",
     },
     {
       title: t.landing.featureAnalytics,
       description: t.landing.featureAnalyticsDescription,
-      icon: "/assets/landing/features/analytics-3d.png",
+      icon: "/assets/landing/features/growth.png",
     },
     {
       title: t.landing.featureSubscriptions,
       description: t.landing.featureSubscriptionsDescription,
-      icon: "/assets/landing/features/star-3d.png",
+      icon: "/assets/landing/features/star.png",
     },
     {
       title: t.landing.featureSupport,
       description: t.landing.featureSupportDescription,
-      icon: "/assets/landing/features/support-3d.png",
+      icon: "/assets/landing/features/support-chat.png",
     },
   ];
 
   return (
-    <section id="features" className="bg-[#fafafa] dark:bg-[var(--nx-bg)]">
+    <section
+      id="features"
+      className="bg-[#fafafa] dark:bg-[var(--nx-bg)]"
+    >
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
 
         <div className="max-w-3xl">
@@ -65,8 +68,7 @@ export default function Features() {
             >
               <div className="flex items-center justify-between">
 
-                {/* 3D FEATURE ICON */}
-                <div className="relative flex h-14 w-14 items-center justify-center">
+                <div className="flex h-14 w-14 items-center justify-center">
                   <Image
                     src={item.icon}
                     alt=""
@@ -104,4 +106,4 @@ export default function Features() {
       </div>
     </section>
   );
-      }
+}
