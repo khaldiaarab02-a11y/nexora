@@ -27,7 +27,7 @@ export default function LanguageSwitcher() {
         "
       >
         <Image
-          src="/assets/landing/nexora-globe-3d.png"
+  src="/assets/icons/language-globe-3d.png"
           alt=""
           width={30}
           height={30}
