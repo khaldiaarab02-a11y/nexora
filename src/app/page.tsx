@@ -14,7 +14,7 @@ export default function LandingPage() {
   const { dir } = useI18n();
 
   return (
-    <main dir={dir} className="landing-page min-h-screen overflow-x-hidden bg-white text-zinc-950">
+    <main dir={dir} className="landing-page min-h-screen overflow-x-hidden bg-white text-zinc-950 dark:bg-[var(--nx-bg)]">
       <Hero />
       <HeroSection />
       <WhyNexora />

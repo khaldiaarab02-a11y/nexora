@@ -246,3 +246,75 @@ html[dir="rtl"] .landing-capability-item {
     border-top: 0;
   }
 }
+
+/* Dark mode — same structure/spacing, deep-charcoal surfaces + violet glow.
+   Scoped locally to this stylesheet since these are bespoke landing-page
+   classes, not Tailwind utilities (those are handled by the compatibility
+   layer in globals.css). */
+.dark .landing-heading {
+  color: var(--nx-fg);
+}
+
+.dark .landing-eyebrow {
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.12);
+  color: var(--nx-accent-strong);
+}
+
+.dark .landing-image-frame {
+  border-color: var(--nx-border);
+  background: var(--nx-surface);
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.55);
+}
+
+.dark .landing-float-card {
+  border-color: var(--nx-border);
+  background: rgba(19, 19, 24, 0.85);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.dark .landing-media-shell {
+  background: var(--nx-muted);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.dark .landing-dark-image {
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+}
+
+.dark .landing-capability-strip {
+  border-color: var(--nx-border);
+  background: rgba(19, 19, 24, 0.86);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.dark .landing-capability-number {
+  background: var(--nx-accent-soft);
+  color: var(--nx-accent);
+}
+
+.dark .landing-capability-item h2 {
+  color: var(--nx-fg);
+}
+
+.dark .landing-capability-item p {
+  color: var(--nx-fg-muted);
+}
+
+.dark .landing-capability-item + .landing-capability-item {
+  border-inline-start-color: var(--nx-border-subtle);
+}
+
+@media (max-width: 1023px) {
+  .dark .landing-capability-item:nth-child(3),
+  .dark .landing-capability-item:nth-child(4) {
+    border-top-color: var(--nx-border-subtle);
+  }
+}
+
+@media (max-width: 639px) {
+  .dark .landing-capability-item,
+  .dark .landing-capability-item + .landing-capability-item {
+    border-top-color: var(--nx-border-subtle);
+  }
+}
