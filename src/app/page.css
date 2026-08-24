@@ -318,3 +318,99 @@ html[dir="rtl"] .landing-capability-item {
     border-top-color: var(--nx-border-subtle);
   }
 }
+/* =========================================================
+   LANDING PAGE — DARK MODE COMPATIBILITY
+   Keeps the existing light design untouched and normalizes
+   Tailwind utility colors inside the landing page only.
+   ========================================================= */
+
+.dark .landing-page {
+  background-color: var(--nx-bg);
+  color: var(--nx-fg);
+}
+
+/* Backgrounds */
+.dark .landing-page .bg-white {
+  background-color: var(--nx-surface) !important;
+}
+
+.dark .landing-page .bg-zinc-50 {
+  background-color: var(--nx-bg) !important;
+}
+
+.dark .landing-page .bg-zinc-100 {
+  background-color: var(--nx-muted) !important;
+}
+
+/* Main text colors */
+.dark .landing-page .text-zinc-950,
+.dark .landing-page .text-zinc-900,
+.dark .landing-page .text-zinc-800 {
+  color: var(--nx-fg) !important;
+}
+
+/* Secondary text */
+.dark .landing-page .text-zinc-700,
+.dark .landing-page .text-zinc-600,
+.dark .landing-page .text-zinc-500,
+.dark .landing-page .text-zinc-400 {
+  color: var(--nx-fg-muted) !important;
+}
+
+/* Borders */
+.dark .landing-page .border-zinc-200,
+.dark .landing-page .border-zinc-300 {
+  border-color: var(--nx-border) !important;
+}
+
+/* Common neutral dividers */
+.dark .landing-page .divide-zinc-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--nx-border) !important;
+}
+
+/* Inputs / controls used by the landing page */
+.dark .landing-page input,
+.dark .landing-page select,
+.dark .landing-page textarea {
+  background-color: var(--nx-surface);
+  color: var(--nx-fg);
+  border-color: var(--nx-border);
+}
+
+.dark .landing-page input::placeholder,
+.dark .landing-page textarea::placeholder {
+  color: var(--nx-fg-muted);
+}
+
+/* White text remains white when explicitly intended */
+.dark .landing-page .text-white {
+  color: #ffffff !important;
+}
+
+/* Dark sections should remain deep charcoal rather than becoming
+   accidentally overridden by generic surface rules. */
+.dark .landing-page .bg-zinc-950 {
+  background-color: var(--nx-bg) !important;
+}
+
+/* Smooth theme transition for the landing surface */
+.landing-page,
+.landing-page section,
+.landing-page article,
+.landing-page nav,
+.landing-page footer {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page,
+  .landing-page section,
+  .landing-page article,
+  .landing-page nav,
+  .landing-page footer {
+    transition: none;
+  }
+}
