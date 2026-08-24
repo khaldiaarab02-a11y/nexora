@@ -3,15 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import Logo from "@/components/shared/Logo";
 import { useI18n } from "@/i18n/LanguageProvider";
-
-function LogoMark() {
-  return (
-    <span className="landing-logo-mark" aria-hidden="true">
-      <span className="landing-logo-dot" />
-    </span>
-  );
-}
 
 function ArrowIcon() {
   return (
@@ -25,11 +19,10 @@ export default function Hero() {
   const { t } = useI18n();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl dark:border-[var(--nx-border)] dark:bg-[var(--nx-surface)]/90">
       <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Nexora">
-          <LogoMark />
-          <span className="text-[19px] font-extrabold tracking-[-0.05em]">Nexora</span>
+        <Link href="/" className="flex shrink-0 items-center" aria-label="Nexora">
+          <Logo variant="compact" height={26} priority />
         </Link>
 
         <nav className="hidden items-center gap-7 text-[13px] font-medium text-zinc-500 lg:flex">
@@ -40,6 +33,7 @@ export default function Hero() {
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <ThemeToggle />
           <LanguageSwitcher />
           <Link href="/auth" className="hidden rounded-xl px-3 py-2.5 text-[13px] font-semibold text-zinc-700 transition hover:bg-zinc-100 sm:inline-flex">
             {t.nav.login}
