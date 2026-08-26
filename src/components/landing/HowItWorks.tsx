@@ -15,7 +15,7 @@ export default function HowItWorks() {
   {
     title: t.landing.step2,
     description: t.landing.step2Description,
-    icon: "/assets/landing/features/settings.png",
+    icon: "/assets/landing/features/storefront.png",
   },
   {
     title: t.landing.step3,
