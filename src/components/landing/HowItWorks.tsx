@@ -7,22 +7,22 @@ export default function HowItWorks() {
   const { t } = useI18n();
 
   const steps = [
-    {
-      title: t.landing.step1,
-      description: t.landing.step1Description,
-      icon: "/assets/landing/features/storefront.png",
-    },
-    {
-      title: t.landing.step2,
-      description: t.landing.step2Description,
-      icon: "/assets/landing/features/payment.png",
-    },
-    {
-      title: t.landing.step3,
-      description: t.landing.step3Description,
-      icon: "/assets/landing/features/analytics.png",
-    },
-  ];
+  {
+    title: t.landing.step1,
+    description: t.landing.step1Description,
+    icon: "/assets/landing/features/profile.png",
+  },
+  {
+    title: t.landing.step2,
+    description: t.landing.step2Description,
+    icon: "/assets/landing/features/settings.png",
+  },
+  {
+    title: t.landing.step3,
+    description: t.landing.step3Description,
+    icon: "/assets/landing/features/payment.png",
+  },
+];
 
   return (
     <section id="how" className="bg-white">
