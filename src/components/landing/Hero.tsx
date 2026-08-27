@@ -189,7 +189,10 @@ export function HeroSection() {
 
           {/* Light/Dark readability overlay */}
           <div
-  className="landing-hero-overlay absolute inset-0"
+  className="
+    hero-readability-overlay
+    absolute inset-0
+  "
   aria-hidden="true"
 />
 
