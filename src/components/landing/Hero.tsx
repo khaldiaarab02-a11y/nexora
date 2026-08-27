@@ -206,7 +206,6 @@ export function HeroSection() {
   className="
     landing-hero-title
     mt-6
-    whitespace-nowrap
     text-[25px]
     font-bold
     leading-tight
