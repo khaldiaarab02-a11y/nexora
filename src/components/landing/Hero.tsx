@@ -214,12 +214,13 @@ export function HeroSection() {
   className="
     landing-hero-title
     mt-6
-    text-[43px]
-    font-black
-    leading-[1.08]
-    tracking-[-0.04em]
-    sm:text-[58px]
-    lg:text-[72px]
+    whitespace-nowrap
+    text-[25px]
+    font-bold
+    leading-tight
+    tracking-[-0.035em]
+    sm:text-[42px]
+    lg:text-[54px]
   "
 >
   {t.landing.heroTitle}
