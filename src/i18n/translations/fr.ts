@@ -618,7 +618,7 @@ export const fr = {
   },
   landing: {
     platformLabel: "Plateforme e-commerce tout-en-un",
-    heroTitle: "Lancez votre boutique. Vendez avec confiance. Grandissez sereinement.",
+    heroTitle: "Créez votre boutique en quelques minutes et commencez à vendre",
     heroDescription: "Tout ce qu’il vous faut pour créer une vitrine élégante, gérer vos produits et commandes et développer votre marque depuis une seule plateforme connectée.",
     storeStatus: "Active",
     explore: "Découvrir Nexora",
