@@ -29,6 +29,7 @@ export const ar = {
   },
 
   adminNav: {
+    paymentSettings: "إعدادات الدفع",
     home: "الرئيسية",
     stores: "المتاجر",
     subscriptions: "الاشتراكات",
@@ -89,6 +90,7 @@ export const ar = {
     confirmingAccount: "جاري تأكيد الحساب...",
   },
 
+  notifications: { title: "الإشعارات", markAllRead: "تحديد الكل كمقروء", empty: "لا توجد إشعارات جديدة." },
   common: {
     status: "الحالة",
     language: "اللغة",
@@ -145,6 +147,7 @@ export const ar = {
   },
 
   feedback: {
+    paymentSettingsSaveSuccess: "تم حفظ إعدادات الدفع بنجاح.",
     sessionExpired: "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
     genericError: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     supportSentSuccess: "تم إرسال طلب الدعم بنجاح.",
@@ -470,6 +473,9 @@ export const ar = {
     rejectionReasonPlaceholder: "سبب الرفض، مطلوب عند الرفض",
   },
 
+  adminPaymentSettings: {
+    title: "إعدادات الدفع", subtitle: "إدارة معلومات الدفع التي تظهر للتجار.", ccpAccount: "رقم حساب CCP", accountHolder: "اسم صاحب الحساب", paymentMethods: "طرق الدفع المقبولة", instructions: "تعليمات وشروط الدفع", ccpPlaceholder: "مثال: 12345678 clé 00", instructionsPlaceholder: "تعليمات وشروط الدفع..."
+  },
   adminHome: {
     title: "لوحة تحكم Nexora",
     subtitle: "نظرة عامة على المتاجر والاشتراكات.",
@@ -686,6 +692,12 @@ export const ar = {
   },
 
   subscription: {
+    paymentInfoTitle: "معلومات الدفع",
+    ccpAccountLabel: "حساب CCP",
+    accountHolderLabel: "صاحب الحساب",
+    paymentMethodsLabel: "طرق الدفع",
+    paymentInstructionsLabel: "تعليمات وشروط الدفع",
+
     title: "الاشتراك",
     subtitle: "اختر الخطة ثم أرسلي إثبات الدفع للمراجعة.",
     back: "العودة",

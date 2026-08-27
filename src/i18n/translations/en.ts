@@ -1,14 +1,17 @@
 export const en = {
   nav: { home: "Home", about: "About", features: "Features", plans: "Pricing", login: "Sign in", createStore: "Create your store", dashboard: "Dashboard", support: "Support", subscription: "Subscription", appearance: "Appearance", logout: "Log out" },
   dashboardNav: { home: "Home", orders: "Orders", products: "Products", storeSettings: "Store settings", appearance: "Appearance", subscription: "Subscription", support: "Support", account: "Account", viewStore: "View store", logout: "Log out", menu: "Menu", checkingSession: "Checking your session..." },
-  adminNav: { home: "Home", stores: "Stores", subscriptions: "Subscriptions", support: "Support", logout: "Log out", checkingSession: "Checking your session...", forbiddenTitle: "You don't have access", forbiddenText: "This panel is for the Nexora team only.", goToDashboard: "Go to my store dashboard" },
+  adminNav: {
+    paymentSettings: "Payment settings", home: "Home", stores: "Stores", subscriptions: "Subscriptions", support: "Support", logout: "Log out", checkingSession: "Checking your session...", forbiddenTitle: "You don't have access", forbiddenText: "This panel is for the Nexora team only.", goToDashboard: "Go to my store dashboard" },
   orderStatus: { pending: "Pending", confirmed: "Confirmed", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled" },
   storeStatus: { pending: "Pending", active: "Active", expired: "Expired", cancelled: "Cancelled" },
   auth: { passwordResetIntro: "Enter your account email and we will send you a recovery link.", passwordResetInvalidLink: "The reset link is invalid or expired. Please request a new one.",  login: "Log in", signup: "Create account", email: "Email address", password: "Password", confirm: "Confirm password", forgot: "Forgot password?", resend: "Resend verification email", verifyTitle: "Verify your email", verifyText: "Check your inbox to confirm your Nexora account.", continue: "Continue", reset: "Reset password", newPassword: "New password", success: "Done", loginSubtitle: "Access your store dashboard.", signupSubtitle: "Create your account and start your store journey.", passwordMismatch: "The passwords do not match.", invalidCredentials: "Incorrect email or password.", emailNotConfirmed: "Please confirm your email first. Check your inbox.", alreadyRegistered: "This email is already registered. Sign in instead of creating a new account.", passwordTooShort: "Password is too short. Use at least 6 characters.", invalidEmailFormat: "Invalid email format.", networkError: "Unable to connect to the server. Check your internet connection and try again.", verifyAfterLoginError: "Unable to verify the account after signing in. Please try again.", emailConfirmedRedirecting: "Email confirmed. Redirecting...", resendSuccess: "Verification email resent.", sending: "Sending...", backToLogin: "Back to sign in", confirmingAccount: "Confirming your account..." },
+  notifications: { title: "Notifications", markAllRead: "Mark all as read", empty: "No notifications yet." },
   common: { status: "Status", language: "Language", loading: "Loading...", error: "Something went wrong.", save: "Save", back: "Back", submit: "Submit", pending: "Pending", active: "Active", rejected: "Rejected", resolved: "Resolved", open: "Open", close: "Close", saving: "Saving...", sending: "Sending...", deleting: "Deleting...", theme: "Theme", themeLight: "Light", themeDark: "Dark", themeSystem: "System" },
   plans: { title: "Choose your plan", starter: "Starter", business: "Business", choose: "Choose plan", current: "Current plan" },
   support: { title: "Support", new: "New request", subject: "Subject", message: "Message", category: "Category", reply: "Reply", send: "Send", technical: "Technical issue", store: "Store issue", subscription: "Subscription", payment: "Payment", general: "General question", newPlaceholder: "Subject", messagePlaceholder: "Write your message", myConversations: "My conversations", noConversations: "No conversations yet.", loading: "Loading...", conversationNotFound: "Conversation not found.", backToSupport: "← Support", replyPlaceholder: "Write a reply...", merchantSupportTitle: "Merchant support" },
   feedback: {
+    paymentSettingsSaveSuccess: "Payment settings saved successfully.",
     sessionExpired: "Your session has expired. Please sign in again.",
     genericError: "Something went wrong. Please try again.",
     supportSentSuccess: "Your support request was sent successfully.",
@@ -314,6 +317,9 @@ export const en = {
     rejectRequest: "Reject request",
     rejectionReasonPlaceholder: "Rejection reason, required when rejecting",
   },
+  adminPaymentSettings: {
+    title: "Payment settings", subtitle: "Manage the payment information shown to merchants.", ccpAccount: "CCP account number", accountHolder: "Account holder", paymentMethods: "Accepted payment methods", instructions: "Payment instructions and terms", ccpPlaceholder: "Example: 12345678 key 00", instructionsPlaceholder: "Payment instructions and terms..."
+  },
   adminHome: {
     title: "Nexora dashboard",
     subtitle: "Overview of stores and subscriptions.",
@@ -518,6 +524,12 @@ export const en = {
     orderStatusBreakdownTitle: "Order status",
   },
   subscription: {
+    paymentInfoTitle: "Payment information",
+    ccpAccountLabel: "CCP account",
+    accountHolderLabel: "Account holder",
+    paymentMethodsLabel: "Payment methods",
+    paymentInstructionsLabel: "Payment instructions and terms",
+
     title: "Subscription",
     subtitle: "Choose a plan, then submit your payment proof for review.",
     back: "Back",

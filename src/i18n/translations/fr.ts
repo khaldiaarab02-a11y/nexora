@@ -1,14 +1,17 @@
 export const fr = {
   nav: { home: "Accueil", about: "À propos", features: "Fonctionnalités", plans: "Tarifs", login: "Connexion", createStore: "Créer votre boutique", dashboard: "Tableau de bord", support: "Support", subscription: "Abonnement", appearance: "Apparence", logout: "Se déconnecter" },
   dashboardNav: { home: "Accueil", orders: "Commandes", products: "Produits", storeSettings: "Paramètres de la boutique", appearance: "Apparence", subscription: "Abonnement", support: "Support", account: "Compte", viewStore: "Voir la boutique", logout: "Se déconnecter", menu: "Menu", checkingSession: "Vérification de votre session..." },
-  adminNav: { home: "Accueil", stores: "Boutiques", subscriptions: "Abonnements", support: "Support", logout: "Se déconnecter", checkingSession: "Vérification de votre session...", forbiddenTitle: "Vous n'avez pas accès", forbiddenText: "Ce panneau est réservé à l'équipe Nexora.", goToDashboard: "Aller au tableau de bord de ma boutique" },
+  adminNav: {
+    paymentSettings: "Paramètres de paiement", home: "Accueil", stores: "Boutiques", subscriptions: "Abonnements", support: "Support", logout: "Se déconnecter", checkingSession: "Vérification de votre session...", forbiddenTitle: "Vous n'avez pas accès", forbiddenText: "Ce panneau est réservé à l'équipe Nexora.", goToDashboard: "Aller au tableau de bord de ma boutique" },
   orderStatus: { pending: "En attente", confirmed: "Confirmée", shipped: "Expédiée", delivered: "Livrée", cancelled: "Annulée" },
   storeStatus: { pending: "En attente", active: "Actif", expired: "Expiré", cancelled: "Annulé" },
   auth: { passwordResetIntro: "Saisissez l’e-mail de votre compte et nous vous enverrons un lien de récupération.", passwordResetInvalidLink: "Le lien de réinitialisation est invalide ou expiré. Veuillez en demander un nouveau.",  login: "Connexion", signup: "Créer un compte", email: "Adresse e-mail", password: "Mot de passe", confirm: "Confirmer le mot de passe", forgot: "Mot de passe oublié ?", resend: "Renvoyer l’e-mail de vérification", verifyTitle: "Vérifiez votre e-mail", verifyText: "Consultez votre boîte de réception pour confirmer votre compte Nexora.", continue: "Continuer", reset: "Réinitialiser le mot de passe", newPassword: "Nouveau mot de passe", success: "Terminé", loginSubtitle: "Accédez au tableau de bord de votre boutique.", signupSubtitle: "Créez votre compte et démarrez l'aventure de votre boutique.", passwordMismatch: "Les mots de passe ne correspondent pas.", invalidCredentials: "E-mail ou mot de passe incorrect.", emailNotConfirmed: "Veuillez d'abord confirmer votre e-mail. Consultez votre boîte de réception.", alreadyRegistered: "Cet e-mail est déjà enregistré. Connectez-vous au lieu de créer un nouveau compte.", passwordTooShort: "Le mot de passe est trop court. Utilisez au moins 6 caractères.", invalidEmailFormat: "Format d'e-mail invalide.", networkError: "Impossible de se connecter au serveur. Vérifiez votre connexion internet et réessayez.", verifyAfterLoginError: "Impossible de vérifier le compte après la connexion. Veuillez réessayer.", emailConfirmedRedirecting: "E-mail confirmé. Redirection...", resendSuccess: "E-mail de vérification renvoyé.", sending: "Envoi en cours...", backToLogin: "Retour à la connexion", confirmingAccount: "Confirmation de votre compte..." },
+  notifications: { title: "Notifications", markAllRead: "Tout marquer comme lu", empty: "Aucune notification pour le moment." },
   common: { status: "Statut", language: "Langue", loading: "Chargement...", error: "Une erreur est survenue.", save: "Enregistrer", back: "Retour", submit: "Envoyer", pending: "En attente", active: "Actif", rejected: "Refusé", resolved: "Résolu", open: "Ouvert", close: "Fermer", saving: "Enregistrement...", sending: "Envoi en cours...", deleting: "Suppression...", theme: "Thème", themeLight: "Clair", themeDark: "Sombre", themeSystem: "Système" },
   plans: { title: "Choisissez votre plan", starter: "Starter", business: "Business", choose: "Choisir", current: "Plan actuel" },
   support: { title: "Support", new: "Nouvelle demande", subject: "Sujet", message: "Message", category: "Catégorie", reply: "Répondre", send: "Envoyer", technical: "Problème technique", store: "Problème boutique", subscription: "Abonnement", payment: "Paiement", general: "Question générale", newPlaceholder: "Objet", messagePlaceholder: "Écrivez votre message", myConversations: "Mes conversations", noConversations: "Aucune conversation pour le moment.", loading: "Chargement...", conversationNotFound: "Conversation introuvable.", backToSupport: "← Support", replyPlaceholder: "Écrivez une réponse...", merchantSupportTitle: "Support des marchands" },
   feedback: {
+    paymentSettingsSaveSuccess: "Paramètres de paiement enregistrés avec succès.",
     sessionExpired: "Votre session a expiré. Veuillez vous reconnecter.",
     genericError: "Une erreur est survenue. Veuillez réessayer.",
     supportSentSuccess: "Votre demande d’assistance a été envoyée avec succès.",
@@ -314,6 +317,9 @@ export const fr = {
     rejectRequest: "Rejeter la demande",
     rejectionReasonPlaceholder: "Motif du refus, requis en cas de rejet",
   },
+  adminPaymentSettings: {
+    title: "Paramètres de paiement", subtitle: "Gérez les informations de paiement affichées aux marchands.", ccpAccount: "Numéro de compte CCP", accountHolder: "Titulaire du compte", paymentMethods: "Modes de paiement acceptés", instructions: "Instructions et conditions de paiement", ccpPlaceholder: "Exemple : 12345678 clé 00", instructionsPlaceholder: "Instructions et conditions de paiement..."
+  },
   adminHome: {
     title: "Tableau de bord Nexora",
     subtitle: "Aperçu des boutiques et des abonnements.",
@@ -518,6 +524,12 @@ export const fr = {
     orderStatusBreakdownTitle: "Statut des commandes",
   },
   subscription: {
+    paymentInfoTitle: "Informations de paiement",
+    ccpAccountLabel: "Compte CCP",
+    accountHolderLabel: "Titulaire du compte",
+    paymentMethodsLabel: "Modes de paiement",
+    paymentInstructionsLabel: "Instructions et conditions de paiement",
+
     title: "Abonnement",
     subtitle: "Choisissez un plan, puis envoyez votre justificatif de paiement pour vérification.",
     back: "Retour",
