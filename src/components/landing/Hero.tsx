@@ -211,20 +211,19 @@ export function HeroSection() {
               </span>
 
               <h1
-                className="
-                  mt-6
-                  text-[43px]
-                  font-black
-                  leading-[0.98]
-                  tracking-[-0.06em]
-                  text-zinc-950
-                  dark:text-white
-                  sm:text-[58px]
-                  lg:text-[72px]
-                "
-              >
-                {t.landing.heroTitle}
-              </h1>
+  className="
+    landing-hero-title
+    mt-6
+    text-[43px]
+    font-black
+    leading-[1.08]
+    tracking-[-0.04em]
+    sm:text-[58px]
+    lg:text-[72px]
+  "
+>
+  {t.landing.heroTitle}
+</h1>
 
               <p
                 className="
