@@ -189,20 +189,9 @@ export function HeroSection() {
 
           {/* Light/Dark readability overlay */}
           <div
-            className="
-              absolute inset-0
-              bg-gradient-to-r
-              from-white
-              via-white/95
-              to-white/5
-              sm:via-white/90
-              dark:from-zinc-950/95
-              dark:via-zinc-950/70
-              dark:to-transparent
-              dark:sm:via-zinc-950/65
-            "
-            aria-hidden="true"
-          />
+  className="landing-hero-overlay absolute inset-0"
+  aria-hidden="true"
+/>
 
           <div className="relative z-10 flex min-h-[560px] items-center px-6 py-14 sm:min-h-[600px] sm:px-10 lg:min-h-[650px] lg:px-14">
             <div className="max-w-[500px]">
