@@ -1,1 +1,2 @@
-
+import {NextResponse} from "next/server";import {getBearerUser,serviceClient} from "@/lib/server/auth";
+export async function GET(request:Request){try{const u=await getBearerUser(request);if(!u)return NextResponse.json({error:"Unauthorized"},{status:401});const {data,error}=await serviceClient().from("platform_payment_settings").select("ccp_account,account_holder,payment_methods,instructions,updated_at").eq("id",true).maybeSingle();if(error)throw new Error(error.message);return NextResponse.json({settings:data||null});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Failed"},{status:500});}}
