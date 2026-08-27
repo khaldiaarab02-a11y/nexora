@@ -172,3 +172,47 @@ input, textarea, select { text-align: start; }
     drop-shadow(0 5px 16px rgba(167, 139, 250, 0.22))
     drop-shadow(0 0 30px rgba(167, 139, 250, 0.10));
 }
+/* Nexora Hero Title */
+.landing-hero-title {
+  background: linear-gradient(
+    110deg,
+    #6d28d9 0%,
+    #8b5cf6 22%,
+    #c084fc 45%,
+    #7c3aed 68%,
+    #a855f7 82%,
+    #6d28d9 100%
+  );
+
+  background-size: 240% 240%;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  filter:
+    drop-shadow(0 4px 12px rgba(124, 58, 237, 0.16))
+    drop-shadow(0 0 24px rgba(168, 85, 247, 0.08));
+
+  animation: nexora-violet-flow 8s ease-in-out infinite;
+}
+
+@keyframes nexora-violet-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.dark .landing-hero-title {
+  filter:
+    drop-shadow(0 5px 16px rgba(167, 139, 250, 0.22))
+    drop-shadow(0 0 30px rgba(167, 139, 250, 0.10));
+}
